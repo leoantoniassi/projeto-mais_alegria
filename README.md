@@ -73,17 +73,23 @@ Para o desenvolvimento deste projeto, serão utilizadas as seguintes tecnologias
 
 ## 4. Modelo do Banco de Dados Relacional
 
-O banco de dados do projeto será estruturado utilizando um **Banco de Dados Relacional** (como PostgreSQL ou MySQL), garantindo a integridade referencial dos dados e permitindo o cruzamento de informações entre clientes, eventos e funcionários de forma robusta.
+O banco de dados do projeto será estruturado utilizando um **Banco de Dados Relacional** (como PostgreSQL ou MySQL), garantindo a integridade referencial dos dados e permitindo o cruzamento de informações entre clientes, eventos, funcionários, financeiro e suprimentos de forma robusta.
 
 > **Clientes:** Armazena os dados pessoais e de contato (Nome, E-mail, RG/CPF, Telefone).
 
 > **Funcionários:** Armazena os dados da equipe e a função exercida (Recreador, Garçom, etc.).
 
-> **Eventos:** Registra os detalhes das festas/eventos, possuindo uma chave estrangeira (Foreign Key) que o vincula a um Cliente.
+> **Orçamentos:** Registra as propostas financeiras geradas para os clientes, contendo valores, data de validade, status (pendente, aprovado, reprovado) e uma chave estrangeira que o vincula ao Cliente.
+
+> **Eventos:** Registra os detalhes das festas/eventos, possuindo uma chave estrangeira (Foreign Key) que o vincula a um Cliente e, opcionalmente, ao Orçamento que originou aquele evento.
+
+> **Produtos (Estoque):** Armazena o inventário de itens disponíveis (alimentos, bebidas, descartáveis, etc.), registrando nome, categoria, quantidade em estoque, unidade de medida e custo.
 
 > **Documentos:** Armazena o caminho/URL do arquivo (ex: PDF de contrato), referenciando a qual Cliente ou Evento ele pertence.
 
 > **Escala (Evento_Funcionario):** Tabela intermediária (N:M) para registrar quais funcionários estão alocados em quais eventos.
+
+> **Itens_Consumo (Evento_Produto / Orcamento_Produto):** Tabelas intermediárias (N:M) necessárias para registrar quais produtos do estoque e em quais quantidades foram listados em um orçamento ou serão consumidos em um evento específico.
 
 ![Diagrama do Banco de Dados Relacional](img/BancoRelacional.png)
 
@@ -182,7 +188,6 @@ O design do **Projeto Mais Alegria** deve transmitir profissionalismo sem perder
 ---
 
 ## 10. Protótipo
-
 
 ---
 
