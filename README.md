@@ -73,7 +73,7 @@ Para o desenvolvimento deste projeto, serão utilizadas as seguintes tecnologias
 
 ## 4. Modelo do Banco de Dados Relacional
 
-O banco de dados do projeto será estruturado utilizando um **Banco de Dados Relacional** (como PostgreSQL ou MySQL), garantindo a integridade referencial dos dados e permitindo o cruzamento de informações entre clientes, eventos, funcionários, financeiro e suprimentos de forma robusta.
+O banco de dados do projeto será estruturado utilizando um **Banco de Dados Relacional** PostgreSQL , garantindo a integridade referencial dos dados e permitindo o cruzamento de informações entre clientes, eventos, funcionários, financeiro e suprimentos de forma robusta.
 
 > **Clientes:** Armazena os dados pessoais e de contato (Nome, E-mail, RG/CPF, Telefone).
 
