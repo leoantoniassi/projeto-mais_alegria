@@ -126,6 +126,10 @@ O modelo físico segue a estrutura relacional padrão, utilizando tabelas interl
 - Apenas usuários com permissão administrativa podem excluir contratos já assinados e anexados ao sistema.
 - O sistema deve aceitar formatos padronizados para documentos (ex: `.pdf`, `.jpg`, `.png`).
 
+### RN4: Controle de Público
+
+- Quando o evento tiver mais de 50 pessoas na festa ou evento é necessário identificar o número de crianças, adultos e bebês.
+
 ---
 
 ## 7. Estudo de Viabilidade
