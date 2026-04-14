@@ -185,10 +185,16 @@ O projeto é altamente viável, pois resolve dores reais de gestão de eventos u
 
 O design do **Projeto Mais Alegria** deve transmitir profissionalismo sem perder a essência acolhedora e dinâmica do setor de eventos.
 
-- **Paleta de Cores:** 
-  - **HEX:** `#FEDC57`
-  - **RGB:** `254, 220, 87`
-  - **HSB:** `48°, 66%, 100%`
+- **Paleta de Cores:**
+  - 🟡 **Amarelo (Primária):**
+    - **HEX:** `#FEDC57` | **RGB:** `254, 220, 87`
+  - 🟢 **Verde (Secundária):**
+    - **HEX:** `#7DBA00` | **RGB:** `125, 186, 0`
+  - ⚪ **Branco (Base/Fundo):**
+    - **HEX:** `#FFFFFF` | **RGB:** `255, 255, 255`
+  - 🟣 **Roxo (Cor Extra/Apoio):**
+    - **HEX:** `#6600A1` | **RGB:** `102, 0, 161`
+
 
 - **Tipografia:** Fontes modernas, sem serifa e de alta legibilidade (ex: Roboto, Inter ou Poppins) para organizar bem as tabelas de clientes e escalas.
 - **Layout:** Totalmente responsivo (graças aos componentes do React), garantindo que a equipe administrativa possa consultar dados tanto no computador do escritório quanto no smartphone durante a montagem de uma festa.
