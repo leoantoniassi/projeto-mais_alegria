@@ -130,24 +130,6 @@ Sistema de gestão de festas/eventos com React SPA + Node.js API + PostgreSQL, c
 
 ---
 
-### 4. Tabela de Usuários (adicional ao DDL existente)
-
-#### [MODIFY] database/ddl.sql
-Adição da tabela `USUARIOS` no início do script para autenticação:
-```sql
-CREATE TABLE USUARIOS (
-    USR_ID        SERIAL       PRIMARY KEY,
-    USR_NOME      VARCHAR(150) NOT NULL,
-    USR_EMAIL     VARCHAR(150) NOT NULL UNIQUE,
-    USR_SENHA     VARCHAR(255) NOT NULL,
-    USR_ROLE      VARCHAR(20)  NOT NULL DEFAULT 'operador',
-    USR_CRIADO_EM TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT CK_USUARIOS_ROLE CHECK (USR_ROLE IN ('admin', 'gerente', 'operador'))
-);
-```
-
----
-
 ## Verification Plan
 
 ### Automated Tests
