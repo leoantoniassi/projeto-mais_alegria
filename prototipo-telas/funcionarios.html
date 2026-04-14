@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+
+<html class="light" lang="pt-br"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Mais Alegria - Colaboradores</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Plus+Jakarta+Sans:wght@600;700;800&amp;display=swap" rel="stylesheet"/>
+<!-- Icons -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#FEDC57", // Yellow (CTAs & Highlights)
+              "on-primary": "#402d00",
+              "primary-container": "#fff1db",
+              "secondary": "#7DBA00", // Green (Success & Growth)
+              "on-secondary": "#ffffff",
+              "secondary-container": "#f0ffcc",
+              "tertiary": "#6600A1", // Purple (Distinctive Accents)
+              "on-tertiary": "#ffffff",
+              "tertiary-container": "#f3e5f5",
+              "background": "#fdfdfb",
+              "surface": "#ffffff",
+              "surface-variant": "#f4f4f4",
+              "on-surface": "#1d1b16",
+              "on-surface-variant": "#4d4639",
+              "outline": "#7e7667",
+              "error": "#b3261e",
+              "surface-container-low": "#f7f3e8",
+              "surface-container-lowest": "#ffffff",
+              "surface-container-high": "#ece7da"
+            },
+            fontFamily: {
+              "headline": ["Plus Jakarta Sans"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.5rem", "lg": "0.75rem", "xl": "1rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3 { font-family: 'Plus Jakarta Sans', sans-serif; }
+    </style>
+</head>
+<body class="bg-background text-on-surface flex min-h-screen overflow-hidden">
+<!-- Shared SideNavBar -->
+<aside class="fixed left-0 top-0 h-full z-40 h-screen w-64 border-r border-surface-container-high bg-white flex flex-col">
+<div class="p-6">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-on-primary shadow-sm">
+<span class="material-symbols-outlined" data-icon="celebration">celebration</span>
+</div>
+<div>
+<h1 class="text-xl font-extrabold text-on-surface leading-none">Mais Alegria</h1>
+<p class="text-xs text-on-surface-variant/70 font-medium">Festive Architect</p>
+</div>
+</div>
+</div>
+<nav class="flex-1 px-4 py-4 space-y-1 overflow-y-auto">
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-primary/10 transition-colors font-plus-jakarta-sans text-sm font-medium rounded-full" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+            Dashboard
+        </a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-primary/10 transition-colors font-plus-jakarta-sans text-sm font-medium rounded-full" href="#">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+            Clients
+        </a>
+<!-- Active Navigation: Employees -->
+<a class="flex items-center gap-3 px-4 py-3 bg-primary text-on-primary rounded-full shadow-md font-plus-jakarta-sans text-sm font-bold" href="#">
+<span class="material-symbols-outlined" data-icon="badge" style="font-variation-settings: 'FILL' 1;">badge</span>
+            Employees
+        </a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-primary/10 transition-colors font-plus-jakarta-sans text-sm font-medium rounded-full" href="#">
+<span class="material-symbols-outlined" data-icon="request_quote">request_quote</span>
+            Quotes
+        </a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-primary/10 transition-colors font-plus-jakarta-sans text-sm font-medium rounded-full" href="#">
+<span class="material-symbols-outlined" data-icon="event_available">event_available</span>
+            Events
+        </a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-primary/10 transition-colors font-plus-jakarta-sans text-sm font-medium rounded-full" href="#">
+<span class="material-symbols-outlined" data-icon="inventory_2">inventory_2</span>
+            Inventory
+        </a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-primary/10 transition-colors font-plus-jakarta-sans text-sm font-medium rounded-full" href="#">
+<span class="material-symbols-outlined" data-icon="description">description</span>
+            Documents
+        </a>
+</nav>
+<div class="p-6 border-t border-surface-container-high">
+<div class="flex items-center gap-3">
+<img alt="User profile" class="w-10 h-10 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBNf2lCIHtwGCY7YTFwkpYEJxsnpCHn9kOUIGfHM9EeoJsw975ZVvXCALc8eQlNlq7tENRpemjWmkyah2AiK241Qu1e6pL9GQWkSJYs1wbHFR4hp4Ma-9QxAE4W1BZaG2TeWciqWdbIAAXciVmpwMpc-ykr2NGfhkmh4-2WNQ7TwwlOkU745Yu2F1WGDlVlQCb85JevR_tJAWqJhfsGJXY3XQe-_wXT8m1i2FBinj9s5PezLLrZWu874sUvJ8GRgLpsgfq5LSqiaQ"/>
+<div class="flex-1 overflow-hidden">
+<p class="text-sm font-bold text-on-surface truncate">Admin Manager</p>
+<p class="text-xs text-on-surface-variant truncate">Logistics Dept.</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 ml-64 min-h-screen flex flex-col relative overflow-y-auto">
+<!-- Shared TopNavBar -->
+<header class="flex justify-between items-center w-full px-8 h-16 sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-surface-container-high">
+<div class="flex-1 max-w-xl">
+<div class="relative group">
+<span class="absolute inset-y-0 left-0 pl-3 flex items-center text-on-surface-variant pointer-events-none group-focus-within:text-tertiary">
+<span class="material-symbols-outlined">search</span>
+</span>
+<input class="block w-full pl-10 pr-3 py-2 bg-surface-container-low border-none rounded-full focus:ring-2 focus:ring-tertiary/20 transition-all text-sm text-on-surface placeholder-on-surface-variant/50" placeholder="Pesquisar colaboradores..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 text-on-surface-variant hover:text-tertiary transition-colors relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-error rounded-full border-2 border-white"></span>
+</button>
+<button class="p-2 text-on-surface-variant hover:text-tertiary transition-colors">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<div class="h-8 w-[1px] bg-surface-container-high mx-2"></div>
+<button class="flex items-center gap-2 group">
+<img alt="User Profile Avatar" class="w-8 h-8 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBwnPDFSy7Gu7xWRu_YFUu2adF1fdkrSrvjyZxURElW4G98VVyawOyoVVnvQALaFAk1CSPVCC6zTAwMX8F7moXJ8ZDABprc7ab7UkykgrHryR9LlBhnUZholoyLP9jI1N5Xm8xo-vG3K5BOM9ZhNUylJlgfhYTaItX75KPURpZu2vGslRu1DQf_3uZzn_1oSt6vacWlwCdA1Fo41ktIn3Or-AesfmrWkzGdBt8xA9HSZRfUV6GXjwxBlafbUqvh5fHqq6Eq77eBVQ"/>
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-tertiary">expand_more</span>
+</button>
+</div>
+</header>
+<!-- Page Canvas -->
+<div class="p-8 max-w-7xl mx-auto w-full space-y-8">
+<!-- Page Header -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
+<div class="space-y-2">
+<h2 class="text-4xl font-extrabold text-on-surface tracking-tight">Colaboradores</h2>
+<p class="text-on-surface-variant font-medium">Gerencie sua equipe de festas e eventos em um só lugar.</p>
+</div>
+<button class="inline-flex items-center gap-2 px-8 py-4 bg-primary text-on-primary rounded-full font-bold shadow-lg shadow-primary/30 hover:scale-[1.02] active:scale-[0.98] transition-all">
+<span class="material-symbols-outlined">person_add</span>
+                Novo Colaborador
+            </button>
+</div>
+<!-- Dashboard Content -->
+<div class="grid grid-cols-12 gap-8">
+<!-- Filter Section -->
+<div class="col-span-12 lg:col-span-3 space-y-6">
+<div class="bg-surface-container-low p-6 rounded-xl space-y-4">
+<p class="text-xs font-bold uppercase tracking-widest text-on-surface-variant">Categorias</p>
+<div class="space-y-2">
+<label class="flex items-center gap-3 p-2 rounded-full hover:bg-white/50 cursor-pointer transition-colors group">
+<input checked="" class="rounded-full text-tertiary focus:ring-tertiary w-5 h-5 border-outline" type="checkbox"/>
+<span class="text-sm font-medium text-on-surface group-hover:text-tertiary transition-colors">Todos</span>
+</label>
+<label class="flex items-center gap-3 p-2 rounded-full hover:bg-white/50 cursor-pointer transition-colors group">
+<input class="rounded-full text-tertiary focus:ring-tertiary w-5 h-5 border-outline" type="checkbox"/>
+<span class="text-sm font-medium text-on-surface group-hover:text-tertiary transition-colors">Entertainer</span>
+</label>
+<label class="flex items-center gap-3 p-2 rounded-full hover:bg-white/50 cursor-pointer transition-colors group">
+<input class="rounded-full text-tertiary focus:ring-tertiary w-5 h-5 border-outline" type="checkbox"/>
+<span class="text-sm font-medium text-on-surface group-hover:text-tertiary transition-colors">Cook</span>
+</label>
+<label class="flex items-center gap-3 p-2 rounded-full hover:bg-white/50 cursor-pointer transition-colors group">
+<input class="rounded-full text-tertiary focus:ring-tertiary w-5 h-5 border-outline" type="checkbox"/>
+<span class="text-sm font-medium text-on-surface group-hover:text-tertiary transition-colors">Waiter</span>
+</label>
+</div>
+</div>
+<div class="bg-tertiary p-6 rounded-xl text-on-tertiary relative overflow-hidden group shadow-lg shadow-tertiary/20">
+<div class="relative z-10">
+<p class="text-xs font-bold uppercase tracking-widest opacity-70">Status do Time</p>
+<h3 class="text-4xl font-black mt-2">24</h3>
+<p class="text-sm font-medium mt-1">Colaboradores Ativos</p>
+</div>
+<span class="material-symbols-outlined absolute -bottom-4 -right-4 text-8xl opacity-10 group-hover:rotate-12 transition-transform duration-500">celebration</span>
+</div>
+</div>
+<!-- Main Data Table Container -->
+<div class="col-span-12 lg:col-span-9 space-y-4">
+<div class="bg-surface-container-lowest border border-surface-container-high rounded-xl shadow-sm overflow-hidden">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low/50">
+<th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-on-surface-variant">Nome &amp; Perfil</th>
+<th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-on-surface-variant">Contato</th>
+<th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-on-surface-variant">Categoria</th>
+<th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-on-surface-variant">Status</th>
+<th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-on-surface-variant text-right">Ações</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-surface-container-high">
+<!-- Row 1 -->
+<tr class="group hover:bg-primary/5 transition-colors">
+<td class="px-6 py-5">
+<div class="flex items-center gap-4">
+<img alt="Employee Photo" class="w-12 h-12 rounded-full object-cover shadow-sm ring-2 ring-primary/20" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBTjv-gwS-Lz23v6CVU45iK5ArkyDoALAy8F6bVnmy1qohNxQDr1uHrqhe0VXgdqzsr8PmnLI0_ZOpSZBf-K7WOMEt0VyYpeR7AXgGMma0gWXOUTf2cAUgd-lEF3Z1fymPhkvFv_jMJ40IVMg0tvZH6foUTJ3X4R0B6z0qFuMve07QVbk879U7YWH-lTP_bURRIElMkXjvHkck5oUSJnQs_dl816lqw5pc41pmznmDrje9-nUR40L9U4Pk8j6UtXdrD8dCvopxoKw"/>
+<div>
+<p class="font-bold text-on-surface">Ricardo Santos</p>
+<p class="text-xs text-on-surface-variant">ID: #MA-4902</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-5">
+<div class="space-y-1">
+<p class="text-sm font-medium text-on-surface">ricardo.s@maisalegria.com</p>
+<p class="text-xs text-on-surface-variant">(11) 98765-4321</p>
+</div>
+</td>
+<td class="px-6 py-5">
+<span class="px-3 py-1 bg-primary/20 text-on-primary text-xs font-bold rounded-full uppercase tracking-tight">Cook</span>
+</td>
+<td class="px-6 py-5">
+<div class="flex items-center gap-1.5 text-secondary font-bold text-xs uppercase">
+<span class="w-2.5 h-2.5 bg-secondary rounded-full shadow-sm"></span>
+                                        Ativo
+                                    </div>
+</td>
+<td class="px-6 py-5 text-right">
+<button class="p-2 text-on-surface-variant hover:text-tertiary transition-colors">
+<span class="material-symbols-outlined">edit</span>
+</button>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="group hover:bg-primary/5 transition-colors">
+<td class="px-6 py-5">
+<div class="flex items-center gap-4">
+<img alt="Employee Photo" class="w-12 h-12 rounded-full object-cover shadow-sm ring-2 ring-primary/20" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB9yDSuO_qUgdfHQ1_ba2Ss57I4lRwSN-uBHonTB6sa_Ltgc08HhOhRZqzpw2RRKc1YchJrm4_Mpx6tiQ2xg3k_thEEgLBoAwN4tto3XSN3UVzAuuYqw9b5NqXIZQLSkrL_BMwC7jzebBWrHsK1NFYDY9mERC4jH4rD7ysj8t0biiQ5wYj53RLcmEo3Ts4RMj2q7csvnsdEjRO82ewIQgQCKuMeR3ODDiiq_IyLg86xo_WXBv7exe31-7han8l5dm3PiEOqe6hQxA"/>
+<div>
+<p class="font-bold text-on-surface">Mariana Lima</p>
+<p class="text-xs text-on-surface-variant">ID: #MA-3211</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-5">
+<div class="space-y-1">
+<p class="text-sm font-medium text-on-surface">mari.lima@maisalegria.com</p>
+<p class="text-xs text-on-surface-variant">(11) 97654-3210</p>
+</div>
+</td>
+<td class="px-6 py-5">
+<span class="px-3 py-1 bg-secondary/20 text-secondary text-xs font-bold rounded-full uppercase tracking-tight">Entertainer</span>
+</td>
+<td class="px-6 py-5">
+<div class="flex items-center gap-1.5 text-secondary font-bold text-xs uppercase">
+<span class="w-2.5 h-2.5 bg-secondary rounded-full shadow-sm"></span>
+                                        Ativo
+                                    </div>
+</td>
+<td class="px-6 py-5 text-right">
+<button class="p-2 text-on-surface-variant hover:text-tertiary transition-colors">
+<span class="material-symbols-outlined">edit</span>
+</button>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="group hover:bg-primary/5 transition-colors">
+<td class="px-6 py-5">
+<div class="flex items-center gap-4">
+<img alt="Employee Photo" class="w-12 h-12 rounded-full object-cover shadow-sm ring-2 ring-primary/20" src="https://lh3.googleusercontent.com/aida-public/AB6AXuByF5ay-FZ8SXQcoKhK1Wk_eu14RWJYTE0yMrzedAufE3B8XH1z318WAxK73Vr23ZRy8aZMTb_tfTXBvH_E8XApx26cUxPHqrlZUj3ME0W0GjmWhAQKPlrzPfCK5jjWQYpqwvn-f5cH0MOopn45untjbPLJoBJ1ItEfoEmWNlHX-2YFNfFK1PWY_GqHrkXs2zWvhGmQV9J6PY8r_9dr8vTOc9jxMx8p2FIf0xhA-QIAVe9P40dCt6gahPnrsVHyPOjkf-9-crCjpg"/>
+<div>
+<p class="font-bold text-on-surface">Lucas Ferreira</p>
+<p class="text-xs text-on-surface-variant">ID: #MA-8822</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-5">
+<div class="space-y-1">
+<p class="text-sm font-medium text-on-surface">lucas.f@maisalegria.com</p>
+<p class="text-xs text-on-surface-variant">(11) 96543-2109</p>
+</div>
+</td>
+<td class="px-6 py-5">
+<span class="px-3 py-1 bg-tertiary/10 text-tertiary text-xs font-bold rounded-full uppercase tracking-tight">Waiter</span>
+</td>
+<td class="px-6 py-5">
+<div class="flex items-center gap-1.5 text-tertiary font-bold text-xs uppercase">
+<span class="w-2.5 h-2.5 bg-tertiary rounded-full shadow-sm"></span>
+                                        Em Folga
+                                    </div>
+</td>
+<td class="px-6 py-5 text-right">
+<button class="p-2 text-on-surface-variant hover:text-tertiary transition-colors">
+<span class="material-symbols-outlined">edit</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="px-6 py-4 bg-surface-container-low/30 flex items-center justify-between border-t border-surface-container-high">
+<p class="text-xs text-on-surface-variant font-medium">Mostrando 1-3 de 24 colaboradores</p>
+<div class="flex gap-2">
+<button class="p-2 rounded-full bg-white border border-surface-container-high text-on-surface-variant hover:bg-primary/10 hover:text-on-primary transition-colors">
+<span class="material-symbols-outlined text-sm">chevron_left</span>
+</button>
+<button class="p-2 rounded-full bg-white border border-surface-container-high text-on-surface-variant hover:bg-primary/10 hover:text-on-primary transition-colors">
+<span class="material-symbols-outlined text-sm">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</body></html>

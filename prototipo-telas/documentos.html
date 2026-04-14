@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Mais Alegria - Documentos</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#FEDC57",
+              "on-primary": "#241e00",
+              "secondary": "#7DBA00",
+              "on-secondary": "#ffffff",
+              "tertiary": "#6600A1",
+              "on-tertiary": "#ffffff",
+              "surface-container": "#fdf8e6",
+              "surface-container-lowest": "#ffffff",
+              "surface-container-low": "#fffcf0",
+              "surface-container-high": "#f9f2d1",
+              "surface-container-highest": "#f3eab8",
+              "background": "#fffdf5",
+              "on-surface": "#1d1c16",
+              "on-surface-variant": "#4a473e",
+              "outline": "#7b7768",
+              "outline-variant": "#ccc6b5",
+              "error": "#b31b25",
+              "secondary-container": "#d6f7a1",
+              "on-secondary-container": "#233600"
+            },
+            fontFamily: {
+              "headline": ["Plus Jakarta Sans"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "9999px", "lg": "1.5rem", "xl": "2rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3, .brand-font { font-family: 'Plus Jakarta Sans', sans-serif; }
+    </style>
+</head>
+<body class="bg-background text-on-surface flex min-h-screen">
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-0 h-full z-40 w-64 border-r-0 bg-primary/10 dark:bg-stone-900 font-plus-jakarta-sans text-sm font-medium">
+<div class="p-6 flex flex-col h-full">
+<div class="mb-10 px-4">
+<h1 class="text-xl font-bold text-on-surface">Mais Alegria</h1>
+<p class="text-xs text-on-surface-variant opacity-70">Festive Architect</p>
+</div>
+<nav class="flex-1 space-y-2">
+<!-- Dashboard -->
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-primary/20 rounded-full transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span>Dashboard</span>
+</a>
+<!-- Clients -->
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-primary/20 rounded-full transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+<span>Clients</span>
+</a>
+<!-- Employees -->
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-primary/20 rounded-full transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="badge">badge</span>
+<span>Employees</span>
+</a>
+<!-- Quotes -->
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-primary/20 rounded-full transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="request_quote">request_quote</span>
+<span>Quotes</span>
+</a>
+<!-- Events -->
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-primary/20 rounded-full transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="event_available">event_available</span>
+<span>Events</span>
+</a>
+<!-- Inventory -->
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-primary/20 rounded-full transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="inventory_2">inventory_2</span>
+<span>Inventory</span>
+</a>
+<!-- Documents (ACTIVE) -->
+<a class="flex items-center gap-3 px-4 py-3 bg-white text-on-surface rounded-full shadow-sm" href="#">
+<span class="material-symbols-outlined text-tertiary" data-icon="description" style="font-variation-settings: 'FILL' 1;">description</span>
+<span class="font-bold">Documents</span>
+</a>
+</nav>
+<div class="mt-auto pt-6 px-4">
+<div class="flex items-center gap-3 p-3 bg-surface-container rounded-full">
+<img alt="Mariana Silva" class="w-8 h-8 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBYRDT5xKLaCd4vFR99TVe6YWSm0LOA38TCgDHymuh_1xtg_fs3IaU1q-zJpiQGRF_ig7xfI6qfaLI9Q3j5XHDtJ4Tmra5dRaAV4p_St-HzWBTOFwtnjK9uurhzzocN839xrOhU4c28oey6wIrZXO7TbKih4oq4yUQFti7GSRhznkBJmGzYC0vKmhReRD3-vSVTzR0_baETVU-PAoIJwzbvrzVxKE-DuUy6BNvHe83fGSFA4oT--gQlyqCc-ms5i9Adw8ISvT084g"/>
+<div class="overflow-hidden">
+<p class="text-xs font-bold truncate">Mariana Silva</p>
+<p class="text-[10px] opacity-60 truncate">Lead Architect</p>
+</div>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 ml-64 min-h-screen">
+<!-- TopAppBar -->
+<header class="flex justify-between items-center w-full px-8 h-16 sticky top-0 z-30 bg-white/80 backdrop-blur-md shadow-sm border-b border-outline-variant/30">
+<div class="flex items-center gap-4 flex-1">
+<div class="relative w-full max-w-md focus-within:ring-2 focus-within:ring-primary/50 transition-all rounded-full bg-surface-container-low px-4 flex items-center h-10 border border-outline-variant/30">
+<span class="material-symbols-outlined text-on-surface-variant text-lg" data-icon="search">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-sm w-full font-body placeholder:text-on-surface-variant/50" placeholder="Procurar documentos..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-4">
+<button class="p-2 text-on-surface-variant hover:text-tertiary transition-colors">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:text-tertiary transition-colors">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</button>
+</div>
+<div class="w-8 h-8 rounded-full bg-primary overflow-hidden border border-outline-variant/50">
+<img alt="User" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDFJvs5FWPJzRMXLybCOVt5CkbZETxu77JhdfyHzCCtstBXTyLwF1x8KFlaHsL6QMoMlE9aSH4ldja-EUDsqKzMqMIzAyWuwxXFVPgy7WI8bNwFiffBOzJLSK3FaEt3Hso2iQNbtabL0nSQYQIAWP2o6yIo-EOd0VP_o1XyKUGAR2KBaoJcKB14KAOypwnw_BdJIXsq8qoDz7YKIlFprEOzXy6F88W59MCKCH-2mRyHiEhLXc9276F4iwioN8Fg5E8CbziyLCqOtg"/>
+</div>
+</div>
+</header>
+<!-- Content Canvas -->
+<div class="p-8 max-w-7xl mx-auto">
+<!-- Header Section -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+<div>
+<h2 class="text-4xl font-extrabold text-on-surface tracking-tight mb-2">Documentos</h2>
+<p class="text-on-surface-variant font-body">Gerencie contratos, orçamentos e arquivos de mídia para seus eventos.</p>
+</div>
+<button class="bg-primary hover:bg-yellow-400 text-on-primary px-8 py-3 rounded-full font-bold flex items-center gap-2 shadow-lg shadow-primary/30 transition-all active:scale-95">
+<span class="material-symbols-outlined" data-icon="upload">upload</span>
+                    Upload File
+                </button>
+</div>
+<!-- Stats/Quick Filter Bento -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
+<div class="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant/30 shadow-sm flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center text-on-surface">
+<span class="material-symbols-outlined" data-icon="picture_as_pdf" style="font-variation-settings: 'FILL' 1;">picture_as_pdf</span>
+</div>
+<div>
+<p class="text-2xl font-bold">124</p>
+<p class="text-xs text-on-surface-variant font-label">Contratos PDF</p>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant/30 shadow-sm flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-secondary/20 flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined" data-icon="image" style="font-variation-settings: 'FILL' 1;">image</span>
+</div>
+<div>
+<p class="text-2xl font-bold">852</p>
+<p class="text-xs text-on-surface-variant font-label">Mídias PNG/JPG</p>
+</div>
+</div>
+<div class="md:col-span-2 bg-secondary-container p-6 rounded-xl border border-secondary/20 flex items-center justify-between">
+<div>
+<h4 class="font-bold text-on-secondary-container">Espaço em Nuvem</h4>
+<p class="text-sm text-on-secondary-container/70 mb-2">75% de 50GB utilizados</p>
+<div class="w-48 h-2 bg-white/50 rounded-full overflow-hidden">
+<div class="h-full bg-secondary w-[75%]"></div>
+</div>
+</div>
+<button class="text-secondary font-bold text-sm bg-white px-5 py-2.5 rounded-full shadow-sm hover:bg-secondary/5 transition-colors">Upgrade Plan</button>
+</div>
+</div>
+<!-- Documents Explorer -->
+<div class="flex items-center justify-between mb-6">
+<div class="flex items-center gap-4">
+<button class="px-6 py-2 rounded-full bg-tertiary text-on-tertiary text-sm font-bold">All Files</button>
+<button class="px-6 py-2 rounded-full text-on-surface-variant hover:bg-surface-container text-sm font-medium transition-colors">Recent</button>
+<button class="px-6 py-2 rounded-full text-on-surface-variant hover:bg-surface-container text-sm font-medium transition-colors">Shared</button>
+</div>
+<div class="flex items-center gap-2 text-on-surface-variant">
+<button class="p-2.5 bg-primary text-on-primary rounded-full">
+<span class="material-symbols-outlined" data-icon="grid_view">grid_view</span>
+</button>
+<button class="p-2.5 hover:bg-surface-container rounded-full transition-colors">
+<span class="material-symbols-outlined" data-icon="list">list</span>
+</button>
+</div>
+</div>
+<!-- File Grid -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+<!-- File Card 1: PDF -->
+<div class="group bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-outline-variant/30">
+<div class="aspect-[4/3] bg-primary/10 relative flex items-center justify-center overflow-hidden">
+<div class="absolute inset-0 bg-gradient-to-t from-black/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+<span class="material-symbols-outlined text-6xl text-primary" data-icon="description">description</span>
+<div class="absolute bottom-3 left-3 flex gap-2">
+<span class="px-3 py-1 bg-white/90 backdrop-blur rounded-full text-[10px] font-bold text-tertiary border border-tertiary/20">PDF</span>
+</div>
+</div>
+<div class="p-6">
+<h3 class="font-bold text-on-surface truncate mb-1">Contrato_Casamento_Silva.pdf</h3>
+<div class="flex flex-col gap-1 mb-4">
+<div class="flex items-center gap-2 text-xs text-on-surface-variant">
+<span class="material-symbols-outlined text-sm" data-icon="event">event</span>
+<span>Casamento Silva &amp; Oliveira</span>
+</div>
+<div class="flex items-center gap-2 text-xs text-on-surface-variant">
+<span class="material-symbols-outlined text-sm" data-icon="person">person</span>
+<span>Ricardo Silva</span>
+</div>
+<div class="flex items-center gap-2 text-xs text-on-surface-variant mt-1 opacity-60">
+<span>Uploaded 2 days ago</span>
+</div>
+</div>
+<div class="flex items-center justify-between pt-4 border-t border-outline-variant/30">
+<div class="flex items-center gap-1">
+<button class="p-2.5 hover:bg-primary/20 rounded-full text-tertiary transition-colors" title="View">
+<span class="material-symbols-outlined" data-icon="visibility">visibility</span>
+</button>
+<button class="p-2.5 hover:bg-primary/20 rounded-full text-tertiary transition-colors" title="Download">
+<span class="material-symbols-outlined" data-icon="download">download</span>
+</button>
+</div>
+<button class="p-2.5 hover:bg-error/10 rounded-full text-error transition-colors" title="Delete">
+<span class="material-symbols-outlined" data-icon="delete">delete</span>
+</button>
+</div>
+</div>
+</div>
+<!-- File Card 2: JPG -->
+<div class="group bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-outline-variant/30">
+<div class="aspect-[4/3] bg-surface-container relative overflow-hidden">
+<img alt="Event Preview" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBFozlQ34ZCoI30hBjh-CRVq4oYj-lGnj1l0PYA6lk8zB_skL-1wSUZ9LuhppiDghZ4LPOSAfVadTguishTKQL0KIxT_JGm1nAzy0p2A1T-9S0Islfyk-u_3RKvpDrjKpKcJ61DcaJMslm5GrphpScLX3qfzJ5fKdcttJ57PBzK16TSoSUGHbMgFvSN4w3C1-zzEMmlYcAns2z5gfDH5TsTD99tw9bl0rSW-MkfeyByg8QCQOYX8gL-rErl1DadL2Tb_E0CFVA2MQ"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
+<div class="absolute bottom-3 left-3 flex gap-2">
+<span class="px-3 py-1 bg-white/90 backdrop-blur rounded-full text-[10px] font-bold text-secondary border border-secondary/20">JPG</span>
+</div>
+</div>
+<div class="p-6">
+<h3 class="font-bold text-on-surface truncate mb-1">Banner_Entrada_V1.jpg</h3>
+<div class="flex flex-col gap-1 mb-4">
+<div class="flex items-center gap-2 text-xs text-on-surface-variant">
+<span class="material-symbols-outlined text-sm" data-icon="event">event</span>
+<span>Aniversário 15 anos Júlia</span>
+</div>
+<div class="flex items-center gap-2 text-xs text-on-surface-variant">
+<span class="material-symbols-outlined text-sm" data-icon="person">person</span>
+<span>Família Souza</span>
+</div>
+<div class="flex items-center gap-2 text-xs text-on-surface-variant mt-1 opacity-60">
+<span>Uploaded Oct 12, 2023</span>
+</div>
+</div>
+<div class="flex items-center justify-between pt-4 border-t border-outline-variant/30">
+<div class="flex items-center gap-1">
+<button class="p-2.5 hover:bg-primary/20 rounded-full text-tertiary transition-colors" title="View">
+<span class="material-symbols-outlined" data-icon="visibility">visibility</span>
+</button>
+<button class="p-2.5 hover:bg-primary/20 rounded-full text-tertiary transition-colors" title="Download">
+<span class="material-symbols-outlined" data-icon="download">download</span>
+</button>
+</div>
+<button class="p-2.5 hover:bg-error/10 rounded-full text-error transition-colors" title="Delete">
+<span class="material-symbols-outlined" data-icon="delete">delete</span>
+</button>
+</div>
+</div>
+</div>
+<!-- File Card 3: PNG -->
+<div class="group bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-outline-variant/30">
+<div class="aspect-[4/3] bg-tertiary/5 relative overflow-hidden flex items-center justify-center">
+<img alt="Logo Asset" class="w-3/4 h-3/4 object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuATZmNUhyQCwZuix-JmFOP6-5BNLqR7SXHZ8HmTn419jQI8bzzn0oMB7LfjC62Y4NnXBq6stiq-mT7d2tPYVEH05EK2lfrFf24kCII0laHaDTywh3_7jb0cRnQuvZZaT8V85RCn4YjoOb7lEdJUZctMTbGjOGaQSH-beLsLT7pSZ-2UlolDwY3xIWpfJKnP7g11j0pv7AplRaj-emsurcnFWhdlqfq4YzarwzlNHddBiYzFCn3ZvBuo2TOMkSrszrpcjVIdbYh_mw"/>
+<div class="absolute inset-0 bg-white/10 group-hover:bg-transparent transition-colors"></div>
+<div class="absolute bottom-3 left-3 flex gap-2">
+<span class="px-3 py-1 bg-white/90 backdrop-blur rounded-full text-[10px] font-bold text-tertiary border border-tertiary/20">PNG</span>
+</div>
+</div>
+<div class="p-6">
+<h3 class="font-bold text-on-surface truncate mb-1">Logo_Corporativo_Tech.png</h3>
+<div class="flex flex-col gap-1 mb-4">
+<div class="flex items-center gap-2 text-xs text-on-surface-variant">
+<span class="material-symbols-outlined text-sm" data-icon="event">event</span>
+<span>Summit Inovação 2024</span>
+</div>
+<div class="flex items-center gap-2 text-xs text-on-surface-variant">
+<span class="material-symbols-outlined text-sm" data-icon="person">person</span>
+<span>Tech Global S.A.</span>
+</div>
+<div class="flex items-center gap-2 text-xs text-on-surface-variant mt-1 opacity-60">
+<span>Uploaded 5 hours ago</span>
+</div>
+</div>
+<div class="flex items-center justify-between pt-4 border-t border-outline-variant/30">
+<div class="flex items-center gap-1">
+<button class="p-2.5 hover:bg-primary/20 rounded-full text-tertiary transition-colors" title="View">
+<span class="material-symbols-outlined" data-icon="visibility">visibility</span>
+</button>
+<button class="p-2.5 hover:bg-primary/20 rounded-full text-tertiary transition-colors" title="Download">
+<span class="material-symbols-outlined" data-icon="download">download</span>
+</button>
+</div>
+<button class="p-2.5 hover:bg-error/10 rounded-full text-error transition-colors" title="Delete">
+<span class="material-symbols-outlined" data-icon="delete">delete</span>
+</button>
+</div>
+</div>
+</div>
+<!-- File Card 4: PDF -->
+<div class="group bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-outline-variant/30">
+<div class="aspect-[4/3] bg-primary/10 relative flex items-center justify-center overflow-hidden">
+<span class="material-symbols-outlined text-6xl text-primary" data-icon="request_quote">request_quote</span>
+<div class="absolute bottom-3 left-3 flex gap-2">
+<span class="px-3 py-1 bg-white/90 backdrop-blur rounded-full text-[10px] font-bold text-tertiary border border-tertiary/20">PDF</span>
+</div>
+</div>
+<div class="p-6">
+<h3 class="font-bold text-on-surface truncate mb-1">Orcamento_Buffet_Premium.pdf</h3>
+<div class="flex flex-col gap-1 mb-4">
+<div class="flex items-center gap-2 text-xs text-on-surface-variant">
+<span class="material-symbols-outlined text-sm" data-icon="event">event</span>
+<span>Festa de Fim de Ano</span>
+</div>
+<div class="flex items-center gap-2 text-xs text-on-surface-variant">
+<span class="material-symbols-outlined text-sm" data-icon="person">person</span>
+<span>Internacional Corretora</span>
+</div>
+<div class="flex items-center gap-2 text-xs text-on-surface-variant mt-1 opacity-60">
+<span>Uploaded Sept 28, 2023</span>
+</div>
+</div>
+<div class="flex items-center justify-between pt-4 border-t border-outline-variant/30">
+<div class="flex items-center gap-1">
+<button class="p-2.5 hover:bg-primary/20 rounded-full text-tertiary transition-colors" title="View">
+<span class="material-symbols-outlined" data-icon="visibility">visibility</span>
+</button>
+<button class="p-2.5 hover:bg-primary/20 rounded-full text-tertiary transition-colors" title="Download">
+<span class="material-symbols-outlined" data-icon="download">download</span>
+</button>
+</div>
+<button class="p-2.5 hover:bg-error/10 rounded-full text-error transition-colors" title="Delete">
+<span class="material-symbols-outlined" data-icon="delete">delete</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Empty State / Add Suggestion -->
+<div class="mt-16 bg-surface-container-low border-2 border-dashed border-primary/40 rounded-[2.5rem] p-12 text-center">
+<div class="w-20 h-20 bg-white rounded-full flex items-center justify-center mx-auto mb-6 shadow-md border border-primary/30">
+<span class="material-symbols-outlined text-4xl text-tertiary" data-icon="upload_file">upload_file</span>
+</div>
+<h3 class="text-xl font-bold mb-2">Precisa de mais espaço?</h3>
+<p class="text-on-surface-variant max-w-sm mx-auto mb-8 font-body">Arraste seus arquivos aqui para começar o upload imediato para a galeria de projetos.</p>
+<div class="flex items-center justify-center gap-4">
+<button class="bg-primary hover:bg-yellow-400 text-on-primary font-bold px-10 py-3 rounded-full shadow-lg shadow-primary/20 transition-all">Selecionar Arquivos</button>
+<button class="text-tertiary font-bold px-10 py-3 hover:bg-tertiary/5 rounded-full transition-colors">Ver Tutoriais</button>
+</div>
+</div>
+</div>
+</main>
+</body></html>

@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Mais Alegria - Festive Architect Dashboard</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "surface-container": "#f8f9fb",
+              "surface-container-lowest": "#ffffff",
+              "tertiary-fixed": "#6600A1",
+              "on-tertiary": "#ffffff",
+              "secondary-fixed": "#7DBA00",
+              "on-tertiary-fixed-variant": "#4d007a",
+              "secondary-dim": "#5d8a00",
+              "secondary": "#7DBA00",
+              "on-tertiary-fixed": "#ffffff",
+              "primary-container": "#FEDC57",
+              "tertiary": "#6600A1",
+              "surface-container-highest": "#f0f2f5",
+              "inverse-primary": "#FEDC57",
+              "surface-variant": "#f0f4f8",
+              "on-error": "#ffffff",
+              "inverse-on-surface": "#ffffff",
+              "error": "#b31b25",
+              "surface-tint": "#FEDC57",
+              "background": "#fdfdfd",
+              "primary-fixed-dim": "#f7d12f",
+              "on-surface": "#1a1c1e",
+              "on-primary-fixed": "#1a1c1e",
+              "on-surface-variant": "#44474e",
+              "outline": "#74777f",
+              "on-secondary-fixed-variant": "#7DBA00",
+              "tertiary-fixed-dim": "#8526bf",
+              "primary-dim": "#e6c100",
+              "error-dim": "#9f0519",
+              "on-primary": "#1a1c1e",
+              "outline-variant": "#c4c7cf",
+              "secondary-fixed-dim": "#99cc33",
+              "on-error-container": "#570008",
+              "secondary-container": "#7DBA00",
+              "on-primary-fixed-variant": "#1a1c1e",
+              "primary-fixed": "#FEDC57",
+              "on-secondary-fixed": "#ffffff",
+              "on-tertiary-container": "#ffffff",
+              "on-primary-container": "#1a1c1e",
+              "surface": "#fdfdfd",
+              "inverse-surface": "#2f3033",
+              "surface-bright": "#fdfdfd",
+              "primary": "#FEDC57",
+              "on-background": "#1a1c1e",
+              "surface-dim": "#dcdfe3",
+              "on-secondary": "#ffffff",
+              "tertiary-dim": "#4d007a",
+              "surface-container-low": "#f7f9fc",
+              "surface-container-high": "#ebeef2",
+              "error-container": "#fb5151",
+              "on-secondary-container": "#ffffff",
+              "tertiary-container": "#6600A1"
+            },
+            fontFamily: {
+              "headline": ["Plus Jakarta Sans"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #fdfdfd;
+            color: #1a1c1e;
+        }
+        .editorial-shadow {
+            box-shadow: 0px 20px 40px rgba(0, 0, 0, 0.04);
+        }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #c4c7cf; border-radius: 10px; }
+    </style>
+</head>
+<body class="min-h-screen">
+<!-- SideNavBar (Fixed Shell) -->
+<aside class="fixed left-0 top-0 h-full z-40 h-screen w-64 bg-stone-50 dark:bg-stone-900 font-plus-jakarta-sans text-sm font-medium flex flex-col border-r border-stone-200/50">
+<div class="p-8 flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-on-primary">
+<span class="material-symbols-outlined" data-icon="celebration">celebration</span>
+</div>
+<div class="flex flex-col">
+<span class="text-xl font-bold text-stone-900 dark:text-stone-100 leading-tight">Mais Alegria</span>
+<span class="text-[10px] uppercase tracking-widest text-stone-500">Festive Architect</span>
+</div>
+</div>
+<nav class="mt-4 flex-1">
+<div class="space-y-1 pr-4">
+<!-- Dashboard Active -->
+<a class="flex items-center gap-3 px-4 py-3 bg-white dark:bg-stone-800 text-tertiary dark:text-tertiary-fixed rounded-r-full shadow-sm" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard" style="font-variation-settings: 'FILL' 1;">dashboard</span>
+<span>Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-stone-600 dark:text-stone-400 hover:bg-stone-100 transition-colors rounded-r-full" href="#">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+<span>Clients</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-stone-600 dark:text-stone-400 hover:bg-stone-100 transition-colors rounded-r-full" href="#">
+<span class="material-symbols-outlined" data-icon="badge">badge</span>
+<span>Employees</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-stone-600 dark:text-stone-400 hover:bg-stone-100 transition-colors rounded-r-full" href="#">
+<span class="material-symbols-outlined" data-icon="request_quote">request_quote</span>
+<span>Quotes</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-stone-600 dark:text-stone-400 hover:bg-stone-100 transition-colors rounded-r-full" href="#">
+<span class="material-symbols-outlined" data-icon="event_available">event_available</span>
+<span>Events</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-stone-600 dark:text-stone-400 hover:bg-stone-100 transition-colors rounded-r-full" href="#">
+<span class="material-symbols-outlined" data-icon="inventory_2">inventory_2</span>
+<span>Inventory</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-stone-600 dark:text-stone-400 hover:bg-stone-100 transition-colors rounded-r-full" href="#">
+<span class="material-symbols-outlined" data-icon="description">description</span>
+<span>Documents</span>
+</a>
+</div>
+</nav>
+<div class="p-6 mt-auto">
+<div class="p-4 bg-stone-100 dark:bg-stone-800/50 rounded-full">
+<p class="text-[11px] text-stone-500 mb-2 uppercase font-bold tracking-tighter px-2">Plan Usage</p>
+<div class="w-full bg-white h-1.5 rounded-full overflow-hidden border border-stone-200">
+<div class="bg-primary h-full w-[72%]"></div>
+</div>
+<p class="text-[11px] mt-2 text-stone-500 px-2">72 events this month</p>
+</div>
+</div>
+</aside>
+<!-- Main Content Shell -->
+<main class="ml-64 min-h-screen">
+<!-- TopNavBar -->
+<header class="flex justify-between items-center w-full px-8 h-16 sticky top-0 z-30 bg-white/80 dark:bg-stone-950/80 backdrop-blur-md border-b border-stone-100">
+<div class="flex items-center gap-4 flex-1">
+<div class="relative w-full max-w-md group">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-stone-400" data-icon="search">search</span>
+<input class="w-full pl-10 pr-4 py-2 bg-surface-container-low border-none rounded-full text-sm focus:ring-2 focus:ring-primary/20 transition-all placeholder:text-stone-400" placeholder="Search events, clients, or quotes..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<button class="relative text-stone-500 hover:text-tertiary transition-colors">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+<span class="absolute top-0 right-0 w-2 h-2 bg-secondary rounded-full border-2 border-white"></span>
+</button>
+<button class="text-stone-500 hover:text-tertiary transition-colors">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</button>
+<div class="h-8 w-[1px] bg-stone-200"></div>
+<div class="flex items-center gap-3">
+<div class="text-right">
+<p class="text-xs font-bold text-on-surface">Alex Rivera</p>
+<p class="text-[10px] text-stone-500">Creative Lead</p>
+</div>
+<img alt="User Profile Avatar" class="w-10 h-10 rounded-full border-2 border-white shadow-sm object-cover" data-alt="professional headshot of a creative director with a warm friendly expression and styled dark hair" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBgJXza2xROY2eZA-CkhisAXLdYCLrEtBXpLiOdXxPD8oNUbhuJqXfg4EodJMgBGhbyajXqz-grZEE2BM9vqlI5qSSOKZPK277xLM2QdFZd1LfyVmf5XiOafITqS6hOuAtF7KbyyGoSxnqlI9BC0Ybdlqh6WCwhtQHNlMUFoTB0HUo4in69WW0b09targ4Pg00yC68VAjPCEIbQtlqoNfej8gm1lGY73fEqVXFNfRJJt__512ZV5dPH_zuHWwFFPYFUgury1GxxqQ"/>
+</div>
+</div>
+</header>
+<!-- Canvas Container -->
+<div class="p-8 space-y-10">
+<!-- Hero / Welcome Section -->
+<section class="flex flex-col md:flex-row justify-between items-end gap-8">
+<div class="max-w-2xl">
+<h1 class="font-headline text-5xl font-extrabold text-on-surface tracking-tight leading-tight">
+                    Architecture of <span class="text-tertiary italic">Celebration</span>.
+                </h1>
+<p class="mt-4 text-on-surface-variant font-body text-lg max-w-lg">
+                    You have 4 events scheduled for today and 12 pending quotes requiring your artistic touch.
+                </p>
+</div>
+<div class="flex gap-4">
+<button class="bg-stone-100 text-stone-700 px-6 py-3 rounded-full font-bold text-sm flex items-center gap-2 hover:bg-stone-200 transition-all">
+<span class="material-symbols-outlined text-[20px]" data-icon="download">download</span>
+                    Export Report
+                </button>
+<button class="bg-primary text-on-primary px-8 py-3 rounded-full font-bold text-sm flex items-center gap-2 editorial-shadow hover:scale-[1.02] transition-transform">
+<span class="material-symbols-outlined text-[20px]" data-icon="add">add</span>
+                    New Event
+                </button>
+</div>
+</section>
+<!-- Metrics Bento Grid -->
+<section class="grid grid-cols-1 md:grid-cols-4 gap-6">
+<!-- Card 1 -->
+<div class="bg-surface-container-lowest p-6 rounded-full px-8 editorial-shadow border border-stone-100 relative overflow-hidden group">
+<div class="absolute -right-4 -top-4 w-24 h-24 bg-primary/10 rounded-full group-hover:scale-110 transition-transform"></div>
+<p class="text-[11px] font-bold text-on-surface-variant uppercase tracking-widest mb-4">Upcoming Events</p>
+<div class="flex items-baseline gap-2">
+<span class="text-4xl font-headline font-extrabold text-tertiary">24</span>
+<span class="text-xs text-secondary font-bold">+12%</span>
+</div>
+<p class="text-xs text-stone-400 mt-2">Next 30 days scheduled</p>
+</div>
+<!-- Card 2 -->
+<div class="bg-surface-container-lowest p-6 rounded-full px-8 editorial-shadow border border-stone-100 group">
+<p class="text-[11px] font-bold text-on-surface-variant uppercase tracking-widest mb-4">Pending Quotes</p>
+<div class="flex items-baseline gap-2">
+<span class="text-4xl font-headline font-extrabold text-secondary">12</span>
+<span class="text-xs text-error font-bold">-2%</span>
+</div>
+<p class="text-xs text-stone-400 mt-2">Awaiting client signature</p>
+</div>
+<!-- Card 3 -->
+<div class="bg-surface-container-lowest p-6 rounded-full px-8 editorial-shadow border border-stone-100 group">
+<p class="text-[11px] font-bold text-on-surface-variant uppercase tracking-widest mb-4">Total Clients</p>
+<div class="flex items-baseline gap-2">
+<span class="text-4xl font-headline font-extrabold text-stone-900">184</span>
+<span class="text-xs text-secondary font-bold">+5</span>
+</div>
+<p class="text-xs text-stone-400 mt-2">Active partnerships</p>
+</div>
+<!-- Card 4 -->
+<div class="bg-surface-container-lowest p-6 rounded-full px-8 editorial-shadow border border-stone-100 group">
+<p class="text-[11px] font-bold text-on-surface-variant uppercase tracking-widest mb-4">Employees</p>
+<div class="flex items-baseline gap-2">
+<span class="text-4xl font-headline font-extrabold text-tertiary">32</span>
+<span class="text-xs text-stone-400 font-bold">Stable</span>
+</div>
+<p class="text-xs text-stone-400 mt-2">Creative &amp; Logistics staff</p>
+</div>
+</section>
+<!-- Charts & Visual Data Section -->
+<section class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+<!-- Bar Chart Replacement -->
+<div class="lg:col-span-2 bg-surface-container-lowest p-8 rounded-full px-12 editorial-shadow">
+<div class="flex justify-between items-center mb-8">
+<div>
+<h3 class="font-headline text-xl font-bold">Monthly Events</h3>
+<p class="text-xs text-stone-500">Volume comparison per trimester</p>
+</div>
+<div class="flex gap-2">
+<span class="flex items-center gap-1 text-[10px] font-bold text-stone-400 uppercase tracking-tighter"><span class="w-2 h-2 rounded-full bg-tertiary"></span> 2024</span>
+<span class="flex items-center gap-1 text-[10px] font-bold text-stone-400 uppercase tracking-tighter"><span class="w-2 h-2 rounded-full bg-primary"></span> 2023</span>
+</div>
+</div>
+<div class="h-64 flex items-end justify-between gap-4 px-4">
+<div class="flex-1 flex flex-col justify-end items-center gap-2 group">
+<div class="w-full max-w-[24px] bg-tertiary rounded-full h-[40%] group-hover:opacity-80 transition-all"></div>
+<div class="w-full max-w-[24px] bg-primary rounded-full h-[25%] opacity-40"></div>
+<span class="text-[10px] font-bold text-stone-400 mt-2">JAN</span>
+</div>
+<div class="flex-1 flex flex-col justify-end items-center gap-2 group">
+<div class="w-full max-w-[24px] bg-tertiary rounded-full h-[65%] group-hover:opacity-80 transition-all"></div>
+<div class="w-full max-w-[24px] bg-primary rounded-full h-[45%] opacity-40"></div>
+<span class="text-[10px] font-bold text-stone-400 mt-2">FEB</span>
+</div>
+<div class="flex-1 flex flex-col justify-end items-center gap-2 group">
+<div class="w-full max-w-[24px] bg-tertiary rounded-full h-[90%] group-hover:opacity-80 transition-all"></div>
+<div class="w-full max-w-[24px] bg-primary rounded-full h-[55%] opacity-40"></div>
+<span class="text-[10px] font-bold text-stone-400 mt-2">MAR</span>
+</div>
+<div class="flex-1 flex flex-col justify-end items-center gap-2 group">
+<div class="w-full max-w-[24px] bg-tertiary rounded-full h-[50%] group-hover:opacity-80 transition-all"></div>
+<div class="w-full max-w-[24px] bg-primary rounded-full h-[35%] opacity-40"></div>
+<span class="text-[10px] font-bold text-stone-400 mt-2">APR</span>
+</div>
+<div class="flex-1 flex flex-col justify-end items-center gap-2 group">
+<div class="w-full max-w-[24px] bg-tertiary rounded-full h-[75%] group-hover:opacity-80 transition-all"></div>
+<div class="w-full max-w-[24px] bg-primary rounded-full h-[65%] opacity-40"></div>
+<span class="text-[10px] font-bold text-stone-400 mt-2">MAY</span>
+</div>
+<div class="flex-1 flex flex-col justify-end items-center gap-2 group">
+<div class="w-full max-w-[24px] bg-tertiary rounded-full h-[82%] group-hover:opacity-80 transition-all"></div>
+<div class="w-full max-w-[24px] bg-primary rounded-full h-[70%] opacity-40"></div>
+<span class="text-[10px] font-bold text-stone-400 mt-2">JUN</span>
+</div>
+</div>
+</div>
+<!-- Quotes Status -->
+<div class="bg-surface-container-lowest p-8 rounded-full px-12 editorial-shadow flex flex-col">
+<h3 class="font-headline text-xl font-bold mb-2">Quotes Status</h3>
+<p class="text-xs text-stone-500 mb-8">Pipeline distribution</p>
+<div class="relative w-48 h-48 mx-auto flex items-center justify-center">
+<svg class="w-full h-full transform -rotate-90">
+<circle cx="96" cy="96" fill="transparent" r="80" stroke="#FEDC57" stroke-dasharray="502" stroke-dashoffset="120" stroke-width="24"></circle>
+<circle cx="96" cy="96" fill="transparent" r="80" stroke="#6600A1" stroke-dasharray="502" stroke-dashoffset="380" stroke-width="24"></circle>
+<circle cx="96" cy="96" fill="transparent" r="80" stroke="#7DBA00" stroke-dasharray="502" stroke-dashoffset="450" stroke-width="24"></circle>
+</svg>
+<div class="absolute flex flex-col items-center">
+<span class="text-2xl font-extrabold text-on-surface">54</span>
+<span class="text-[10px] font-bold text-stone-400 uppercase">Total</span>
+</div>
+</div>
+<div class="mt-8 space-y-3">
+<div class="flex justify-between items-center">
+<div class="flex items-center gap-2">
+<span class="w-2.5 h-2.5 rounded-full bg-secondary"></span>
+<span class="text-xs font-medium text-on-surface-variant">Approved</span>
+</div>
+<span class="text-xs font-bold">28%</span>
+</div>
+<div class="flex justify-between items-center">
+<div class="flex items-center gap-2">
+<span class="w-2.5 h-2.5 rounded-full bg-tertiary"></span>
+<span class="text-xs font-medium text-on-surface-variant">Reviewing</span>
+</div>
+<span class="text-xs font-bold">54%</span>
+</div>
+<div class="flex justify-between items-center">
+<div class="flex items-center gap-2">
+<span class="w-2.5 h-2.5 rounded-full bg-primary"></span>
+<span class="text-xs font-medium text-on-surface-variant">Draft</span>
+</div>
+<span class="text-xs font-bold">18%</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Table Section -->
+<section class="bg-surface-container-lowest rounded-xl editorial-shadow overflow-hidden">
+<div class="p-8 flex justify-between items-center border-b border-stone-100">
+<h3 class="font-headline text-2xl font-bold text-on-surface">Latest Upcoming Events</h3>
+<button class="text-tertiary font-bold text-xs hover:underline">View All Schedule</button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left">
+<thead>
+<tr class="bg-stone-50">
+<th class="px-8 py-4 text-[11px] font-bold text-stone-500 uppercase tracking-widest">Event Name</th>
+<th class="px-8 py-4 text-[11px] font-bold text-stone-500 uppercase tracking-widest">Client</th>
+<th class="px-8 py-4 text-[11px] font-bold text-stone-500 uppercase tracking-widest">Date &amp; Time</th>
+<th class="px-8 py-4 text-[11px] font-bold text-stone-500 uppercase tracking-widest">Status</th>
+<th class="px-8 py-4 text-[11px] font-bold text-stone-500 uppercase tracking-widest"></th>
+</tr>
+</thead>
+<tbody class="divide-y divide-stone-100">
+<!-- Row 1 -->
+<tr class="hover:bg-stone-50 transition-colors">
+<td class="px-8 py-5">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-stone-100 flex items-center justify-center text-tertiary font-bold">GW</div>
+<div>
+<p class="text-sm font-bold text-on-surface">Golden Wedding Gala</p>
+<p class="text-[11px] text-stone-500">Corporate Event</p>
+</div>
+</div>
+</td>
+<td class="px-8 py-5">
+<p class="text-sm text-on-surface-variant">Marriott International</p>
+</td>
+<td class="px-8 py-5">
+<p class="text-sm text-on-surface font-medium">Oct 14, 2024</p>
+<p class="text-[11px] text-stone-500">19:00 PM</p>
+</td>
+<td class="px-8 py-5">
+<span class="px-3 py-1 bg-secondary text-on-secondary text-[10px] font-bold rounded-full uppercase tracking-tighter">Confirmed</span>
+</td>
+<td class="px-8 py-5 text-right">
+<button class="text-stone-400 hover:text-tertiary transition-colors">
+<span class="material-symbols-outlined" data-icon="more_vert">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-stone-50 transition-colors">
+<td class="px-8 py-5">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-stone-100 flex items-center justify-center text-secondary font-bold">SL</div>
+<div>
+<p class="text-sm font-bold text-on-surface">Sunset Lounge Opening</p>
+<p class="text-[11px] text-stone-500">Private Celebration</p>
+</div>
+</div>
+</td>
+<td class="px-8 py-5">
+<p class="text-sm text-on-surface-variant">Elena Rodriguez</p>
+</td>
+<td class="px-8 py-5">
+<p class="text-sm text-on-surface font-medium">Oct 16, 2024</p>
+<p class="text-[11px] text-stone-500">18:30 PM</p>
+</td>
+<td class="px-8 py-5">
+<span class="px-3 py-1 bg-primary text-on-primary text-[10px] font-bold rounded-full uppercase tracking-tighter">In Planning</span>
+</td>
+<td class="px-8 py-5 text-right">
+<button class="text-stone-400 hover:text-tertiary transition-colors">
+<span class="material-symbols-outlined" data-icon="more_vert">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-stone-50 transition-colors">
+<td class="px-8 py-5">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-stone-100 flex items-center justify-center text-error font-bold">BC</div>
+<div>
+<p class="text-sm font-bold text-on-surface">Blockchain Summit Dinner</p>
+<p class="text-[11px] text-stone-500">Conference</p>
+</div>
+</div>
+</td>
+<td class="px-8 py-5">
+<p class="text-sm text-on-surface-variant">TechNexus Hub</p>
+</td>
+<td class="px-8 py-5">
+<p class="text-sm text-on-surface font-medium">Oct 19, 2024</p>
+<p class="text-[11px] text-stone-500">20:00 PM</p>
+</td>
+<td class="px-8 py-5">
+<span class="px-3 py-1 bg-secondary text-on-secondary text-[10px] font-bold rounded-full uppercase tracking-tighter">Confirmed</span>
+</td>
+<td class="px-8 py-5 text-right">
+<button class="text-stone-400 hover:text-tertiary transition-colors">
+<span class="material-symbols-outlined" data-icon="more_vert">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr class="hover:bg-stone-50 transition-colors">
+<td class="px-8 py-5">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-stone-100 flex items-center justify-center text-tertiary font-bold">VY</div>
+<div>
+<p class="text-sm font-bold text-on-surface">Vintage Yacht Party</p>
+<p class="text-[11px] text-stone-500">Anniversary</p>
+</div>
+</div>
+</td>
+<td class="px-8 py-5">
+<p class="text-sm text-on-surface-variant">The Sterling Group</p>
+</td>
+<td class="px-8 py-5">
+<p class="text-sm text-on-surface font-medium">Oct 22, 2024</p>
+<p class="text-[11px] text-stone-500">17:00 PM</p>
+</td>
+<td class="px-8 py-5">
+<span class="px-3 py-1 bg-stone-100 text-stone-500 text-[10px] font-bold rounded-full uppercase tracking-tighter">Draft</span>
+</td>
+<td class="px-8 py-5 text-right">
+<button class="text-stone-400 hover:text-tertiary transition-colors">
+<span class="material-symbols-outlined" data-icon="more_vert">more_vert</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</div>
+<footer class="p-8 text-center text-[10px] text-stone-400 uppercase tracking-widest font-bold">
+        © 2024 Mais Alegria • Precision in Celebration
+    </footer>
+</main>
+<!-- Contextual FAB -->
+<button class="fixed bottom-8 right-8 w-14 h-14 bg-tertiary text-white rounded-full editorial-shadow flex items-center justify-center hover:scale-110 active:scale-95 transition-all z-50">
+<span class="material-symbols-outlined" data-icon="calendar_add_on">calendar_add_on</span>
+</button>
+</body></html>

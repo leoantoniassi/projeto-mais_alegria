@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+
+<html class="light" lang="pt-br"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Mais Alegria - Clients Management</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#FEDC57",
+              "on-primary": "#2D2600",
+              "primary-container": "#FFE082",
+              "on-primary-container": "#4A3F00",
+              "secondary": "#7DBA00",
+              "on-secondary": "#FFFFFF",
+              "secondary-container": "#E6F4CC",
+              "on-secondary-container": "#243600",
+              "tertiary": "#6600A1",
+              "on-tertiary": "#FFFFFF",
+              "tertiary-container": "#F1E6FF",
+              "on-tertiary-container": "#24003E",
+              "surface": "#F9FAFB",
+              "on-surface": "#1A1C1E",
+              "surface-variant": "#E1E2EC",
+              "on-surface-variant": "#44474E",
+              "outline": "#74777F",
+              "outline-variant": "#C4C6D0",
+              "background": "#FDFDFF",
+              "on-background": "#1A1C1E",
+              "surface-container-lowest": "#FFFFFF",
+              "surface-container-low": "#F2F3F6",
+              "surface-container": "#EBEDF0",
+              "surface-container-high": "#E5E7EB",
+              "surface-container-highest": "#DEE1E6",
+              "error": "#BA1A1A",
+              "error-container": "#FFDAD6",
+              "on-error": "#FFFFFF",
+              "on-error-container": "#410002"
+            },
+            fontFamily: {
+              "headline": ["Plus Jakarta Sans"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "9999px", "lg": "1.5rem", "xl": "2rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .editorial-shadow {
+            box-shadow: 0px 20px 40px rgba(0, 0, 0, 0.05);
+        }
+        /* Applied 'Festiva Modern' design system aesthetics */
+    </style>
+</head>
+<body class="bg-background font-body text-on-surface">
+<!-- SIDE NAVBAR -->
+<aside class="fixed left-0 top-0 h-full z-40 w-64 border-r border-outline-variant/30 bg-white dark:bg-stone-900 font-headline text-sm font-medium">
+<div class="p-8">
+<div class="flex items-center gap-3 mb-10">
+<div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-on-primary shadow-sm">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">celebration</span>
+</div>
+<div>
+<h1 class="text-xl font-extrabold text-on-surface leading-none">Mais Alegria</h1>
+<p class="text-[10px] uppercase tracking-widest text-on-surface-variant opacity-70 mt-1 font-body">Festive Architect</p>
+</div>
+</div>
+<nav class="space-y-1">
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container transition-all rounded-full" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span>Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 bg-primary text-on-primary font-bold rounded-full shadow-md shadow-primary/20" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">group</span>
+<span>Clients</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container transition-all rounded-full" href="#">
+<span class="material-symbols-outlined">badge</span>
+<span>Employees</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container transition-all rounded-full" href="#">
+<span class="material-symbols-outlined">request_quote</span>
+<span>Quotes</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container transition-all rounded-full" href="#">
+<span class="material-symbols-outlined">event_available</span>
+<span>Events</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container transition-all rounded-full" href="#">
+<span class="material-symbols-outlined">inventory_2</span>
+<span>Inventory</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container transition-all rounded-full" href="#">
+<span class="material-symbols-outlined">description</span>
+<span>Documents</span>
+</a>
+</nav>
+</div>
+</aside>
+<!-- MAIN CONTENT AREA -->
+<main class="ml-64 min-h-screen">
+<!-- TOP NAV BAR -->
+<header class="flex justify-between items-center w-full px-8 h-16 sticky top-0 z-30 bg-white/80 dark:bg-stone-950/80 backdrop-blur-md border-b border-outline-variant/30 font-body text-sm">
+<div class="flex items-center bg-surface-container-low px-4 py-2 rounded-full w-96 group focus-within:ring-2 focus-within:ring-primary transition-all">
+<span class="material-symbols-outlined text-on-surface-variant mr-2">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-sm w-full placeholder:text-on-surface-variant/60" placeholder="Search clients..." type="text"/>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-4 text-on-surface-variant">
+<button class="hover:text-tertiary transition-all">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="hover:text-tertiary transition-all">
+<span class="material-symbols-outlined">settings</span>
+</button>
+</div>
+<div class="h-8 w-[1px] bg-outline-variant/30"></div>
+<div class="flex items-center gap-3">
+<img alt="User Profile" class="w-9 h-9 rounded-full object-cover border-2 border-primary" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDhgV479UDgc55wf0nJc0bJxHpkbaSGMnr4u7NN1BAabuB6XVqZ1n6z2XteCucODmesOR0i9v3gww5E1xQNSYRaaaqmK4aYshdg1Bf637YPgmpNAteUwBUdlK6C2wBb6dPxviJl-OEvZ5j4-9eem1Oqjtwy2G3wza-OGoW73QvSS7xX__d_55fVClpOUaX52DYqZs1DbVlQKmQ19ZBKOSpSzda5dG6_5CfsdWX2sWRO72nTFuphy_9ELn-eWlWO5a5Zz3Uq8vtd5A"/>
+<span class="font-bold text-on-surface font-headline">Ana Luiza</span>
+</div>
+</div>
+</header>
+<!-- PAGE HEADER -->
+<section class="px-10 pt-10 pb-6">
+<div class="flex justify-between items-end mb-10">
+<div class="max-w-2xl">
+<h2 class="text-4xl font-extrabold font-headline text-on-surface tracking-tight mb-2">Clientes</h2>
+<p class="text-on-surface-variant font-body">Manage your event hosts and corporate partners. Maintain detailed records of every festive collaboration.</p>
+</div>
+<button class="bg-primary text-on-primary px-8 py-3 rounded-full font-bold flex items-center gap-2 shadow-xl shadow-primary/30 hover:scale-[1.05] active:scale-95 transition-all">
+<span class="material-symbols-outlined">add_circle</span>
+<span>New Client</span>
+</button>
+</div>
+<!-- FILTERS & STATS -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+<div class="bg-white p-6 rounded-xl border border-outline-variant/10 editorial-shadow">
+<p class="text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-1">Total Active</p>
+<p class="text-3xl font-headline font-extrabold text-tertiary">1,284</p>
+</div>
+<div class="bg-white p-6 rounded-xl border border-outline-variant/10 editorial-shadow">
+<div class="flex items-center gap-2 mb-4">
+<span class="text-xs font-bold uppercase tracking-widest text-on-surface-variant">Filter by Type</span>
+</div>
+<div class="flex flex-wrap gap-2">
+<span class="bg-primary text-on-primary px-4 py-1.5 rounded-full text-xs font-bold cursor-pointer shadow-sm">All</span>
+<span class="bg-surface-container-low text-on-surface-variant px-4 py-1.5 rounded-full text-xs font-bold cursor-pointer hover:bg-surface-container transition-colors">Individual</span>
+<span class="bg-surface-container-low text-on-surface-variant px-4 py-1.5 rounded-full text-xs font-bold cursor-pointer hover:bg-surface-container transition-colors">Corporate</span>
+</div>
+</div>
+<div class="md:col-span-2 bg-secondary p-6 rounded-xl border border-secondary shadow-lg shadow-secondary/20 flex items-center justify-between text-white">
+<div>
+<p class="text-xs font-bold uppercase tracking-widest text-on-secondary/80 mb-1">Upcoming Celebrations</p>
+<p class="text-xl font-headline font-bold">12 clients have events this week</p>
+</div>
+<span class="material-symbols-outlined text-white text-5xl opacity-50" style="font-variation-settings: 'FILL' 1;">celebration</span>
+</div>
+</div>
+<!-- CLIENTS TABLE -->
+<div class="bg-white rounded-xl editorial-shadow overflow-hidden border border-outline-variant/10">
+<div class="overflow-x-auto">
+<table class="w-full text-left">
+<thead>
+<tr class="bg-surface-container text-on-surface-variant text-xs uppercase tracking-[0.15em] font-bold">
+<th class="px-6 py-5">Name &amp; Email</th>
+<th class="px-6 py-5">ID Number</th>
+<th class="px-6 py-5">Phone</th>
+<th class="px-6 py-5">Type</th>
+<th class="px-6 py-5 text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/10">
+<!-- Row 1 -->
+<tr class="hover:bg-primary/5 transition-colors group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-primary/20 text-on-primary-container flex items-center justify-center font-bold text-sm">MB</div>
+<div>
+<p class="font-bold text-on-surface">Mariana Barbosa</p>
+<p class="text-xs text-on-surface-variant">mariana.b@email.com</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 text-sm text-on-surface-variant font-mono">123.456.789-00</td>
+<td class="px-6 py-4 text-sm text-on-surface-variant">(11) 98765-4321</td>
+<td class="px-6 py-4">
+<span class="bg-secondary-container text-on-secondary-container px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider">Individual</span>
+</td>
+<td class="px-6 py-4 text-right">
+<div class="flex justify-end gap-2">
+<button class="w-9 h-9 rounded-full bg-secondary text-on-secondary flex items-center justify-center hover:scale-110 transition-all shadow-md shadow-secondary/20" title="WhatsApp Message">
+<span class="material-symbols-outlined text-lg" style="font-variation-settings: 'FILL' 1;">chat</span>
+</button>
+<button class="w-9 h-9 rounded-full bg-surface-container text-on-surface-variant flex items-center justify-center hover:bg-primary/20 hover:text-on-primary-container transition-all">
+<span class="material-symbols-outlined text-lg">edit</span>
+</button>
+<button class="w-9 h-9 rounded-full bg-error-container/20 text-error flex items-center justify-center hover:bg-error hover:text-white transition-all">
+<span class="material-symbols-outlined text-lg">delete</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-primary/5 transition-colors group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-tertiary/10 text-tertiary flex items-center justify-center font-bold text-sm">RJ</div>
+<div>
+<p class="font-bold text-on-surface">Ricardo Juntos S.A.</p>
+<p class="text-xs text-on-surface-variant">financeiro@juntos.com.br</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 text-sm text-on-surface-variant font-mono">12.345.678/0001-90</td>
+<td class="px-6 py-4 text-sm text-on-surface-variant">(21) 3344-5566</td>
+<td class="px-6 py-4">
+<span class="bg-tertiary/10 text-tertiary px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider">Corporate</span>
+</td>
+<td class="px-6 py-4 text-right">
+<div class="flex justify-end gap-2">
+<button class="w-9 h-9 rounded-full bg-secondary text-on-secondary flex items-center justify-center hover:scale-110 transition-all shadow-md shadow-secondary/20">
+<span class="material-symbols-outlined text-lg" style="font-variation-settings: 'FILL' 1;">chat</span>
+</button>
+<button class="w-9 h-9 rounded-full bg-surface-container text-on-surface-variant flex items-center justify-center hover:bg-primary/20 hover:text-on-primary-container transition-all">
+<span class="material-symbols-outlined text-lg">edit</span>
+</button>
+<button class="w-9 h-9 rounded-full bg-error-container/20 text-error flex items-center justify-center hover:bg-error hover:text-white transition-all">
+<span class="material-symbols-outlined text-lg">delete</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-primary/5 transition-colors group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<img alt="Client" class="w-10 h-10 rounded-full object-cover border border-outline-variant/20" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC0heLUwyyTnjZEOLbSOBuC-gxf4rhR99TmezH8c5-yP591b_HC9WpZ3Hb1OL8vTlP2JPRkR1mAIQQj7BLH7dC_dx5QLF5WLOgj-2o7yJAOP1HsD_Kx5dvejDBO1t9h34BClS9308DWSQEt3jc4hqtOK9fjfikhFeSs9psRGCy9MFEOtfvbomnogL48aEy9bVQ9IsYH30lcsIH0nuhS_3sxltQ-gMeb7pla04lHXwVRiZ-WbtOJRFqRagjmRbqbOmWAbF81kPVS4A"/>
+<div>
+<p class="font-bold text-on-surface">Lucas Mendes</p>
+<p class="text-xs text-on-surface-variant">lucas.mendes@web.com</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 text-sm text-on-surface-variant font-mono">987.654.321-11</td>
+<td class="px-6 py-4 text-sm text-on-surface-variant">(19) 99122-3344</td>
+<td class="px-6 py-4">
+<span class="bg-secondary-container text-on-secondary-container px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider">Individual</span>
+</td>
+<td class="px-6 py-4 text-right">
+<div class="flex justify-end gap-2">
+<button class="w-9 h-9 rounded-full bg-secondary text-on-secondary flex items-center justify-center hover:scale-110 transition-all shadow-md shadow-secondary/20">
+<span class="material-symbols-outlined text-lg" style="font-variation-settings: 'FILL' 1;">chat</span>
+</button>
+<button class="w-9 h-9 rounded-full bg-surface-container text-on-surface-variant flex items-center justify-center hover:bg-primary/20 hover:text-on-primary-container transition-all">
+<span class="material-symbols-outlined text-lg">edit</span>
+</button>
+<button class="w-9 h-9 rounded-full bg-error-container/20 text-error flex items-center justify-center hover:bg-error hover:text-white transition-all">
+<span class="material-symbols-outlined text-lg">delete</span>
+</button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- PAGINATION -->
+<div class="px-6 py-4 bg-surface-container-low text-xs font-bold text-on-surface-variant flex items-center justify-between border-t border-outline-variant/10">
+<p>Showing 1 to 10 of 1,284 entries</p>
+<div class="flex items-center gap-1">
+<button class="w-8 h-8 rounded-full flex items-center justify-center hover:bg-surface-container-highest transition-colors disabled:opacity-30" disabled="">
+<span class="material-symbols-outlined text-sm">chevron_left</span>
+</button>
+<button class="w-8 h-8 rounded-full flex items-center justify-center bg-primary text-on-primary font-bold shadow-sm">1</button>
+<button class="w-8 h-8 rounded-full flex items-center justify-center hover:bg-surface-container-highest transition-colors">2</button>
+<button class="w-8 h-8 rounded-full flex items-center justify-center hover:bg-surface-container-highest transition-colors">3</button>
+<span class="px-2">...</span>
+<button class="w-8 h-8 rounded-full flex items-center justify-center hover:bg-surface-container-highest transition-colors">129</button>
+<button class="w-8 h-8 rounded-full flex items-center justify-center hover:bg-surface-container-highest transition-colors">
+<span class="material-symbols-outlined text-sm">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- SLIDE-OVER PANEL (Add/Edit Client) -->
+<div class="fixed inset-0 bg-on-surface/40 backdrop-blur-md z-50 flex justify-end">
+<div class="w-full max-w-lg bg-white h-full shadow-2xl flex flex-col animate-in slide-in-from-right duration-300 rounded-l-3xl">
+<div class="p-8 border-b border-outline-variant/30 flex justify-between items-start">
+<div>
+<h3 class="text-2xl font-headline font-extrabold text-on-surface">Client Details</h3>
+<p class="text-sm text-on-surface-variant mt-1 font-body">Add a new festive architect to your database.</p>
+</div>
+<button class="p-2 hover:bg-surface-container rounded-full transition-colors text-on-surface-variant">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<div class="flex-1 overflow-y-auto p-8 font-body">
+<form class="space-y-6">
+<div class="space-y-2">
+<label class="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-4">Full Name</label>
+<input class="w-full bg-surface-container-low border-none rounded-full py-3.5 px-6 focus:bg-white focus:ring-2 focus:ring-primary transition-all shadow-inner" placeholder="e.g. Mariana Barbosa" type="text"/>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div class="space-y-2">
+<label class="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-4">Email</label>
+<input class="w-full bg-surface-container-low border-none rounded-full py-3.5 px-6 focus:bg-white focus:ring-2 focus:ring-primary transition-all shadow-inner" placeholder="mariana.b@email.com" type="email"/>
+</div>
+<div class="space-y-2">
+<label class="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-4">Phone</label>
+<input class="w-full bg-surface-container-low border-none rounded-full py-3.5 px-6 focus:bg-white focus:ring-2 focus:ring-primary transition-all shadow-inner" placeholder="(11) 98765-4321" type="tel"/>
+</div>
+</div>
+<div class="space-y-2">
+<label class="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-4">ID Number (CPF/CNPJ)</label>
+<input class="w-full bg-surface-container-low border-none rounded-full py-3.5 px-6 focus:bg-white focus:ring-2 focus:ring-primary transition-all shadow-inner" placeholder="000.000.000-00" type="text"/>
+</div>
+<div class="space-y-2">
+<label class="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-4">Full Address</label>
+<textarea class="w-full bg-surface-container-low border-none rounded-3xl py-4 px-6 focus:bg-white focus:ring-2 focus:ring-primary transition-all resize-none shadow-inner" placeholder="Rua das Flores, 123..." rows="3"></textarea>
+</div>
+<div class="space-y-4">
+<label class="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-4">Client Category</label>
+<div class="flex gap-4 px-1">
+<label class="flex-1 cursor-pointer">
+<input checked="" class="hidden peer" name="category" type="radio"/>
+<div class="p-5 rounded-2xl border-2 border-surface-container text-center peer-checked:border-primary peer-checked:bg-primary/5 transition-all">
+<span class="material-symbols-outlined block mb-1 text-on-surface-variant peer-checked:text-tertiary">person</span>
+<span class="text-xs font-bold uppercase tracking-wider">Individual</span>
+</div>
+</label>
+<label class="flex-1 cursor-pointer">
+<input class="hidden peer" name="category" type="radio"/>
+<div class="p-5 rounded-2xl border-2 border-surface-container text-center peer-checked:border-primary peer-checked:bg-primary/5 transition-all">
+<span class="material-symbols-outlined block mb-1 text-on-surface-variant">business</span>
+<span class="text-xs font-bold uppercase tracking-wider">Corporate</span>
+</div>
+</label>
+</div>
+</div>
+</form>
+</div>
+<div class="p-8 bg-surface-container-low flex gap-4 rounded-tl-3xl">
+<button class="flex-1 border-2 border-outline-variant text-on-surface-variant py-3.5 rounded-full font-bold hover:bg-white transition-all">Discard</button>
+<button class="flex-[2] bg-primary text-on-primary py-3.5 rounded-full font-bold shadow-xl shadow-primary/30 hover:scale-[1.02] active:scale-95 transition-all">Save Client</button>
+</div>
+</div>
+</div>
+</body></html>

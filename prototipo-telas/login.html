@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+
+<html class="light" lang="pt-br"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Mais Alegria - Admin Login</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#FEDC57",
+              "on-primary": "#241e00",
+              "secondary": "#7DBA00",
+              "on-secondary": "#ffffff",
+              "accent": "#6600A1",
+              "on-accent": "#ffffff",
+              "surface": "#ffffff",
+              "background": "#fdfcf5",
+              "on-surface": "#1d1c16",
+              "on-surface-variant": "#49473a",
+              "outline": "#7a7768",
+              "outline-variant": "#cbc7b6",
+              "surface-container-lowest": "#ffffff",
+              "surface-container-low": "#f7f4ea",
+              "surface-container": "#f1eee4",
+              "surface-container-high": "#ebe8de",
+              "surface-container-highest": "#e5e2d8"
+            },
+            fontFamily: {
+              "headline": ["Plus Jakarta Sans"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "9999px", "lg": "9999px", "xl": "9999px", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .brand-gradient {
+            background: linear-gradient(135deg, #FEDC57 0%, #e5c545 100%);
+        }
+    </style>
+</head>
+<body class="bg-background font-body text-on-surface selection:bg-primary selection:text-on-primary">
+<main class="min-h-screen flex items-stretch">
+<!-- Visual Brand Side -->
+<section class="hidden lg:flex w-1/2 relative items-end p-16 overflow-hidden">
+<!-- Background Image -->
+<div class="absolute inset-0 z-0">
+<img class="w-full h-full object-cover brightness-50" data-alt="Luxurious high-end wedding reception set at night with warm hanging fairy lights, elegant table settings, and vibrant floral arrangements" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBzeGqSrkFAw_mcRupQuxAs1N5K1GnciBwS8N2SEL-0JGrEmmbKIwlooBUZ58eKFAnSL0---qgY5H7ScmisO7qOKz8__uNw_NODjeOpuvHNcAirzrCEMZpCPiFv7_cY1sAtJQj_35T5w24zkfG22IicCwJgf0kdfpGpwqF6wOxtlT66vNoTjXZWOk4srLJx9k1jgaK3HdLHCxXKOHxfJcERsMGrXDFZP1CXHmsS0aT9KO_8Gk4wRm62NP_g1meaaR4V8PwJ-bYSQA"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
+</div>
+<!-- Branding Text on Image -->
+<div class="relative z-10 text-white max-w-lg">
+<div class="flex items-center gap-3 mb-6">
+<span class="material-symbols-outlined text-4xl bg-primary text-on-primary p-2 rounded-full">celebration</span>
+<h1 class="font-headline font-extrabold text-4xl tracking-tight">Mais Alegria</h1>
+</div>
+<p class="font-headline text-2xl font-medium leading-tight">Transformando Sonhos em Celebrações.</p>
+<div class="mt-8 h-1 w-24 bg-primary rounded-full"></div>
+</div>
+</section>
+<!-- Form Side -->
+<section class="w-full lg:w-1/2 flex flex-col justify-center items-center px-6 sm:px-12 md:px-24 bg-surface">
+<div class="w-full max-w-md">
+<!-- Mobile Branding Header -->
+<div class="lg:hidden flex flex-col items-center mb-12">
+<div class="bg-primary p-3 rounded-full mb-4 shadow-xl shadow-primary/20">
+<span class="material-symbols-outlined text-on-primary text-3xl" data-icon="celebration">celebration</span>
+</div>
+<h2 class="font-headline font-extrabold text-3xl text-on-surface tracking-tight">Mais Alegria</h2>
+<p class="text-on-surface-variant font-medium mt-1">Festive Architect Portal</p>
+</div>
+<!-- Welcome Text -->
+<div class="mb-10 text-center lg:text-left">
+<h3 class="font-headline text-3xl font-bold text-on-surface mb-2">Bem-vindo de volta</h3>
+<p class="text-on-surface-variant">Acesse sua conta para gerenciar seus eventos</p>
+</div>
+<!-- Login Form -->
+<form class="space-y-6">
+<!-- Role Dropdown -->
+<div class="space-y-2">
+<label class="block text-sm font-semibold text-on-surface-variant ml-4" for="role">Perfil de Acesso</label>
+<div class="relative">
+<select class="w-full h-14 pl-12 pr-10 py-3 bg-surface-container-low border-none rounded-full focus:ring-2 focus:ring-secondary appearance-none transition-all font-medium text-on-surface" id="role" name="role">
+<option value="admin">Administrator</option>
+<option value="manager">Manager</option>
+</select>
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-accent" data-icon="badge">badge</span>
+<span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none" data-icon="expand_more">expand_more</span>
+</div>
+</div>
+<!-- Email Field -->
+<div class="space-y-2">
+<label class="block text-sm font-semibold text-on-surface-variant ml-4" for="email">E-mail Corporativo</label>
+<div class="relative">
+<input class="w-full h-14 pl-12 pr-4 py-3 bg-surface-container-low border-none rounded-full focus:ring-2 focus:ring-secondary transition-all placeholder:text-outline-variant" id="email" name="email" placeholder="admin@maisalegria.com.br" type="email"/>
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-accent" data-icon="mail">mail</span>
+</div>
+</div>
+<!-- Password Field -->
+<div class="space-y-2">
+<div class="flex justify-between items-center ml-4 mr-4">
+<label class="block text-sm font-semibold text-on-surface-variant" for="password">Senha</label>
+<a class="text-xs font-bold text-accent hover:underline transition-colors" href="#">Esqueceu a senha?</a>
+</div>
+<div class="relative">
+<input class="w-full h-14 pl-12 pr-12 py-3 bg-surface-container-low border-none rounded-full focus:ring-2 focus:ring-secondary transition-all placeholder:text-outline-variant" id="password" name="password" placeholder="••••••••" type="password"/>
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-accent" data-icon="lock">lock</span>
+<button class="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-accent transition-colors" type="button">
+<span class="material-symbols-outlined" data-icon="visibility">visibility</span>
+</button>
+</div>
+</div>
+<!-- Submit Button -->
+<button class="w-full h-14 brand-gradient text-on-primary font-headline font-bold text-lg rounded-full shadow-lg shadow-primary/20 hover:shadow-primary/40 hover:-translate-y-0.5 active:translate-y-0 transition-all" type="submit">
+                    Login
+                </button>
+</form>
+<!-- Footer Branding -->
+<footer class="mt-16 text-center">
+<p class="text-on-surface-variant text-sm flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-secondary text-sm" data-icon="favorite" style="font-variation-settings: 'FILL' 1;">favorite</span>
+                    Design com excelência para eventos inesquecíveis
+                </p>
+</footer>
+</div>
+</section>
+</main>
+<!-- Floating Ornamental Element -->
+<div class="fixed top-8 right-8 pointer-events-none opacity-10 hidden lg:block">
+<svg fill="none" height="200" viewbox="0 0 200 200" width="200" xmlns="http://www.w3.org/2000/svg">
+<circle class="text-accent" cx="100" cy="100" r="99.5" stroke="currentColor"></circle>
+<path class="text-accent" d="M100 0V200M0 100H200" stroke="currentColor"></path>
+<circle class="text-accent" cx="100" cy="100" r="50" stroke="currentColor" stroke-dasharray="4 4"></circle>
+</svg>
+</div>
+</body></html>

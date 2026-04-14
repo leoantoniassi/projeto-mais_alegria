@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+
+<html class="light" lang="pt-br"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Mais Alegria - Eventos</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#FEDC57",
+              "on-primary": "#402d00",
+              "primary-container": "#fff1db",
+              "on-primary-container": "#584000",
+              "secondary": "#7DBA00",
+              "on-secondary": "#ffffff",
+              "secondary-container": "#e8f5d0",
+              "on-secondary-container": "#243a00",
+              "tertiary": "#6600A1",
+              "on-tertiary": "#ffffff",
+              "tertiary-container": "#f0e6ff",
+              "on-tertiary-container": "#24003d",
+              "surface-container": "#fdf8e1",
+              "surface-container-lowest": "#ffffff",
+              "surface-container-low": "#fffbf0",
+              "surface-container-high": "#f9f2d1",
+              "surface-container-highest": "#f4ecc4",
+              "background": "#fffcf5",
+              "on-background": "#211b00",
+              "surface": "#fffcf5",
+              "on-surface": "#211b00",
+              "on-surface-variant": "#4d4633",
+              "outline": "#7e7660",
+              "outline-variant": "#cfc6ad",
+              "error": "#b31b25",
+              "on-error": "#ffffff",
+              "error-container": "#ffdad6",
+              "on-error-container": "#410002"
+            },
+            fontFamily: {
+              "headline": ["Plus Jakarta Sans"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {
+              "DEFAULT": "0.25rem", 
+              "lg": "0.5rem", 
+              "xl": "0.75rem", 
+              "2xl": "1rem",
+              "3xl": "1.5rem",
+              "full": "9999px"
+            },
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body { font-family: 'Inter', sans-serif; background-color: #fffcf5; color: #211b00; }
+        h1, h2, h3, .font-headline { font-family: 'Plus Jakarta Sans', sans-serif; }
+    </style>
+</head>
+<body class="overflow-x-hidden">
+<!-- Sidebar Navigation -->
+<aside class="fixed left-0 top-0 h-full z-40 h-screen w-64 border-r-0 bg-[#fffdf0] dark:bg-stone-900 font-plus-jakarta-sans text-sm font-medium">
+<div class="p-6 flex flex-col h-full">
+<div class="mb-10">
+<div class="flex items-center gap-3">
+<img alt="Mais Alegria Logo" class="w-8 h-8" data-alt="Stylized yellow festival tent logo with elegant curves and warm sunset color palette" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD7AkyJitKA4nUEx7TdqtH2d8JRUUgeO3uDhXD3E42LI_TxcEgdGCfOD4c6R0j8OSbGlGjn4PAyAd3TucLqCqA0Zsn793XKu84l7s1GTHD9Sj9Kd7RrenhNvCeaRyBoyEGTHigTN1zcSlDhEW-nMLMtnuY4kyb2oxAC4cwo1dwNcNKRs9pM2FELQPVAp_Q1imkP3qoddOC4tbrZHb3ACTdoAw7i69jOfYYYcuDAlu5E7HvWl0AouPbFo4WnLHwtr5q3xba-TSqRgw"/>
+<div>
+<h1 class="text-xl font-bold text-on-surface">Mais Alegria</h1>
+<p class="text-[10px] uppercase tracking-widest text-outline">Festive Architect</p>
+</div>
+</div>
+</div>
+<nav class="flex flex-col gap-1">
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-primary/10 dark:hover:bg-stone-800/30 transition-colors rounded-full" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span> Dashboard
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-primary/10 dark:hover:bg-stone-800/30 transition-colors rounded-full" href="#">
+<span class="material-symbols-outlined" data-icon="group">group</span> Clients
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-primary/10 dark:hover:bg-stone-800/30 transition-colors rounded-full" href="#">
+<span class="material-symbols-outlined" data-icon="badge">badge</span> Employees
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-primary/10 dark:hover:bg-stone-800/30 transition-colors rounded-full" href="#">
+<span class="material-symbols-outlined" data-icon="request_quote">request_quote</span> Quotes
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 bg-white dark:bg-stone-800 text-tertiary rounded-full shadow-sm" href="#">
+<span class="material-symbols-outlined" data-icon="event_available" style="font-variation-settings: 'FILL' 1;">event_available</span> Events
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-primary/10 dark:hover:bg-stone-800/30 transition-colors rounded-full" href="#">
+<span class="material-symbols-outlined" data-icon="inventory_2">inventory_2</span> Inventory
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-primary/10 dark:hover:bg-stone-800/30 transition-colors rounded-full" href="#">
+<span class="material-symbols-outlined" data-icon="description">description</span> Documents
+            </a>
+</nav>
+<div class="mt-auto pt-6 border-t border-outline-variant">
+<div class="flex items-center gap-3 px-4 py-2">
+<div class="w-8 h-8 rounded-full bg-primary text-on-primary flex items-center justify-center font-bold text-xs">JD</div>
+<div class="overflow-hidden">
+<p class="text-xs font-bold truncate">Juliana Duarte</p>
+<p class="text-[10px] text-outline">Event Lead</p>
+</div>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content Shell -->
+<main class="ml-64 min-h-screen">
+<!-- Top Navigation Bar -->
+<header class="flex justify-between items-center w-full px-12 h-20 sticky top-0 z-30 bg-white/80 dark:bg-stone-950/80 backdrop-blur-md">
+<div class="flex items-center gap-6 w-1/2">
+<div class="relative w-full max-w-md">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline" data-icon="search">search</span>
+<input class="w-full bg-surface-container border-none rounded-full py-2.5 pl-12 pr-4 text-sm focus:ring-2 focus:ring-primary/20 transition-all" placeholder="Search events, clients or staff..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 hover:bg-surface-container transition-colors rounded-full relative">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="notifications">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-tertiary rounded-full"></span>
+</button>
+<button class="p-2 hover:bg-surface-container transition-colors rounded-full">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="settings">settings</span>
+</button>
+</div>
+</header>
+<div class="px-12 py-8">
+<!-- Header Section -->
+<div class="flex justify-between items-end mb-12">
+<div>
+<h2 class="text-5xl font-extrabold tracking-tight text-on-surface mb-2">Eventos</h2>
+<p class="text-on-surface-variant max-w-lg">Managing the architecture of celebration. Track upcoming logistics and orchestrate joy.</p>
+</div>
+<button class="flex items-center gap-2 px-8 py-4 bg-primary text-on-primary rounded-full font-bold shadow-lg shadow-primary/20 hover:scale-[1.02] transition-transform">
+<span class="material-symbols-outlined" data-icon="add">add</span>
+                New Event
+            </button>
+</div>
+<!-- Dashboard Bento Grid Content -->
+<div class="grid grid-cols-12 gap-8">
+<!-- Main Events Table (Large Section) -->
+<div class="col-span-12 lg:col-span-8 space-y-8">
+<div class="bg-surface-container-lowest rounded-3xl p-8 overflow-hidden shadow-sm">
+<div class="flex justify-between items-center mb-6">
+<h3 class="text-xl font-bold">Upcoming Schedule</h3>
+<div class="flex gap-2">
+<span class="px-4 py-1.5 bg-primary text-on-primary rounded-full text-xs font-semibold cursor-pointer">This Month</span>
+<span class="px-4 py-1.5 hover:bg-surface-container rounded-full text-xs font-semibold cursor-pointer">Quarterly</span>
+</div>
+</div>
+<div class="w-full overflow-x-auto">
+<table class="w-full text-left">
+<thead>
+<tr class="text-on-surface-variant text-[11px] uppercase tracking-widest border-b border-outline-variant">
+<th class="pb-4 font-semibold">Event Name</th>
+<th class="pb-4 font-semibold">Date &amp; Time</th>
+<th class="pb-4 font-semibold">Location</th>
+<th class="pb-4 font-semibold">Client</th>
+<th class="pb-4 font-semibold">Status</th>
+<th class="pb-4"></th>
+</tr>
+</thead>
+<tbody class="divide-y-0">
+<tr class="group hover:bg-surface-container-low transition-colors">
+<td class="py-5 font-bold text-on-surface">Tropical Wedding Gala</td>
+<td class="py-5 text-sm">Oct 24, 2024 <span class="text-outline block text-[11px]">18:00 - 02:00</span></td>
+<td class="py-5 text-sm italic">Quinta das Flores</td>
+<td class="py-5 text-sm">Mariana &amp; Tiago</td>
+<td class="py-5">
+<span class="px-3 py-1 bg-secondary-container text-on-secondary-container rounded-full text-xs font-bold">CONFIRMED</span>
+</td>
+<td class="py-5 text-right">
+<button class="text-outline hover:text-tertiary transition-colors">
+<span class="material-symbols-outlined" data-icon="more_vert">more_vert</span>
+</button>
+</td>
+</tr>
+<tr class="group hover:bg-surface-container-low transition-colors">
+<td class="py-5 font-bold text-on-surface">15th Birthday: Alice in Wonderland</td>
+<td class="py-5 text-sm">Nov 02, 2024 <span class="text-outline block text-[11px]">16:00 - 00:00</span></td>
+<td class="py-5 text-sm italic">Terrace Sky Garden</td>
+<td class="py-5 text-sm">Beatriz Ferreira</td>
+<td class="py-5">
+<span class="px-3 py-1 bg-primary-container text-on-primary-container rounded-full text-xs font-bold">PLANNING</span>
+</td>
+<td class="py-5 text-right">
+<button class="text-outline hover:text-tertiary transition-colors">
+<span class="material-symbols-outlined" data-icon="more_vert">more_vert</span>
+</button>
+</td>
+</tr>
+<tr class="group hover:bg-surface-container-low transition-colors">
+<td class="py-5 font-bold text-on-surface">Tech Corp Annual Summit</td>
+<td class="py-5 text-sm">Nov 15, 2024 <span class="text-outline block text-[11px]">09:00 - 18:00</span></td>
+<td class="py-5 text-sm italic">Centro de Eventos XL</td>
+<td class="py-5 text-sm">TechCorp PT</td>
+<td class="py-5">
+<span class="px-3 py-1 bg-surface-container-highest text-on-surface-variant rounded-full text-xs font-bold">DRAFT</span>
+</td>
+<td class="py-5 text-right">
+<button class="text-outline hover:text-tertiary transition-colors">
+<span class="material-symbols-outlined" data-icon="more_vert">more_vert</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Team Builder UI -->
+<div class="bg-surface-container-low rounded-3xl p-8 border-l-8 border-primary shadow-sm">
+<div class="flex justify-between items-start mb-8">
+<div>
+<h3 class="text-2xl font-bold mb-1">Team Builder</h3>
+<p class="text-sm text-on-surface-variant">Check availability and assign staff for "Tropical Wedding Gala"</p>
+</div>
+<div class="flex items-center gap-2 bg-white px-5 py-2.5 rounded-full shadow-sm">
+<span class="w-3 h-3 bg-error rounded-full animate-pulse"></span>
+<span class="text-xs font-bold text-error">3 CONFLICTS DETECTED</span>
+</div>
+</div>
+<div class="flex gap-4 mb-6">
+<button class="px-5 py-2 bg-primary text-on-primary rounded-full text-xs font-bold shadow-md shadow-primary/10">All Staff</button>
+<button class="px-5 py-2 bg-white text-on-surface rounded-full text-xs font-bold hover:bg-surface-container transition-colors">Decorators</button>
+<button class="px-5 py-2 bg-white text-on-surface rounded-full text-xs font-bold hover:bg-surface-container transition-colors">Catering</button>
+<button class="px-5 py-2 bg-white text-on-surface rounded-full text-xs font-bold hover:bg-surface-container transition-colors">Logistics</button>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<!-- Staff Card 1 -->
+<div class="bg-white p-4 rounded-3xl flex items-center justify-between border border-transparent hover:border-primary/50 transition-all cursor-pointer shadow-sm">
+<div class="flex items-center gap-4">
+<img alt="Staff Avatar" class="w-12 h-12 rounded-full object-cover" data-alt="Portrait of a smiling professional male staff member in a clean white uniform shirt against a warm neutral background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBEk45Adg-Gs7hbH19GuCxFjtj6l_X2nkYffzhmwog7rmmSQYtADXE6GZleN1wuOkHZXkP7L0efHWwiZ-AHjATMojnnk7jwxezKcFFUa6IuKNO9Dnf48yS8MzUBojttu8nA1R3kYXs_nc3eY8sTo8J3QRNFbcnSUBBjDVmihtUsA5O8s4e8H5s2TJie0W1kTeKbPrLWHlwcvKnIwV8JPf7-7sS7e00MnpEbZMS4lS0xRslUGBqT8HTy2gHWsTZCnxuAJgIduIdnoQ"/>
+<div>
+<p class="font-bold text-sm text-on-surface">Ricardo Pereira</p>
+<p class="text-[10px] text-on-surface-variant uppercase font-bold tracking-tighter">Senior Decorator</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-secondary" data-icon="check_circle" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<!-- Staff Card 2 -->
+<div class="bg-white p-4 rounded-3xl flex items-center justify-between border border-error/20 bg-error/5 cursor-not-allowed shadow-sm">
+<div class="flex items-center gap-4">
+<img alt="Staff Avatar" class="w-12 h-12 rounded-full object-cover grayscale" data-alt="Portrait of a young professional woman with hair tied back, wearing a black blazer, serious expression, studio lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDlf80w8JuUmyDMnaIHLX6kW1o4eC4uB9I76ifU2_yxTFOb7Mz24fnnfhkYd_z2etZTB5P3xZH6XkRYSVRMmsbHSar60kxfNtZZyEHeZXEqAysyU7tcAfEYDM-GuFVL3QQW1lTgsClr5ad4hlAfjasY14MfjglG8bbkKUDbFx7ZdPi7d6_WAt0S7WxmDD0tgBm-oovyuBUTDp2Hgpy5MBWle_JcILNYMlh6qfLteiPU5LbjwRflXFWldVNqiuV3DB5KFRMHFPQLeA"/>
+<div>
+<p class="font-bold text-sm text-on-surface">Ana Martins</p>
+<p class="text-[10px] text-error font-bold uppercase tracking-tighter">Event Coordinator • BUSY</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-error" data-icon="warning">warning</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Detail View / Sidebar Stats (Right Section) -->
+<div class="col-span-12 lg:col-span-4 space-y-8">
+<!-- Event Snapshot Card -->
+<div class="bg-tertiary text-on-tertiary rounded-3xl p-8 shadow-2xl relative overflow-hidden">
+<div class="relative z-10">
+<span class="text-[10px] font-bold uppercase tracking-[0.2em] opacity-80 mb-2 block">Current Selection</span>
+<h3 class="text-3xl font-extrabold leading-tight mb-4">Tropical Wedding Gala</h3>
+<div class="space-y-4 mb-8">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary" data-icon="location_on" style="font-variation-settings: 'FILL' 1;">location_on</span>
+<p class="text-sm font-medium">Quinta das Flores, Sintra</p>
+</div>
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary" data-icon="calendar_today" style="font-variation-settings: 'FILL' 1;">calendar_today</span>
+<p class="text-sm font-medium">Sat, 24 Oct • 18:00</p>
+</div>
+</div>
+<!-- Guest Breakdown -->
+<div class="bg-white/10 rounded-2xl p-6 backdrop-blur-sm border border-white/10">
+<h4 class="text-xs font-bold uppercase tracking-wider mb-4 opacity-70">Guest Breakdown</h4>
+<div class="grid grid-cols-3 gap-2">
+<div class="text-center">
+<p class="text-2xl font-black">142</p>
+<p class="text-[10px] opacity-80">Adults</p>
+</div>
+<div class="text-center border-x border-white/20">
+<p class="text-2xl font-black text-primary">24</p>
+<p class="text-[10px] opacity-80">Children</p>
+</div>
+<div class="text-center">
+<p class="text-2xl font-black">08</p>
+<p class="text-[10px] opacity-80">Babies</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Decorative elements -->
+<div class="absolute -bottom-12 -right-12 w-48 h-48 bg-primary/20 rounded-full"></div>
+<div class="absolute -top-10 -left-10 w-32 h-32 bg-secondary/10 rounded-full"></div>
+</div>
+<!-- Linked Documents -->
+<div class="bg-surface-container-highest rounded-3xl p-8 shadow-sm">
+<h3 class="text-lg font-bold mb-6 flex items-center gap-2">
+<span class="material-symbols-outlined text-tertiary" data-icon="folder_open">folder_open</span>
+                        Linked Documents
+                    </h3>
+<div class="space-y-3">
+<a class="flex items-center justify-between p-4 bg-white/50 rounded-2xl hover:bg-white transition-all group border border-transparent hover:border-outline-variant" href="#">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-error" data-icon="picture_as_pdf">picture_as_pdf</span>
+<span class="text-xs font-bold text-on-surface">Floor_Plan_v3.pdf</span>
+</div>
+<span class="material-symbols-outlined text-outline opacity-0 group-hover:opacity-100 transition-opacity" data-icon="download">download</span>
+</a>
+<a class="flex items-center justify-between p-4 bg-white/50 rounded-2xl hover:bg-white transition-all group border border-transparent hover:border-outline-variant" href="#">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-tertiary" data-icon="description">description</span>
+<span class="text-xs font-bold text-on-surface">Catering_Menu_Final.docx</span>
+</div>
+<span class="material-symbols-outlined text-outline opacity-0 group-hover:opacity-100 transition-opacity" data-icon="download">download</span>
+</a>
+</div>
+<button class="w-full mt-6 py-4 border-2 border-dashed border-outline-variant rounded-2xl text-outline text-xs font-bold hover:bg-white/50 transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-sm" data-icon="upload">upload</span>
+                        Upload New Asset
+                    </button>
+</div>
+<!-- Mini Timeline -->
+<div class="relative pl-6 space-y-6 before:absolute before:left-2 before:top-2 before:bottom-2 before:w-0.5 before:bg-outline-variant">
+<h4 class="text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-4 ml-[-1.5rem] bg-background pr-4 inline-block relative z-10">Live Progress</h4>
+<div class="relative">
+<span class="absolute -left-[1.85rem] top-1 w-4 h-4 bg-secondary rounded-full border-4 border-background"></span>
+<p class="text-xs font-bold text-on-surface">Venue Logistics confirmed</p>
+<p class="text-[10px] text-outline">2 hours ago</p>
+</div>
+<div class="relative">
+<span class="absolute -left-[1.85rem] top-1 w-4 h-4 bg-primary rounded-full border-4 border-background"></span>
+<p class="text-xs font-bold text-on-surface">Inventory: Flower shipment arrival</p>
+<p class="text-[10px] text-outline">Awaiting confirmation</p>
+</div>
+<div class="relative opacity-40">
+<span class="absolute -left-[1.85rem] top-1 w-4 h-4 bg-outline-variant rounded-full border-4 border-background"></span>
+<p class="text-xs font-bold text-on-surface">Staff briefing at site</p>
+<p class="text-[10px] text-outline">Tomorrow, 08:00</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Map Context Floating Action (Subtle) -->
+<div class="fixed bottom-8 right-8 flex flex-col gap-3">
+<button class="w-16 h-16 bg-on-surface text-surface rounded-full shadow-2xl flex items-center justify-center hover:scale-110 transition-transform hover:bg-tertiary">
+<span class="material-symbols-outlined text-2xl" data-icon="map">map</span>
+</button>
+</div>
+</body></html>

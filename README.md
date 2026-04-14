@@ -29,11 +29,11 @@ Para o desenvolvimento deste projeto, serão utilizadas as seguintes tecnologias
 
 - _Frontend:_ React
 - _Backend:_ Node.js
-- _Banco de Dados:_ Banco de Dados Relacional (ex: PostgreSQL ou MySQL)
+- _Banco de Dados:_ Banco de Dados Relacional PostgreSQL
 - _Testes de API:_ Postman
 - _Controle de Versão:_ Git e GitHub
 - _Planejamento:_ Trello
-- _Metodologia de Desenvolvimento:_ Scrum — abordagem ágil que permite adaptações rápidas a mudanças e promove entregas incrementais por meio de sprints.
+- _Metodologia de Desenvolvimento:_ Kanban — abordagem ágil baseada na visualização contínua do fluxo de trabalho, promovendo a eficiência e entregas contínuas.
 
 ---
 
@@ -46,6 +46,7 @@ Para o desenvolvimento deste projeto, serão utilizadas as seguintes tecnologias
 - _RF3:_ O sistema deve permitir o CRUD de Funcionários, com campos para categorização por funções (ex: recreadores, cozinheiros, garçons, etc.).
 - _RF4:_ O sistema deve possuir um módulo de upload e gerenciamento de documentos para adicionar e consultar arquivos, como contratos assinados pelos clientes.
 - _RF5:_ O sistema deve permitir o CRUD de Eventos, registrando data, local, funcionários alocados e informações gerais.
+- _RF6:_ O sistema deve permitir o CRUD de Orçamentos, registrando valor total, data de validade, status (pendente, aprovado, reprovado) e informações gerais.
 
 ### • Requisitos Não Funcionais
 
@@ -75,23 +76,27 @@ Para o desenvolvimento deste projeto, serão utilizadas as seguintes tecnologias
 
 O banco de dados do projeto será estruturado utilizando um **Banco de Dados Relacional** PostgreSQL , garantindo a integridade referencial dos dados e permitindo o cruzamento de informações entre clientes, eventos, funcionários, financeiro e suprimentos de forma robusta.
 
+> **Usuários:** Armazena os usuários do sistema com controle de acesso por níveis (admin, gerente, operador).
+
 > **Clientes:** Armazena os dados pessoais e de contato (Nome, E-mail, RG/CPF, Telefone).
 
 > **Funcionários:** Armazena os dados da equipe e a função exercida (Recreador, Garçom, etc.).
 
-> **Orçamentos:** Registra as propostas financeiras geradas para os clientes, contendo valores, data de validade, status (pendente, aprovado, reprovado) e uma chave estrangeira que o vincula ao Cliente.
+> **Produtos:** Armazena o inventário de itens disponíveis no estoque, registrando nome, categoria, quantidade, unidade de medida e custo unitário.
 
-> **Eventos:** Registra os detalhes das festas/eventos, possuindo uma chave estrangeira (Foreign Key) que o vincula a um Cliente e, opcionalmente, ao Orçamento que originou aquele evento.
+> **Orçamentos:** Registra as propostas financeiras geradas para os clientes, contendo valor total, data de validade, status (pendente, aprovado, reprovado) e uma chave estrangeira que o vincula ao Cliente.
 
-> **Produtos (Estoque):** Armazena o inventário de itens disponíveis (alimentos, bebidas, descartáveis, etc.), registrando nome, categoria, quantidade em estoque, unidade de medida e custo.
+> **Eventos:** Registra os detalhes dos eventos, possuindo chave estrangeira que o vincula a um Cliente e, opcionalmente, ao Orçamento de origem. Também consolida a quantidade detalhada de convidados (adultos, crianças e bebês) e o status do evento.
 
-> **Documentos:** Armazena o caminho/URL do arquivo (ex: PDF de contrato), referenciando a qual Cliente ou Evento ele pertence.
+> **Documentos:** Armazena o caminho/URL do arquivo (ex: .pdf, .jpg, .png), referenciando a qual Cliente ou Evento o documento pertence.
 
-> **Escala (Evento_Funcionario):** Tabela intermediária (N:M) para registrar quais funcionários estão alocados em quais eventos.
+> **Escala:** Tabela intermediária (N:M) para registrar quais funcionários estão alocados em quais eventos.
 
-> **Itens_Consumo (Evento_Produto / Orcamento_Produto):** Tabelas intermediárias (N:M) necessárias para registrar quais produtos do estoque e em quais quantidades foram listados em um orçamento ou serão consumidos em um evento específico.
+> **Evento_Produto:** Tabela intermediária (N:M) que registra os produtos do estoque e as quantidades que serão consumidas em um evento específico.
 
-![Diagrama do Banco de Dados Relacional](img/BancoRelacional.png)
+> **Orcamento_Produto:** Tabela intermediária (N:M) que registra quais produtos do estoque e suas respectivas quantidades e preços unitários listados em um orçamento.
+
+![Diagrama do Banco de Dados Relacional](img/projeto_mais_alegria-diagrama-tabelas.png)
 
 ---
 
@@ -99,13 +104,23 @@ O banco de dados do projeto será estruturado utilizando um **Banco de Dados Rel
 
 O modelo físico segue a estrutura relacional padrão, utilizando tabelas interligadas por chaves primárias (PK) e estrangeiras (FK).
 
-### Relacionamento entre Tabelas
+### Principais Relacionamentos
+
+- **Clientes ↔ Orçamentos:** 1:N (Um cliente pode ter vários orçamentos associados, mas cada orçamento pertence a um único cliente).
 
 - **Clientes ↔ Eventos:** 1:N (Um cliente pode contratar vários eventos, mas um evento específico pertence a um único cliente).
 
-- **Eventos ↔ Funcionários:** N:M (Um evento possui vários funcionários, e um funcionário pode trabalhar em vários eventos). Relacionamento resolvido através da tabela `Escala`.
+- **Orçamentos ↔ Eventos:** 1:N (Um evento pode opcionalmente herdar as informações de um orçamento previamente aprovado).
 
-- **Clientes ↔ Documentos:** 1:N (Um cliente pode ter vários documentos/contratos anexados ao seu perfil).
+- **Clientes ↔ Documentos:** 1:N (Um cliente pode ter vários documentos/contratos gerais anexados ao seu perfil).
+
+- **Eventos ↔ Documentos:** 1:N (Um evento pode ter arquivos e contratos específicos anexados a ele).
+
+- **Eventos ↔ Funcionários:** N:M (Um evento possui vários funcionários alocados, e um funcionário pode trabalhar em vários eventos). Relacionamento resolvido através da tabela intermediária `escala`.
+
+- **Eventos ↔ Produtos:** N:M (Um evento utilizará/consumirá vários produtos, e um produto pode ser utilizado em vários eventos). Relacionamento resolvido através da tabela intermediária `evento_produto`.
+
+- **Orçamentos ↔ Produtos:** N:M (Um orçamento pode conter a previsão de vários produtos, e um produto pode constar em diversos orçamentos). Relacionamento resolvido através da tabela intermediária `orcamento_produto`.
 
 ---
 
@@ -207,7 +222,7 @@ O design do **Projeto Mais Alegria** deve transmitir profissionalismo sem perder
 
 ## 11. Aplicação
 
-A aplicação será construída com uma arquitetura dividida: o Frontend dinâmico em **React** e o Backend robusto em **Node.js**. A comunicação entre eles ocorrerá via API RESTful. Para garantir a confiabilidade dos dados, todas as rotas (CRUD de clientes, eventos, etc.) serão testadas exaustivamente utilizando o **Postman** antes de serem integradas à interface. O fluxo de trabalho seguirá a metodologia **Scrum**, com as tarefas (sprints) organizadas e monitoradas através de um quadro no **Trello**.
+A aplicação será construída com uma arquitetura dividida: o Frontend dinâmico em **React** e o Backend robusto em **Node.js**. A comunicação entre eles ocorrerá via API RESTful. Para garantir a confiabilidade dos dados, todas as rotas (CRUD de clientes, eventos, etc.) serão testadas exaustivamente utilizando o **Postman** antes de serem integradas à interface. O fluxo de trabalho seguirá a metodologia **Kanban**, com as tarefas organizadas e monitoradas através de um quadro no **Trello**.
 
 ---
 
@@ -221,5 +236,4 @@ O sistema do **Projeto Mais Alegria** centralizará as operações da empresa, s
 
 - Documentação Oficial do React: https://pt-br.reactjs.org/
 - Documentação Oficial do Node.js: https://nodejs.org/pt-br/docs/
-- Guia Oficial do Scrum: https://scrumguides.org/
 - Documentação do Postman: https://learning.postman.com/docs/introduction/overview/

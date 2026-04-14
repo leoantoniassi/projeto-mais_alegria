@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+
+<html class="light" lang="pt-br"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Mais Alegria - Gestão de Estoque</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Plus+Jakarta+Sans:wght@500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<!-- Icons -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#FEDC57", // Yellow (Festiva Modern)
+              "on-primary": "#403400",
+              "primary-container": "#FEDC57",
+              "on-primary-container": "#241D00",
+              "secondary": "#7DBA00", // Green (Success/Growth)
+              "on-secondary": "#FFFFFF",
+              "secondary-container": "#D2F481",
+              "on-secondary-container": "#233600",
+              "tertiary": "#6600A1", // Purple (Distinctive Accents)
+              "on-tertiary": "#FFFFFF",
+              "tertiary-container": "#F1DBFF",
+              "on-tertiary-container": "#24003E",
+              "background": "#FDFAF2",
+              "surface": "#FDFAF2",
+              "on-surface": "#1D1B16",
+              "surface-container-low": "#F7F3E8",
+              "surface-container-lowest": "#FFFFFF",
+              "surface-container-high": "#F1EEE2",
+              "surface-container-highest": "#EBE8DB",
+              "on-surface-variant": "#4A4639",
+              "outline": "#7B7767",
+              "outline-variant": "#CDC6B4",
+              "error": "#BA1A1A",
+              "on-error": "#FFFFFF"
+            },
+            fontFamily: {
+              "headline": ["Plus Jakarta Sans"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "9999px", "lg": "1rem", "xl": "1.5rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3, .brand-font { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface">
+<!-- Sidebar Navigation -->
+<aside class="fixed left-0 top-0 h-full w-64 bg-surface-container-low dark:bg-stone-900 z-40 font-plus-jakarta-sans text-sm font-medium">
+<div class="p-8 flex items-center gap-3">
+<div class="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-on-primary shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined" data-weight="fill" style="font-variation-settings: 'FILL' 1;">celebration</span>
+</div>
+<div>
+<h1 class="text-xl font-bold text-on-surface dark:text-orange-100">Mais Alegria</h1>
+<p class="text-[10px] uppercase tracking-widest text-on-surface-variant/70">Festive Architect</p>
+</div>
+</div>
+<nav class="mt-4 px-4 space-y-1">
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-primary/10 rounded-full transition-colors" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+            Dashboard
+        </a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-primary/10 rounded-full transition-colors" href="#">
+<span class="material-symbols-outlined">group</span>
+            Clients
+        </a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-primary/10 rounded-full transition-colors" href="#">
+<span class="material-symbols-outlined">badge</span>
+            Employees
+        </a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-primary/10 rounded-full transition-colors" href="#">
+<span class="material-symbols-outlined">request_quote</span>
+            Quotes
+        </a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-primary/10 rounded-full transition-colors" href="#">
+<span class="material-symbols-outlined">event_available</span>
+            Events
+        </a>
+<a class="flex items-center gap-3 px-4 py-3 bg-white dark:bg-stone-800 text-on-surface-variant border-l-4 border-primary shadow-sm rounded-r-full" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">inventory_2</span>
+            Inventory
+        </a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-primary/10 rounded-full transition-colors" href="#">
+<span class="material-symbols-outlined">description</span>
+            Documents
+        </a>
+</nav>
+<div class="absolute bottom-8 left-0 w-full px-8">
+<div class="p-4 bg-white/50 rounded-2xl flex items-center gap-3 border border-outline-variant/30">
+<img alt="Profile" class="w-10 h-10 rounded-full object-cover" data-alt="professional headshot of a female event planner smiling warmly in a bright modern office studio" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBjBbfThIKdlLHHrRmnFJ-myBFpF-AFppFqxv6DSFkLdgZToUgejXFJ_tEa5vwfTB5IeVFrZj3kd4dmSiepE-plYUqUMQG2HU8mjVbumdxNQJqKby1979LMtjBs4zmUm5KXE7dK22dRxy-AYIuN_-EViusVvVR7vYqUPtiEdBnInn3J0sKseTyPAGyW3ZLwOVJrgYJ7BRnCUc-vs2YgKjDrF-H1qTwHfHy7DoeYPtpKoUF2u6PmH1Ahwz_yumKUreDIWv275nu97w"/>
+<div class="overflow-hidden">
+<p class="font-bold text-on-surface truncate">Ana Silva</p>
+<p class="text-xs text-on-surface-variant truncate">Lead Producer</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="ml-64 min-h-screen">
+<!-- Top Nav Bar -->
+<header class="flex justify-between items-center w-full px-12 h-20 sticky top-0 z-30 bg-white/80 backdrop-blur-md shadow-sm">
+<div class="flex-1 max-w-xl">
+<div class="relative group">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant/50 group-focus-within:text-tertiary transition-colors">search</span>
+<input class="w-full bg-surface-container-low border-none rounded-full py-2.5 pl-12 pr-4 focus:ring-2 focus:ring-primary focus:bg-surface transition-all text-sm" placeholder="Pesquisar itens no estoque..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<button class="relative text-on-surface-variant hover:text-tertiary transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute -top-1 -right-1 w-2 h-2 bg-error rounded-full"></span>
+</button>
+<button class="text-on-surface-variant hover:text-tertiary transition-colors">
+<span class="material-symbols-outlined">settings</span>
+</button>
+</div>
+</header>
+<!-- Content Area -->
+<div class="px-12 py-10 max-w-7xl mx-auto">
+<!-- Header Section -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+<div>
+<h2 class="text-4xl font-extrabold text-on-surface tracking-tight mb-2">Estoque</h2>
+<p class="text-on-surface-variant font-medium">Controle de insumos, materiais e equipamentos para eventos.</p>
+</div>
+<button class="flex items-center gap-2 px-8 py-3.5 bg-primary text-on-primary rounded-full font-bold shadow-lg shadow-primary/20 hover:scale-[1.02] transition-transform active:scale-95">
+<span class="material-symbols-outlined">add</span>
+                Adicionar Item
+            </button>
+</div>
+<!-- Bento-style Stats Overview -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
+<div class="p-6 bg-surface-container-lowest rounded-2xl border-b-4 border-primary">
+<p class="text-xs uppercase tracking-widest text-on-surface-variant font-bold mb-4">Total de Itens</p>
+<div class="flex items-end justify-between">
+<span class="text-4xl font-extrabold text-on-surface">1,248</span>
+<span class="material-symbols-outlined text-primary/40 text-4xl">inventory</span>
+</div>
+</div>
+<div class="p-6 bg-surface-container-lowest rounded-2xl border-b-4 border-error">
+<p class="text-xs uppercase tracking-widest text-on-surface-variant font-bold mb-4">Estoque Baixo</p>
+<div class="flex items-end justify-between">
+<span class="text-4xl font-extrabold text-error">12</span>
+<span class="material-symbols-outlined text-error/30 text-4xl">warning</span>
+</div>
+</div>
+<div class="p-6 bg-surface-container-lowest rounded-2xl border-b-4 border-tertiary">
+<p class="text-xs uppercase tracking-widest text-on-surface-variant font-bold mb-4">Categorias</p>
+<div class="flex items-end justify-between">
+<span class="text-4xl font-extrabold text-tertiary">8</span>
+<span class="material-symbols-outlined text-tertiary/20 text-4xl">category</span>
+</div>
+</div>
+<div class="p-6 bg-secondary text-on-secondary rounded-2xl shadow-xl shadow-secondary/20">
+<p class="text-xs uppercase tracking-widest text-on-secondary/70 font-bold mb-4">Valor Total</p>
+<div class="flex items-end justify-between">
+<span class="text-2xl font-extrabold">R$ 42.500</span>
+<span class="material-symbols-outlined text-on-secondary/30 text-4xl">payments</span>
+</div>
+</div>
+</div>
+<!-- Inventory Editorial Table -->
+<div class="bg-surface-container-lowest rounded-[2rem] overflow-hidden shadow-xl shadow-on-surface/5 border border-outline-variant/10">
+<div class="px-8 py-6 flex items-center justify-between bg-surface-container-low/30 border-b border-outline-variant/10">
+<h3 class="font-bold text-lg text-on-surface">Itens Recentes</h3>
+<div class="flex items-center gap-3">
+<button class="flex items-center gap-2 px-5 py-2.5 bg-white text-on-surface-variant border border-outline-variant/50 rounded-full text-sm font-semibold hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined text-lg">filter_list</span>
+                        Filtrar
+                    </button>
+<button class="flex items-center gap-2 px-5 py-2.5 bg-white text-on-surface-variant border border-outline-variant/50 rounded-full text-sm font-semibold hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined text-lg">download</span>
+                        Exportar CSV
+                    </button>
+</div>
+</div>
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low/10">
+<th class="px-8 py-5 font-bold text-xs uppercase tracking-wider text-on-surface-variant">Item</th>
+<th class="px-8 py-5 font-bold text-xs uppercase tracking-wider text-on-surface-variant">Categoria</th>
+<th class="px-8 py-5 font-bold text-xs uppercase tracking-wider text-on-surface-variant">Quantidade</th>
+<th class="px-8 py-5 font-bold text-xs uppercase tracking-wider text-on-surface-variant">Custo Un.</th>
+<th class="px-8 py-5 font-bold text-xs uppercase tracking-wider text-on-surface-variant text-right">Ações</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/5">
+<!-- Row 1 -->
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="px-8 py-6">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-2xl bg-primary/20 flex items-center justify-center overflow-hidden">
+<img alt="Drink" class="w-full h-full object-cover" data-alt="close up of sparkling champagne being poured into a crystal glass with celebratory bokeh lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBG5XGyNZZpfvGrA_vpJbSDQefYQVribA8KlRX7rqyW74_wBsfSA2oPZlpMbadQbRt753j74xkOXLlqksr1xN67s4fDXXTNeRoM8f6zp5zF7B7lF6uErj9Cli94vLmQD4YSASeZJieUpYSgi0_ggpAjhaMQlgzg5-Dznvo-AeacE_rlXPr5Cgi1YBGXB8Y7B5EAY4N1T83TTXwz9mnHSo1Ke7ZlTpGbXZ04KOW79SgmWuimOhKxScujLTAotaRQpV7E31yOFiZryg"/>
+</div>
+<div>
+<p class="font-bold text-on-surface">Champagne Veuve Clicquot</p>
+<p class="text-xs text-on-surface-variant">ID: FR-092-B</p>
+</div>
+</div>
+</td>
+<td class="px-8 py-6">
+<span class="px-4 py-1.5 bg-tertiary-container text-on-tertiary-container rounded-full text-xs font-bold">Drinks</span>
+</td>
+<td class="px-8 py-6">
+<div class="flex items-center gap-2">
+<span class="font-bold text-on-surface text-lg">48</span>
+<span class="text-on-surface-variant text-xs font-medium">Garrafas</span>
+</div>
+</td>
+<td class="px-8 py-6 font-medium text-on-surface">R$ 380,00</td>
+<td class="px-8 py-6">
+<div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-2 hover:bg-white rounded-full text-secondary transition-colors" title="Update Stock">
+<span class="material-symbols-outlined">sync_alt</span>
+</button>
+<button class="p-2 hover:bg-white rounded-full text-on-surface-variant transition-colors" title="Edit">
+<span class="material-symbols-outlined">edit</span>
+</button>
+<button class="p-2 hover:bg-error/10 rounded-full text-error transition-colors" title="Delete">
+<span class="material-symbols-outlined">delete</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 2 (Low Stock Warning) -->
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="px-8 py-6">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-2xl bg-primary/20 flex items-center justify-center overflow-hidden">
+<img alt="Finger Food" class="w-full h-full object-cover" data-alt="gourmet finger food appetizers arranged beautifully on a black slate tray with elegant presentation" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCA5bmT4Jhkm94uerFdpLUu2RsreYU0dzPAociAJDYt2r1N60dY7sytJBcM0XTuT3TV3dzXQrVGtZio3k0JCzm_quZBk9vg4gOK3ll_snGpaazKqbhYuC3LJ60LzKx2__vdtdbnk1Yi2CcBdv4-Sl_hxFow4EN6jUHhNjLbK8KauNV2KThoGDXsLwyjf7EB_iJL6YJcEa4Pa-yoEYDtUmyjcnTJNak8T1noXzylpdS90l_psjqHxbfiOtcjctsnEHs0G8n-SaXGdg"/>
+</div>
+<div>
+<p class="font-bold text-on-surface">Canapés de Salmão</p>
+<p class="text-xs text-on-surface-variant">ID: FD-112-S</p>
+</div>
+</div>
+</td>
+<td class="px-8 py-6">
+<span class="px-4 py-1.5 bg-primary/30 text-on-primary-container rounded-full text-xs font-bold">Food</span>
+</td>
+<td class="px-8 py-6">
+<div class="flex flex-col gap-1">
+<div class="flex items-center gap-2">
+<span class="font-bold text-error text-lg">15</span>
+<span class="text-on-surface-variant text-xs font-medium">Unidades</span>
+</div>
+<div class="w-24 h-1.5 bg-surface-container-high rounded-full overflow-hidden">
+<div class="bg-error h-full w-[15%]"></div>
+</div>
+</div>
+</td>
+<td class="px-8 py-6 font-medium text-on-surface">R$ 12,50</td>
+<td class="px-8 py-6">
+<div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-2 hover:bg-white rounded-full text-secondary transition-colors">
+<span class="material-symbols-outlined">sync_alt</span>
+</button>
+<button class="p-2 hover:bg-white rounded-full text-on-surface-variant transition-colors">
+<span class="material-symbols-outlined">edit</span>
+</button>
+<button class="p-2 hover:bg-error/10 rounded-full text-error transition-colors">
+<span class="material-symbols-outlined">delete</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="px-8 py-6">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-2xl bg-primary/20 flex items-center justify-center overflow-hidden text-on-surface-variant">
+<span class="material-symbols-outlined text-3xl">eco</span>
+</div>
+<div>
+<p class="font-bold text-on-surface">Copos Compostáveis</p>
+<p class="text-xs text-on-surface-variant">ID: DS-883-C</p>
+</div>
+</div>
+</td>
+<td class="px-8 py-6">
+<span class="px-4 py-1.5 bg-surface-container-highest text-on-surface-variant rounded-full text-xs font-bold">Disposables</span>
+</td>
+<td class="px-8 py-6">
+<div class="flex items-center gap-2">
+<span class="font-bold text-on-surface text-lg">2,500</span>
+<span class="text-on-surface-variant text-xs font-medium">Unidades</span>
+</div>
+</td>
+<td class="px-8 py-6 font-medium text-on-surface">R$ 0,45</td>
+<td class="px-8 py-6">
+<div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-2 hover:bg-white rounded-full text-secondary transition-colors">
+<span class="material-symbols-outlined">sync_alt</span>
+</button>
+<button class="p-2 hover:bg-white rounded-full text-on-surface-variant transition-colors">
+<span class="material-symbols-outlined">edit</span>
+</button>
+<button class="p-2 hover:bg-error/10 rounded-full text-error transition-colors">
+<span class="material-symbols-outlined">delete</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="px-8 py-6">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-2xl bg-primary/20 flex items-center justify-center overflow-hidden">
+<img alt="Coffee" class="w-full h-full object-cover" data-alt="overhead view of high quality roasted coffee beans and a steaming cup of latte with professional latte art" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAWbRtEe58_nTmyfyRa71igB__PHW50qPHTa_mdelPRbzhEuKde0IMj_vQyYipyjOpGr9AJTxvC-KAcFSeyBUrNjjGX3PM_PDjSCmFobuwaD3XMSWpsi4vFy9GBtNpF55zdqNpsTz54ysrTuZnQIZfQE3mc_BzWI81OZ3LVxhmaD5_p27r0CsSLQX4CGg6pMwQJsMhlPxqk_Y7ZXxI0WLESftw_a0xZIBSovobIxmyNycC2JZG8esSHDUq6UvmDRwBYyrH3dB9fTw"/>
+</div>
+<div>
+<p class="font-bold text-on-surface">Café Gourmet Especial</p>
+<p class="text-xs text-on-surface-variant">ID: FD-340-K</p>
+</div>
+</div>
+</td>
+<td class="px-8 py-6">
+<span class="px-4 py-1.5 bg-primary/30 text-on-primary-container rounded-full text-xs font-bold">Food</span>
+</td>
+<td class="px-8 py-6">
+<div class="flex items-center gap-2">
+<span class="font-bold text-on-surface text-lg">12</span>
+<span class="text-on-surface-variant text-xs font-medium">kg</span>
+</div>
+</td>
+<td class="px-8 py-6 font-medium text-on-surface">R$ 85,00</td>
+<td class="px-8 py-6">
+<div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-2 hover:bg-white rounded-full text-secondary transition-colors">
+<span class="material-symbols-outlined">sync_alt</span>
+</button>
+<button class="p-2 hover:bg-white rounded-full text-on-surface-variant transition-colors">
+<span class="material-symbols-outlined">edit</span>
+</button>
+<button class="p-2 hover:bg-error/10 rounded-full text-error transition-colors">
+<span class="material-symbols-outlined">delete</span>
+</button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<!-- Pagination -->
+<div class="px-8 py-5 bg-surface-container-low/20 flex items-center justify-between border-t border-outline-variant/10">
+<p class="text-sm text-on-surface-variant font-medium">Exibindo 1 a 4 de 1,248 itens</p>
+<div class="flex items-center gap-1">
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container-low text-on-surface-variant transition-colors disabled:opacity-30" disabled="">
+<span class="material-symbols-outlined">chevron_left</span>
+</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-full bg-secondary text-on-secondary font-bold">1</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container-low text-on-surface-variant transition-colors">2</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container-low text-on-surface-variant transition-colors">3</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container-low text-on-surface-variant transition-colors">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</main>
+</body></html>
