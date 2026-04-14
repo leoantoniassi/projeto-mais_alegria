@@ -12,7 +12,7 @@ A solução proposta utiliza uma arquitetura web moderna para centralizar os dad
 
 #### Objetivo Geral
 
-Desenvolver um sistema web funcional para gerenciar clientes, funcionários, documentos e informações de eventos, otimizando a organização e a comunicação da empresa.
+Desenvolver um sistema web funcional para gerenciar clientes, funcionários, documentos, orçamentos, estoque e informações de eventos, otimizando a organização e a comunicação da empresa.
 
 #### Objetivos Específicos
 
@@ -20,7 +20,8 @@ Desenvolver um sistema web funcional para gerenciar clientes, funcionários, doc
 - Categorizar e registrar funcionários com base em suas funções operacionais (ex: recreadores, cozinheiros, garçons).
 - Fornecer um ambiente seguro para o armazenamento e gerenciamento de documentos e contratos.
 - Centralizar todos os detalhes e requisitos específicos de cada evento realizado.
-
+- Cadastrar e gerenciar o fluxo de orçamentos
+- Cadastrar e gerenciar o fluxo de estoque
 ---
 
 ### • Metodologia
@@ -67,6 +68,7 @@ Para o desenvolvimento deste projeto, serão utilizadas as seguintes tecnologias
 - **Contatar via WhatsApp:** Ação rápida para abrir o chat do WhatsApp utilizando o número registrado no cadastro do cliente.
 - **Gerenciar Funcionários:** Registra novos colaboradores e os categoriza por suas respectivas funções (recreador, cozinheiro, garçom, etc.).
 - **Gerenciar Documentos:** Permite o upload, visualização e exclusão de arquivos, vinculando contratos aos clientes ou eventos específicos.
+- **Gerenciar Estoque:** Registra as entradas, saídas e controle de inventário de produtos e insumos (alimentos, descartáveis, etc.), garantindo o controle com base na quantidade, unidade de medida e custos.
 - **Gerenciar Orçamentos:** Permite criar, editar, enviar e acompanhar o status de orçamentos (ex: pendente, aprovado, reprovado) para potenciais eventos.
 - **Gerenciar Eventos:** Cria novos eventos (geralmente a partir de orçamentos aprovados), definindo data, local e associando o cliente responsável e a equipe de funcionários alocada.
 
@@ -156,7 +158,7 @@ O setor de eventos (festas infantis, casamentos, confraternizações) exige alto
 ### Viabilidade de Recursos
 
 - **Humanos:** Desenvolvedores (Frontend React e Backend Node.js), Product Owner/Scrum Master para gerenciar as entregas e equipe de testes.
-- **Tecnológicos:** React, Node.js, Banco de Dados Relacional (ex: PostgreSQL ou MySQL), Postman para testes de API e Trello para gestão ágil.
+- **Tecnológicos:** React, Node.js, Banco de Dados Relacional (PostgreSQL), Postman para testes de API e Trello para gestão ágil.
 - **Financeiros:** Custos focados em hospedagem em nuvem e horas de desenvolvimento, utilizando frameworks de código aberto que reduzem despesas com licenciamento.
 
 ### Viabilidade Operacional
