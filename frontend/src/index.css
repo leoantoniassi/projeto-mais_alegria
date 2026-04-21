@@ -1,0 +1,88 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #FEDC57;
+  --color-on-primary: #402d00;
+  --color-primary-container: #fff1db;
+  --color-on-primary-container: #584000;
+  --color-secondary: #7DBA00;
+  --color-on-secondary: #ffffff;
+  --color-secondary-container: #d6f599;
+  --color-on-secondary-container: #233600;
+  --color-tertiary: #6600A1;
+  --color-on-tertiary: #ffffff;
+  --color-tertiary-container: #f0e6ff;
+  --color-on-tertiary-container: #24003d;
+  --color-background: #fdfcf5;
+  --color-surface: #ffffff;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-low: #f7f4ea;
+  --color-surface-container: #f1eee4;
+  --color-surface-container-high: #ebe8de;
+  --color-surface-container-highest: #e5e2d8;
+  --color-on-surface: #1d1c16;
+  --color-on-surface-variant: #4a4639;
+  --color-outline: #7b7768;
+  --color-outline-variant: #cbc7b6;
+  --color-error: #ba1a1a;
+  --color-on-error: #ffffff;
+  --color-error-container: #ffdad6;
+  --color-on-error-container: #410002;
+
+  --font-headline: "Plus Jakarta Sans", sans-serif;
+  --font-body: "Inter", sans-serif;
+  --font-label: "Inter", sans-serif;
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--color-background);
+  color: var(--color-on-surface);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, .font-headline {
+  font-family: var(--font-headline);
+}
+
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.material-symbols-outlined.filled {
+  font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+.editorial-shadow {
+  box-shadow: 0px 20px 40px rgba(0, 0, 0, 0.04);
+}
+
+.brand-gradient {
+  background: linear-gradient(135deg, #FEDC57 0%, #e5c545 100%);
+}
+
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #cbc7b6; border-radius: 10px; }
+
+/* Animations */
+@keyframes slideInRight {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.slide-in-right {
+  animation: slideInRight 0.3s ease-out;
+}
+
+.fade-in {
+  animation: fadeIn 0.2s ease-out;
+}

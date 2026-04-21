@@ -1,6 +1,7 @@
-version: '3.8'
-
 services:
+  # ============================
+  # 🗃️ Banco de Dados PostgreSQL
+  # ============================
   db:
     image: postgres:15-alpine
     container_name: mais_alegria_db
@@ -14,11 +15,49 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
       - ./database/init.sql:/docker-entrypoint-initdb.d/01-init.sql
+      - ./database/seed.sql:/docker-entrypoint-initdb.d/02-seed.sql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
       interval: 5s
       timeout: 5s
       retries: 5
 
+  # ============================
+  # ⚙️ Backend (Node.js + Express)
+  # ============================
+  backend:
+    build: ./backend
+    container_name: mais_alegria_api
+    restart: unless-stopped
+    environment:
+      PORT: 3001
+      JWT_SECRET: mais_alegria_jwt_secret_2026
+      JWT_EXPIRES_IN: 24h
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: ${DB_USER}
+      DB_PASS: ${DB_PASS}
+      DB_NAME: ${DB_NAME}
+    ports:
+      - "3001:3001"
+    volumes:
+      - backend_uploads:/app/uploads
+    depends_on:
+      db:
+        condition: service_healthy
+
+  # ============================
+  # 🎨 Frontend (React + Nginx)
+  # ============================
+  frontend:
+    build: ./frontend
+    container_name: mais_alegria_web
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
 volumes:
   pgdata:
+  backend_uploads:

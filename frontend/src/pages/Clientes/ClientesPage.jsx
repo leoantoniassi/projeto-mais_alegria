@@ -1,0 +1,208 @@
+import { useState, useEffect } from 'react';
+import api from '../../services/api';
+
+export default function ClientesPage() {
+  const [clientes, setClientes] = useState([]);
+  const [total, setTotal] = useState(0);
+  const [page, setPage] = useState(1);
+  const [search, setSearch] = useState('');
+  const [showPanel, setShowPanel] = useState(false);
+  const [editing, setEditing] = useState(null);
+  const [form, setForm] = useState({ nome: '', email: '', telefone: '', rgCpf: '' });
+
+  const fetchClientes = async () => {
+    try {
+      const { data: res } = await api.get('/clientes', { params: { page, limit: 10, busca: search } });
+      const items = Array.isArray(res.data) ? res.data : (res.rows || []);
+      setClientes(items);
+      setTotal(res.pagination?.total || items.length);
+    } catch {}
+  };
+
+  useEffect(() => { fetchClientes(); }, [page, search]);
+
+  const handleSave = async (e) => {
+    e.preventDefault();
+    try {
+      if (editing) {
+        await api.put(`/clientes/${editing}`, form);
+      } else {
+        await api.post('/clientes', form);
+      }
+      setShowPanel(false);
+      setEditing(null);
+      setForm({ nome: '', email: '', telefone: '', rgCpf: '' });
+      fetchClientes();
+    } catch (err) {
+      alert(err.response?.data?.message || 'Erro ao salvar');
+    }
+  };
+
+  const handleEdit = (c) => {
+    setForm({ nome: c.nome, email: c.email, telefone: c.telefone, rgCpf: c.rgCpf });
+    setEditing(c.id);
+    setShowPanel(true);
+  };
+
+  const handleDelete = async (id) => {
+    if (!confirm('Deseja realmente excluir este cliente?')) return;
+    try {
+      await api.delete(`/clientes/${id}`);
+      fetchClientes();
+    } catch (err) {
+      alert(err.response?.data?.message || 'Erro ao excluir');
+    }
+  };
+
+  const handleWhatsApp = async (id) => {
+    try {
+      const { data: res } = await api.get(`/clientes/${id}/whatsapp`);
+      window.open(res.data?.link || res.url, '_blank');
+    } catch {}
+  };
+
+  const initials = (name) => (name || 'NA').split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
+
+  return (
+    <div>
+      {/* Header */}
+      <section className="px-2 pb-6">
+        <div className="flex justify-between items-end mb-10">
+          <div className="max-w-2xl">
+            <h2 className="text-4xl font-extrabold font-headline text-on-surface tracking-tight mb-2">Clientes</h2>
+            <p className="text-on-surface-variant">Gerencie os organizadores de eventos e parceiros corporativos.</p>
+          </div>
+          <button
+            onClick={() => { setEditing(null); setForm({ nome: '', email: '', telefone: '', rgCpf: '' }); setShowPanel(true); }}
+            className="bg-primary text-on-primary px-8 py-3 rounded-full font-bold flex items-center gap-2 shadow-xl shadow-primary/30 hover:scale-[1.05] active:scale-95 transition-all"
+          >
+            <span className="material-symbols-outlined">add_circle</span>
+            <span>Novo Cliente</span>
+          </button>
+        </div>
+
+        {/* Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+          <div className="bg-white p-6 rounded-xl border border-outline-variant/10 editorial-shadow">
+            <p className="text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-1">Total Ativos</p>
+            <p className="text-3xl font-headline font-extrabold text-tertiary">{total}</p>
+          </div>
+          <div className="md:col-span-2 bg-white p-6 rounded-xl border border-outline-variant/10 editorial-shadow">
+            <input
+              className="w-full bg-surface-container-low border-none rounded-full py-3 px-6 focus:ring-2 focus:ring-primary transition-all placeholder:text-on-surface-variant/60 text-sm"
+              placeholder="Pesquisar clientes por nome ou email..."
+              value={search}
+              onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+            />
+          </div>
+        </div>
+
+        {/* Table */}
+        <div className="bg-white rounded-xl editorial-shadow overflow-hidden border border-outline-variant/10">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left">
+              <thead>
+                <tr className="bg-surface-container text-on-surface-variant text-xs uppercase tracking-[0.15em] font-bold">
+                  <th className="px-6 py-5">Nome & Email</th>
+                  <th className="px-6 py-5">CPF/CNPJ</th>
+                  <th className="px-6 py-5">Telefone</th>
+                  <th className="px-6 py-5 text-right">Ações</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-outline-variant/10">
+                {clientes.length === 0 && (
+                  <tr><td colSpan={4} className="px-6 py-12 text-center text-on-surface-variant">Nenhum cliente encontrado.</td></tr>
+                )}
+                {clientes.map((c) => (
+                  <tr key={c.id} className="hover:bg-primary/5 transition-colors group">
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-primary/20 text-on-primary-container flex items-center justify-center font-bold text-sm">
+                          {initials(c.nome)}
+                        </div>
+                        <div>
+                          <p className="font-bold text-on-surface">{c.nome}</p>
+                          <p className="text-xs text-on-surface-variant">{c.email}</p>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 text-sm text-on-surface-variant font-mono">{c.rgCpf}</td>
+                    <td className="px-6 py-4 text-sm text-on-surface-variant">{c.telefone}</td>
+                    <td className="px-6 py-4 text-right">
+                      <div className="flex justify-end gap-2">
+                        <button onClick={() => handleWhatsApp(c.id)} className="w-9 h-9 rounded-full bg-secondary text-on-secondary flex items-center justify-center hover:scale-110 transition-all shadow-md shadow-secondary/20" title="WhatsApp">
+                          <span className="material-symbols-outlined text-lg filled">chat</span>
+                        </button>
+                        <button onClick={() => handleEdit(c)} className="w-9 h-9 rounded-full bg-surface-container text-on-surface-variant flex items-center justify-center hover:bg-primary/20 transition-all">
+                          <span className="material-symbols-outlined text-lg">edit</span>
+                        </button>
+                        <button onClick={() => handleDelete(c.id)} className="w-9 h-9 rounded-full bg-error-container/20 text-error flex items-center justify-center hover:bg-error hover:text-white transition-all">
+                          <span className="material-symbols-outlined text-lg">delete</span>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <div className="px-6 py-4 bg-surface-container-low text-xs font-bold text-on-surface-variant flex items-center justify-between border-t border-outline-variant/10">
+            <p>Mostrando {clientes.length} de {total} registros</p>
+            <div className="flex items-center gap-1">
+              <button onClick={() => setPage(Math.max(1, page - 1))} disabled={page === 1} className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-surface-container-highest transition-colors disabled:opacity-30">
+                <span className="material-symbols-outlined text-sm">chevron_left</span>
+              </button>
+              <span className="w-8 h-8 rounded-full flex items-center justify-center bg-primary text-on-primary font-bold shadow-sm">{page}</span>
+              <button onClick={() => setPage(page + 1)} disabled={clientes.length < 10} className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-surface-container-highest transition-colors disabled:opacity-30">
+                <span className="material-symbols-outlined text-sm">chevron_right</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Slide-over Panel */}
+      {showPanel && (
+        <div className="fixed inset-0 bg-on-surface/40 backdrop-blur-md z-50 flex justify-end fade-in" onClick={() => setShowPanel(false)}>
+          <div className="w-full max-w-lg bg-white h-full shadow-2xl flex flex-col slide-in-right rounded-l-3xl" onClick={(e) => e.stopPropagation()}>
+            <div className="p-8 border-b border-outline-variant/30 flex justify-between items-start">
+              <div>
+                <h3 className="text-2xl font-headline font-extrabold text-on-surface">{editing ? 'Editar Cliente' : 'Novo Cliente'}</h3>
+                <p className="text-sm text-on-surface-variant mt-1">Preencha os dados do cliente.</p>
+              </div>
+              <button onClick={() => setShowPanel(false)} className="p-2 hover:bg-surface-container rounded-full transition-colors text-on-surface-variant">
+                <span className="material-symbols-outlined">close</span>
+              </button>
+            </div>
+            <div className="flex-1 overflow-y-auto p-8">
+              <form id="client-form" className="space-y-6" onSubmit={handleSave}>
+                <div className="space-y-2">
+                  <label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-4">Nome Completo</label>
+                  <input className="w-full bg-surface-container-low border-none rounded-full py-3.5 px-6 focus:bg-white focus:ring-2 focus:ring-primary transition-all" placeholder="Ex: Maria Silva" value={form.nome} onChange={(e) => setForm({ ...form, nome: e.target.value })} required />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-4">Email</label>
+                    <input className="w-full bg-surface-container-low border-none rounded-full py-3.5 px-6 focus:bg-white focus:ring-2 focus:ring-primary transition-all" type="email" placeholder="email@email.com" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-4">Telefone</label>
+                    <input className="w-full bg-surface-container-low border-none rounded-full py-3.5 px-6 focus:bg-white focus:ring-2 focus:ring-primary transition-all" placeholder="(11) 98765-4321" value={form.telefone} onChange={(e) => setForm({ ...form, telefone: e.target.value })} required />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-4">CPF/CNPJ</label>
+                  <input className="w-full bg-surface-container-low border-none rounded-full py-3.5 px-6 focus:bg-white focus:ring-2 focus:ring-primary transition-all" placeholder="000.000.000-00" value={form.rgCpf} onChange={(e) => setForm({ ...form, rgCpf: e.target.value })} required />
+                </div>
+              </form>
+            </div>
+            <div className="p-8 bg-surface-container-low flex gap-4 rounded-tl-3xl">
+              <button onClick={() => setShowPanel(false)} className="flex-1 border-2 border-outline-variant text-on-surface-variant py-3.5 rounded-full font-bold hover:bg-white transition-all">Cancelar</button>
+              <button type="submit" form="client-form" className="flex-[2] bg-primary text-on-primary py-3.5 rounded-full font-bold shadow-xl shadow-primary/30 hover:scale-[1.02] active:scale-95 transition-all">Salvar</button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
