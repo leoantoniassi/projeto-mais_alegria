@@ -155,7 +155,7 @@ async function whatsapp(req, res, next) {
 
     const link = gerarLinkWhatsApp(
       cliente.telefone,
-      `Olá ${cliente.nome}! Aqui é da equipe Mais Alegria 🎉`
+      `Olá ${cliente.nome}! Aqui é da equipe Mais Alegria.`
     );
 
     return res.json({
