@@ -1,0 +1,797 @@
+{
+	"info": {
+		"_postman_id": "a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d",
+		"name": "Projeto Mais Alegria",
+		"description": "Coleção de testes para a API do Projeto Mais Alegria",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Health Check",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/health",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"health"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Register",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nome\": \"Admin Teste\",\n  \"email\": \"admin.teste@maisalegria.com\",\n  \"senha\": \"123456\",\n  \"role\": \"admin\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/register",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"if(jsonData.token) {",
+									"    pm.environment.set(\"token\", jsonData.token);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"admin@maisalegria.com\",\n  \"senha\": \"123456\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Clientes",
+			"item": [
+				{
+					"name": "Listar Clientes",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/clientes?page=1&limit=10",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"clientes"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Criar Cliente",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nome\": \"João Silva\",\n  \"email\": \"joao.silva@exemplo.com\",\n  \"rgCpf\": \"12345678901\",\n  \"telefone\": \"11987654321\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/clientes",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"clientes"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Buscar Cliente",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/clientes/{{cliente_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"clientes",
+								"{{cliente_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Atualizar Cliente",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nome\": \"João Silva Alterado\",\n  \"telefone\": \"11999999999\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/clientes/{{cliente_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"clientes",
+								"{{cliente_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Deletar Cliente",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/clientes/{{cliente_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"clientes",
+								"{{cliente_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "WhatsApp Link",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/clientes/{{cliente_id}}/whatsapp",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"clientes",
+								"{{cliente_id}}",
+								"whatsapp"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Funcionarios",
+			"item": [
+				{
+					"name": "Listar Funcionarios",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/funcionarios",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"funcionarios"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Criar Funcionario",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nome\": \"Maria Souza\",\n  \"email\": \"maria.souza@exemplo.com\",\n  \"telefone\": \"11988887777\",\n  \"funcao\": \"Recreador\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/funcionarios",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"funcionarios"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Produtos",
+			"item": [
+				{
+					"name": "Listar Produtos",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/produtos",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"produtos"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Criar Produto",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nome\": \"Copo 200ml\",\n  \"categoria\": \"Descartáveis\",\n  \"quantidade\": 1000,\n  \"unidadeMedida\": \"un\",\n  \"custoUnitario\": 0.10\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/produtos",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"produtos"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Orcamentos",
+			"item": [
+				{
+					"name": "Listar Orcamentos",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/orcamentos",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"orcamentos"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Criar Orcamento",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"clienteId\": \"{{cliente_id}}\",\n  \"valorTotal\": 1500.50,\n  \"dataValidade\": \"2026-12-31\",\n  \"status\": \"pendente\",\n  \"observacoes\": \"Festa infantil padrão\",\n  \"produtos\": [\n    {\n      \"produtoId\": \"{{produto_id}}\",\n      \"quantidade\": 500,\n      \"precoUnitario\": 0.10\n    }\n  ]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/orcamentos",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"orcamentos"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Mudar Status Orcamento",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"status\": \"aprovado\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/orcamentos/{{orcamento_id}}/status",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"orcamentos",
+								"{{orcamento_id}}",
+								"status"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Eventos",
+			"item": [
+				{
+					"name": "Listar Eventos",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/eventos",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"eventos"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Criar Evento",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"clienteId\": \"{{cliente_id}}\",\n  \"orcamentoId\": \"{{orcamento_id}}\",\n  \"nome\": \"Festa de 5 anos - Joãozinho\",\n  \"dataEvento\": \"2026-10-12T14:00:00Z\",\n  \"local\": \"Salão de Festas Encantado\",\n  \"status\": \"pendente\",\n  \"qtdPessoas\": 60,\n  \"qtdAdultos\": 30,\n  \"qtdCriancas\": 25,\n  \"qtdBebes\": 5,\n  \"observacoes\": \"Tema super heróis\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/eventos",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"eventos"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Mudar Status Evento",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"status\": \"confirmado\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/eventos/{{evento_id}}/status",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"eventos",
+								"{{evento_id}}",
+								"status"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Documentos",
+			"item": [
+				{
+					"name": "Listar Documentos",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/documentos",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"documentos"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload Documento",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "clienteId",
+									"value": "{{cliente_id}}",
+									"type": "text"
+								},
+								{
+									"key": "eventoId",
+									"value": "{{evento_id}}",
+									"type": "text"
+								},
+								{
+									"key": "file",
+									"type": "file",
+									"src": []
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/documentos/upload",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"documentos",
+								"upload"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Escala",
+			"item": [
+				{
+					"name": "Listar Escala por Evento",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/escala/evento/{{evento_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"escala",
+								"evento",
+								"{{evento_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Alocar Funcionario",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"eventoId\": \"{{evento_id}}\",\n  \"funcionarioId\": \"{{funcionario_id}}\",\n  \"observacoes\": \"Chegar 1h mais cedo para organizar\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/escala",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"escala"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Dashboard",
+			"item": [
+				{
+					"name": "Estatisticas",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/dashboard/stats",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"dashboard",
+								"stats"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Proximos Eventos",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/dashboard/proximos-eventos",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"dashboard",
+								"proximos-eventos"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:3001/api",
+			"type": "string"
+		},
+		{
+			"key": "token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "cliente_id",
+			"value": "COLOQUE_O_ID_AQUI",
+			"type": "string"
+		},
+		{
+			"key": "funcionario_id",
+			"value": "COLOQUE_O_ID_AQUI",
+			"type": "string"
+		},
+		{
+			"key": "produto_id",
+			"value": "COLOQUE_O_ID_AQUI",
+			"type": "string"
+		},
+		{
+			"key": "orcamento_id",
+			"value": "COLOQUE_O_ID_AQUI",
+			"type": "string"
+		},
+		{
+			"key": "evento_id",
+			"value": "COLOQUE_O_ID_AQUI",
+			"type": "string"
+		}
+	]
+}
