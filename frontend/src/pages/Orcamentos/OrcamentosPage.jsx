@@ -38,6 +38,16 @@ export default function OrcamentosPage() {
 
   const handleDelete = async (id) => { if (!confirm('Excluir orçamento?')) return; try { await api.delete(`/orcamentos/${id}`); fetchData(); } catch (err) { alert(err.response?.data?.error || 'Erro'); } };
 
+  const handleConfirm = async (id) => {
+    if (!window.confirm('Você tem certeza que deseja confirmar este orçamento? Ele será convertido em um evento automaticamente.')) return;
+    try {
+      await api.post(`/orcamentos/${id}/confirmar`);
+      fetchData();
+    } catch (err) {
+      alert(err.response?.data?.error || 'Erro ao confirmar orçamento');
+    }
+  };
+
   const statusBadge = (s) => {
     const m = { aprovado: 'bg-secondary-container text-on-secondary-container', pendente: 'bg-primary-container text-on-primary-container', rejeitado: 'bg-error-container text-on-error-container' };
     return m[s] || 'bg-surface-container text-on-surface-variant';
@@ -70,7 +80,7 @@ export default function OrcamentosPage() {
                   <td className="py-4 px-4"><span className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium ${statusBadge(o.status)}`}>{o.status}</span></td>
                   <td className="py-4 px-4 text-right">
                     <div className="flex justify-end gap-1">
-                      {o.status === 'pendente' && <><button onClick={e => { e.stopPropagation(); handleStatus(o.id, 'aprovado'); }} className="p-1.5 text-secondary hover:bg-secondary/10 rounded-full" title="Aprovar"><span className="material-symbols-outlined text-lg">check</span></button><button onClick={e => { e.stopPropagation(); handleStatus(o.id, 'rejeitado'); }} className="p-1.5 text-error hover:bg-error/10 rounded-full" title="Rejeitar"><span className="material-symbols-outlined text-lg">close</span></button></>}
+                      {o.status === 'pendente' && <><button onClick={e => { e.stopPropagation(); handleConfirm(o.id); }} className="p-1.5 text-secondary hover:bg-secondary/10 rounded-full" title="Aprovar e Confirmar"><span className="material-symbols-outlined text-lg">check</span></button><button onClick={e => { e.stopPropagation(); handleStatus(o.id, 'rejeitado'); }} className="p-1.5 text-error hover:bg-error/10 rounded-full" title="Rejeitar"><span className="material-symbols-outlined text-lg">close</span></button></>}
                       <button onClick={e => { e.stopPropagation(); handleDelete(o.id); }} className="p-1.5 text-on-surface-variant hover:text-error rounded-full"><span className="material-symbols-outlined text-lg">delete</span></button>
                     </div>
                   </td>

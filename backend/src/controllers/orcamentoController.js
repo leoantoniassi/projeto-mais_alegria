@@ -1,8 +1,8 @@
 // ============================================================
 // Controller: Orçamentos
 // ============================================================
-const { Op } = require('sequelize');
-const { Orcamento, Cliente, OrcamentoProduto, Produto } = require('../models');
+const { Op } = require("sequelize");
+const { Orcamento, Cliente, OrcamentoProduto, Produto, Evento } = require("../models");
 
 // GET /api/orcamentos
 async function listar(req, res, next) {
@@ -18,11 +18,15 @@ async function listar(req, res, next) {
     const { count, rows } = await Orcamento.findAndCountAll({
       where,
       include: [
-        { model: Cliente, as: 'cliente', attributes: ['id', 'nome', 'email', 'telefone'] },
+        {
+          model: Cliente,
+          as: "cliente",
+          attributes: ["id", "nome", "email", "telefone"],
+        },
       ],
       limit: parseInt(limit),
       offset: parseInt(offset),
-      order: [['criadoEm', 'DESC']],
+      order: [["criadoEm", "DESC"]],
     });
 
     return res.json({
@@ -45,11 +49,15 @@ async function buscarPorId(req, res, next) {
   try {
     const orcamento = await Orcamento.findByPk(req.params.id, {
       include: [
-        { model: Cliente, as: 'cliente', attributes: ['id', 'nome', 'email', 'telefone'] },
+        {
+          model: Cliente,
+          as: "cliente",
+          attributes: ["id", "nome", "email", "telefone"],
+        },
         {
           model: OrcamentoProduto,
-          as: 'orcamentoProdutos',
-          include: [{ model: Produto, as: 'produto' }],
+          as: "orcamentoProdutos",
+          include: [{ model: Produto, as: "produto" }],
         },
       ],
     });
@@ -57,7 +65,7 @@ async function buscarPorId(req, res, next) {
     if (!orcamento) {
       return res.status(404).json({
         success: false,
-        message: 'Orçamento não encontrado.',
+        message: "Orçamento não encontrado.",
       });
     }
 
@@ -70,12 +78,19 @@ async function buscarPorId(req, res, next) {
 // POST /api/orcamentos
 async function criar(req, res, next) {
   try {
-    const { clienteId, valorTotal, dataValidade, status, observacoes, produtos } = req.body;
+    const {
+      clienteId,
+      valorTotal,
+      dataValidade,
+      status,
+      observacoes,
+      produtos,
+    } = req.body;
 
     if (!clienteId) {
       return res.status(400).json({
         success: false,
-        message: 'O ID do cliente é obrigatório.',
+        message: "O ID do cliente é obrigatório.",
       });
     }
 
@@ -84,7 +99,7 @@ async function criar(req, res, next) {
     if (!cliente) {
       return res.status(404).json({
         success: false,
-        message: 'Cliente não encontrado.',
+        message: "Cliente não encontrado.",
       });
     }
 
@@ -92,7 +107,7 @@ async function criar(req, res, next) {
       clienteId,
       valorTotal: valorTotal || 0,
       dataValidade,
-      status: status || 'pendente',
+      status: status || "pendente",
       observacoes,
     });
 
@@ -110,18 +125,18 @@ async function criar(req, res, next) {
     // Retorna com produtos incluídos
     const orcamentoCompleto = await Orcamento.findByPk(orcamento.id, {
       include: [
-        { model: Cliente, as: 'cliente', attributes: ['id', 'nome'] },
+        { model: Cliente, as: "cliente", attributes: ["id", "nome"] },
         {
           model: OrcamentoProduto,
-          as: 'orcamentoProdutos',
-          include: [{ model: Produto, as: 'produto' }],
+          as: "orcamentoProdutos",
+          include: [{ model: Produto, as: "produto" }],
         },
       ],
     });
 
     return res.status(201).json({
       success: true,
-      message: 'Orçamento criado com sucesso!',
+      message: "Orçamento criado com sucesso!",
       data: orcamentoCompleto,
     });
   } catch (error) {
@@ -136,7 +151,7 @@ async function atualizar(req, res, next) {
     if (!orcamento) {
       return res.status(404).json({
         success: false,
-        message: 'Orçamento não encontrado.',
+        message: "Orçamento não encontrado.",
       });
     }
 
@@ -144,14 +159,16 @@ async function atualizar(req, res, next) {
     await orcamento.update({
       clienteId: clienteId || orcamento.clienteId,
       valorTotal: valorTotal !== undefined ? valorTotal : orcamento.valorTotal,
-      dataValidade: dataValidade !== undefined ? dataValidade : orcamento.dataValidade,
-      observacoes: observacoes !== undefined ? observacoes : orcamento.observacoes,
+      dataValidade:
+        dataValidade !== undefined ? dataValidade : orcamento.dataValidade,
+      observacoes:
+        observacoes !== undefined ? observacoes : orcamento.observacoes,
       atualizadoEm: new Date(),
     });
 
     return res.json({
       success: true,
-      message: 'Orçamento atualizado com sucesso!',
+      message: "Orçamento atualizado com sucesso!",
       data: orcamento,
     });
   } catch (error) {
@@ -166,15 +183,15 @@ async function mudarStatus(req, res, next) {
     if (!orcamento) {
       return res.status(404).json({
         success: false,
-        message: 'Orçamento não encontrado.',
+        message: "Orçamento não encontrado.",
       });
     }
 
     const { status } = req.body;
-    if (!['pendente', 'aprovado', 'reprovado'].includes(status)) {
+    if (!["pendente", "aprovado", "reprovado"].includes(status)) {
       return res.status(400).json({
         success: false,
-        message: 'Status inválido. Use: pendente, aprovado ou reprovado.',
+        message: "Status inválido. Use: pendente, aprovado ou reprovado.",
       });
     }
 
@@ -197,7 +214,7 @@ async function remover(req, res, next) {
     if (!orcamento) {
       return res.status(404).json({
         success: false,
-        message: 'Orçamento não encontrado.',
+        message: "Orçamento não encontrado.",
       });
     }
 
@@ -205,11 +222,53 @@ async function remover(req, res, next) {
 
     return res.json({
       success: true,
-      message: 'Orçamento removido com sucesso!',
+      message: "Orçamento removido com sucesso!",
     });
   } catch (error) {
     return next(error);
   }
 }
 
-module.exports = { listar, buscarPorId, criar, atualizar, mudarStatus, remover };
+// Confirma o orçamento e envia para Eventos
+async function confirmarOrcamento(req, res, next) {
+  try {
+    const orcamento = await Orcamento.findByPk(req.params.id, {
+      include: [{ model: Cliente, as: 'cliente' }]
+    });
+
+    if (!orcamento) {
+      return res.status(404).json({ success: false, message: "Orçamento não encontrado." });
+    }
+
+    // Cria um evento a partir do orçamento
+    const evento = await Evento.create({
+      orcamentoId: orcamento.id,
+      clienteId: orcamento.clienteId,
+      nome: `Evento de ${orcamento.cliente ? orcamento.cliente.nome : 'Cliente'}`,
+      dataEvento: orcamento.dataValidade || new Date(),
+      observacoes: orcamento.observacoes,
+      status: 'pendente'
+    });
+
+    // remove o orçamento após enviar para eventos
+    await orcamento.destroy();
+
+    return res.json({
+      success: true,
+      message: "Orçamento enviado para eventos com sucesso!",
+      data: evento,
+    });
+  } catch (error) {
+    return next(error);
+  }
+}
+
+module.exports = {
+  listar,
+  buscarPorId,
+  criar,
+  atualizar,
+  mudarStatus,
+  remover,
+  confirmarOrcamento,
+};
