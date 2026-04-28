@@ -263,6 +263,25 @@ async function confirmarOrcamento(req, res, next) {
   }
 }
 
+// Rejeita o orçamento e o remove
+async function rejeitarOrcamento(req, res, next) {
+  try {
+    const orcamento = await Orcamento.findByPk(req.params.id);
+    if (!orcamento) {
+      return res.status(404).json({ success: false, message: "Orçamento não encontrado." });
+    }
+
+    await orcamento.update({ status: 'reprovado', deletadoEm: new Date() });
+
+    return res.json({
+      success: true,
+      message: "Orçamento rejeitado e removido com sucesso!",
+    });
+  } catch (error) {
+    return next(error);
+  }
+}
+
 module.exports = {
   listar,
   buscarPorId,
@@ -271,4 +290,5 @@ module.exports = {
   mudarStatus,
   remover,
   confirmarOrcamento,
+  rejeitarOrcamento,
 };

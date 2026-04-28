@@ -81,6 +81,25 @@ export default function EventosPage() {
                     <td className="py-5 text-sm">{evt.cliente?.nome || evt.Cliente?.nome || '—'}</td>
                     <td className="py-5"><span className={`px-3 py-1 ${statusBadge(evt.status)} rounded-full text-xs font-bold uppercase`}>{evt.status}</span></td>
                     <td className="py-5 text-right">
+                      <button onClick={(e) => { 
+                        e.stopPropagation(); 
+                        setEditing(evt.id); 
+                        setForm({
+                          nome: evt.nome || '',
+                          dataEvento: evt.dataEvento ? new Date(new Date(evt.dataEvento).getTime() - (new Date().getTimezoneOffset() * 60000)).toISOString().slice(0, 16) : '',
+                          local: evt.local || '',
+                          clienteId: evt.clienteId || '',
+                          orcamentoId: evt.orcamentoId || '',
+                          qtdPessoas: evt.qtdPessoas || 0,
+                          qtdAdultos: evt.qtdAdultos || 0,
+                          qtdCriancas: evt.qtdCriancas || 0,
+                          qtdBebes: evt.qtdBebes || 0,
+                          observacoes: evt.observacoes || ''
+                        });
+                        setShowPanel(true);
+                      }} className="text-outline hover:text-primary transition-colors mr-2">
+                        <span className="material-symbols-outlined">edit</span>
+                      </button>
                       <button onClick={(e) => { e.stopPropagation(); handleDelete(evt.id); }} className="text-outline hover:text-error transition-colors"><span className="material-symbols-outlined">delete</span></button>
                     </td>
                   </tr>
