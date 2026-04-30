@@ -22,6 +22,7 @@ Desenvolver um sistema web funcional para gerenciar clientes, funcionários, doc
 - Centralizar todos os detalhes e requisitos específicos de cada evento realizado.
 - Cadastrar e gerenciar o fluxo de orçamentos
 - Cadastrar e gerenciar o fluxo de estoque
+
 ---
 
 ### • Metodologia
@@ -60,7 +61,7 @@ Para o desenvolvimento deste projeto, serão utilizadas as seguintes tecnologias
 
 ## 3. Modelo de Casos de Uso
 
-![Diagrama de Casos de Uso](img/casosUso.png)
+![Diagrama de Casos de Uso](/img/casosUso.png)
 
 ### Casos de Uso de Alto Nível
 
@@ -126,31 +127,26 @@ O modelo físico segue a estrutura relacional padrão, utilizando tabelas interl
 
 ---
 
-## 6. Regras de Negócio
+## 6. Regras de Negócio (Principais)
 
-### RN1: Acesso e Autenticação
-
-- O sistema deve possuir níveis de acesso. Apenas usuários com perfil de "Administrador" ou "Gerente" podem aprovar orçamentos, excluir clientes ou apagar documentos.
-
-### RN2: Cadastro Único
+### RN1: Cadastro Único
 
 - Não será permitido o cadastro de dois clientes com o mesmo RG/CPF ou e-mail.
+
 - Não será permitido o cadastro de dois funcionários com o mesmo e-mail.
 
-### RN3: Fluxo de Orçamentos e Eventos
+### RN2: Alocação em Eventos
 
-- Um "Evento" só pode ter seu status alterado para "Confirmado" se houver um "Orçamento" previamente aprovado pelo cliente associado.
-- Quando o evento tiver mais de 50 pessoas na festa ou evento é necessário identificar o número de crianças, adultos e bebês.
+- Um funcionário não pode ser alocado em dois eventos que ocorram exatamente na mesma data e horário conflitante.
 
-### RN4: Alocação de Funcionários
+### RN3: Gestão de Documentos
 
-- O sistema deve impedir a alocação de um mesmo funcionário em dois eventos distintos que ocorram no mesmo dia e horário.
-- A busca por funcionários na hora de montar a equipe do evento deve permitir filtros por função (ex: buscar apenas "Cozinheiros").
-
-### RN5: Gestão de Contratos (Documentos)
-
-- Todo evento deve estar atrelado a um contrato digitalizado. O sistema deve aceitar formatos padronizados e seguros para documentos (ex: `.pdf`, `.jpg`, `.png`).
 - Apenas usuários com permissão administrativa podem excluir contratos já assinados e anexados ao sistema.
+- O sistema deve aceitar formatos padronizados para documentos (ex: `.pdf`, `.jpg`, `.png`).
+
+### RN4: Controle de Público
+
+- Quando o evento tiver mais de 50 pessoas na festa ou evento é necessário identificar o número de crianças, adultos e bebês.
 
 ---
 
@@ -182,9 +178,26 @@ O projeto é altamente viável, pois resolve dores reais de gestão de eventos u
 
 ---
 
-## 8. Modelo Canvas
+## 8. Regras de Negócio (Modelo Canvas)
 
 ![Modelo Canvas](img/modeloCanva.png)
+
+### RN1: Acesso e Autenticação
+
+- O sistema deve possuir níveis de acesso. Apenas usuários com perfil de "Administrador" ou "Gerente" podem aprovar orçamentos, excluir clientes ou apagar documentos.
+
+### RN2: Fluxo de Orçamentos e Eventos
+
+- Um "Evento" só pode ter seu status alterado para "Confirmado" se houver um "Orçamento" previamente aprovado pelo cliente associado.
+
+### RN3: Alocação de Funcionários
+
+- O sistema deve impedir a alocação de um mesmo funcionário em dois eventos distintos que ocorram no mesmo dia e horário.
+- A busca por funcionários na hora de montar a equipe do evento deve permitir filtros por função (ex: buscar apenas "Cozinheiros").
+
+### RN4: Gestão de Contratos (Documentos)
+
+- Todo evento deve estar atrelado a um contrato digitalizado. O sistema deve aceitar extensões seguras e comuns, como `.pdf`, `.png` e `.jpg`.
 
 ---
 
@@ -202,24 +215,12 @@ O design do **Projeto Mais Alegria** deve transmitir profissionalismo sem perder
   - 🟣 **Roxo (Cor Extra/Apoio):**
     - **HEX:** `#6600A1` | **RGB:** `102, 0, 161`
 
-
 - **Tipografia:** Fontes modernas, sem serifa e de alta legibilidade (ex: Roboto, Inter ou Poppins) para organizar bem as tabelas de clientes e escalas.
 - **Layout:** Totalmente responsivo (graças aos componentes do React), garantindo que a equipe administrativa possa consultar dados tanto no computador do escritório quanto no smartphone durante a montagem de uma festa.
 
 ---
 
 ## 10. Protótipo
-
-O projeto conta com um protótipo estático de telas localizado na pasta `prototipo-telas`. As principais interfaces desenvolvidas incluem:
-
-- `login.html`: Tela de autenticação e acesso ao sistema.
-- `dash.html`: Dashboard principal com indicadores e atalhos rápidos.
-- `clientes.html`: Interface para listagem, cadastro e ações de clientes (como contato via WhatsApp).
-- `eventos.html`: Visualização e gestão dos eventos programados.
-- `funcionarios.html`: Interface de controle de equipe e suas respectivas funções.
-- `estoque.html`: Gerenciamento do inventário e insumos.
-- `orçamentos.html`: Geração e acompanhamento das propostas financeiras.
-- `documentos.html`: Área para upload e consulta de contratos.
 
 ---
 
