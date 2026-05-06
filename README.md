@@ -34,7 +34,8 @@ Para o desenvolvimento deste projeto, serão utilizadas as seguintes tecnologias
 - _Banco de Dados:_ Banco de Dados Relacional PostgreSQL
 - _Testes de API:_ Postman
 - _Controle de Versão:_ Git e GitHub
-- _Planejamento:_ Trello
+- _Planejamento:_ [Trello](https://trello.com/invite/b/69b01781ad27faa14e8f2979/ATTI501c15076f0c0d4f15156e5725ece7a2E7879269/alegria)
+- _UI/UX:_ [Figma](https://www.figma.com/design/P2VpQg6U8RSotlZyeOTYm1/Projeto---Alegria?node-id=0-1&t=rr3EdkAum2STFL6b-1)
 - _Metodologia de Desenvolvimento:_ Kanban — abordagem ágil baseada na visualização contínua do fluxo de trabalho, promovendo a eficiência e entregas contínuas.
 
 ---
@@ -222,11 +223,13 @@ O design do **Projeto Mais Alegria** deve transmitir profissionalismo sem perder
 
 ## 10. Protótipo
 
+Acesse o design e protótipo completo no [Figma](https://www.figma.com/design/P2VpQg6U8RSotlZyeOTYm1/Projeto---Alegria?node-id=0-1&t=rr3EdkAum2STFL6b-1).
+
 ---
 
 ## 11. Aplicação
 
-A aplicação será construída com uma arquitetura dividida: o Frontend dinâmico em **React** e o Backend robusto em **Node.js**. A comunicação entre eles ocorrerá via API RESTful. Para garantir a confiabilidade dos dados, todas as rotas (CRUD de clientes, eventos, etc.) serão testadas exaustivamente utilizando o **Postman** antes de serem integradas à interface. O fluxo de trabalho seguirá a metodologia **Kanban**, com as tarefas organizadas e monitoradas através de um quadro no **Trello**.
+A aplicação será construída com uma arquitetura dividida: o Frontend dinâmico em **React** e o Backend robusto em **Node.js**. A comunicação entre eles ocorrerá via API RESTful. Para garantir a confiabilidade dos dados, todas as rotas (CRUD de clientes, eventos, etc.) serão testadas exaustivamente utilizando o **Postman** antes de serem integradas à interface. O fluxo de trabalho seguirá a metodologia **Kanban**, com as tarefas organizadas e monitoradas através de um quadro no **[Trello](https://trello.com/invite/b/69b01781ad27faa14e8f2979/ATTI501c15076f0c0d4f15156e5725ece7a2E7879269/alegria)**.
 
 ---
 
