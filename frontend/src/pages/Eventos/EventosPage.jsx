@@ -60,52 +60,61 @@ export default function EventosPage() {
         <div className="col-span-12 lg:col-span-8 space-y-8">
           <div className="bg-white rounded-3xl p-8 overflow-hidden shadow-sm">
             <h3 className="text-xl font-bold mb-6 font-headline">Agenda de Eventos</h3>
-            <table className="w-full text-left">
-              <thead>
-                <tr className="text-on-surface-variant text-[11px] uppercase tracking-widest border-b border-outline-variant">
-                  <th className="pb-4 font-semibold">Evento</th>
-                  <th className="pb-4 font-semibold">Data & Hora</th>
-                  <th className="pb-4 font-semibold">Local</th>
-                  <th className="pb-4 font-semibold">Cliente</th>
-                  <th className="pb-4 font-semibold">Status</th>
-                  <th className="pb-4"></th>
-                </tr>
-              </thead>
-              <tbody>
-                {eventos.length === 0 && <tr><td colSpan={6} className="py-12 text-center text-on-surface-variant">Nenhum evento.</td></tr>}
-                {eventos.map((evt) => (
-                  <tr key={evt.id} className="group hover:bg-surface-container-low transition-colors cursor-pointer" onClick={() => setSelectedEvento(evt)}>
-                    <td className="py-5 font-bold text-on-surface">{evt.nome}</td>
-                    <td className="py-5 text-sm">{formatDate(evt.dataEvento)} <span className="text-outline block text-[11px]">{formatTime(evt.dataEvento)}</span></td>
-                    <td className="py-5 text-sm italic">{evt.local}</td>
-                    <td className="py-5 text-sm">{evt.cliente?.nome || evt.Cliente?.nome || '—'}</td>
-                    <td className="py-5"><span className={`px-3 py-1 ${statusBadge(evt.status)} rounded-full text-xs font-bold uppercase`}>{evt.status}</span></td>
-                    <td className="py-5 text-right">
-                      <button onClick={(e) => { 
-                        e.stopPropagation(); 
-                        setEditing(evt.id); 
-                        setForm({
-                          nome: evt.nome || '',
-                          dataEvento: evt.dataEvento ? new Date(new Date(evt.dataEvento).getTime() - (new Date().getTimezoneOffset() * 60000)).toISOString().slice(0, 16) : '',
-                          local: evt.local || '',
-                          clienteId: evt.clienteId || '',
-                          orcamentoId: evt.orcamentoId || '',
-                          qtdPessoas: evt.qtdPessoas || 0,
-                          qtdAdultos: evt.qtdAdultos || 0,
-                          qtdCriancas: evt.qtdCriancas || 0,
-                          qtdBebes: evt.qtdBebes || 0,
-                          observacoes: evt.observacoes || ''
-                        });
-                        setShowPanel(true);
-                      }} className="text-outline hover:text-primary transition-colors mr-2">
-                        <span className="material-symbols-outlined">edit</span>
-                      </button>
-                      <button onClick={(e) => { e.stopPropagation(); handleDelete(evt.id); }} className="text-outline hover:text-error transition-colors"><span className="material-symbols-outlined">delete</span></button>
-                    </td>
+            
+            {/* Wrapper adicionado para responsividade no mobile (scroll horizontal) */}
+            <div className="overflow-x-auto">
+              <table className="w-full text-left min-w-[600px]">
+                <thead>
+                  <tr className="text-on-surface-variant text-[11px] uppercase tracking-widest border-b border-outline-variant">
+                    <th className="pb-4 font-semibold px-2">Evento</th>
+                    <th className="pb-4 font-semibold px-2">Data & Hora</th>
+                    <th className="pb-4 font-semibold px-2">Local</th>
+                    <th className="pb-4 font-semibold px-2">Cliente</th>
+                    <th className="pb-4 font-semibold px-2">Status</th>
+                    <th className="pb-4 px-2"></th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {eventos.length === 0 && <tr><td colSpan={6} className="py-12 text-center text-on-surface-variant">Nenhum evento.</td></tr>}
+                  {eventos.map((evt) => (
+                    <tr key={evt.id} className="group hover:bg-surface-container-low transition-colors cursor-pointer" onClick={() => setSelectedEvento(evt)}>
+                      <td className="py-5 px-2 font-bold text-on-surface">{evt.nome}</td>
+                      <td className="py-5 px-2 text-sm">{formatDate(evt.dataEvento)} <span className="text-outline block text-[11px]">{formatTime(evt.dataEvento)}</span></td>
+                      <td className="py-5 px-2 text-sm italic">{evt.local}</td>
+                      <td className="py-5 px-2 text-sm">{evt.cliente?.nome || evt.Cliente?.nome || '—'}</td>
+                      <td className="py-5 px-2"><span className={`px-3 py-1 ${statusBadge(evt.status)} rounded-full text-xs font-bold uppercase`}>{evt.status}</span></td>
+                      <td className="py-5 px-2">
+                        {/* Container Flex com Gap para espaçamento responsivo */}
+                        <div className="flex items-center justify-end gap-3">
+                          <button onClick={(e) => { 
+                            e.stopPropagation(); 
+                            setEditing(evt.id); 
+                            setForm({
+                              nome: evt.nome || '',
+                              dataEvento: evt.dataEvento ? new Date(new Date(evt.dataEvento).getTime() - (new Date().getTimezoneOffset() * 60000)).toISOString().slice(0, 16) : '',
+                              local: evt.local || '',
+                              clienteId: evt.clienteId || '',
+                              orcamentoId: evt.orcamentoId || '',
+                              qtdPessoas: evt.qtdPessoas || 0,
+                              qtdAdultos: evt.qtdAdultos || 0,
+                              qtdCriancas: evt.qtdCriancas || 0,
+                              qtdBebes: evt.qtdBebes || 0,
+                              observacoes: evt.observacoes || ''
+                            });
+                            setShowPanel(true);
+                          }} className="text-outline hover:text-primary transition-colors">
+                            <span className="material-symbols-outlined">edit</span>
+                          </button>
+                          <button onClick={(e) => { e.stopPropagation(); handleDelete(evt.id); }} className="text-outline hover:text-error transition-colors">
+                            <span className="material-symbols-outlined">delete</span>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
 
@@ -157,10 +166,22 @@ export default function EventosPage() {
                   <div className="space-y-2"><label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-4">Orçamento</label><select className="w-full bg-surface-container-low border-none rounded-full py-3.5 px-6 focus:ring-2 focus:ring-primary" value={form.orcamentoId} onChange={e => setForm({...form, orcamentoId: e.target.value})}><option value="">Nenhum</option>{orcamentos.map(o => <option key={o.id} value={o.id}>R$ {o.valorTotal} - {o.status}</option>)}</select></div>
                 </div>
                 <div className="grid grid-cols-4 gap-3">
-                  <div className="space-y-2"><label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-2">Total</label><input type="number" className="w-full bg-surface-container-low border-none rounded-full py-3 px-4 focus:ring-2 focus:ring-primary text-center" value={form.qtdPessoas} onChange={e => setForm({...form, qtdPessoas: +e.target.value})} /></div>
-                  <div className="space-y-2"><label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-2">Adultos</label><input type="number" className="w-full bg-surface-container-low border-none rounded-full py-3 px-4 focus:ring-2 focus:ring-primary text-center" value={form.qtdAdultos} onChange={e => setForm({...form, qtdAdultos: +e.target.value})} /></div>
-                  <div className="space-y-2"><label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-2">Crianças</label><input type="number" className="w-full bg-surface-container-low border-none rounded-full py-3 px-4 focus:ring-2 focus:ring-primary text-center" value={form.qtdCriancas} onChange={e => setForm({...form, qtdCriancas: +e.target.value})} /></div>
-                  <div className="space-y-2"><label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-2">Bebês</label><input type="number" className="w-full bg-surface-container-low border-none rounded-full py-3 px-4 focus:ring-2 focus:ring-primary text-center" value={form.qtdBebes} onChange={e => setForm({...form, qtdBebes: +e.target.value})} /></div>
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-2">Total</label>
+                    <input type="number" className="w-full bg-surface-container-low border-none rounded-full py-3 px-4 focus:ring-2 focus:ring-primary text-center" placeholder="0" value={form.qtdPessoas || ''} onChange={e => setForm({...form, qtdPessoas: e.target.value ? Number(e.target.value) : 0})} />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-2">Adultos</label>
+                    <input type="number" className="w-full bg-surface-container-low border-none rounded-full py-3 px-4 focus:ring-2 focus:ring-primary text-center" placeholder="0" value={form.qtdAdultos || ''} onChange={e => setForm({...form, qtdAdultos: e.target.value ? Number(e.target.value) : 0})} />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-2">Crianças</label>
+                    <input type="number" className="w-full bg-surface-container-low border-none rounded-full py-3 px-4 focus:ring-2 focus:ring-primary text-center" placeholder="0" value={form.qtdCriancas || ''} onChange={e => setForm({...form, qtdCriancas: e.target.value ? Number(e.target.value) : 0})} />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-2">Bebês</label>
+                    <input type="number" className="w-full bg-surface-container-low border-none rounded-full py-3 px-4 focus:ring-2 focus:ring-primary text-center" placeholder="0" value={form.qtdBebes || ''} onChange={e => setForm({...form, qtdBebes: e.target.value ? Number(e.target.value) : 0})} />
+                  </div>
                 </div>
                 <div className="space-y-2"><label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-4">Observações</label><textarea className="w-full bg-surface-container-low border-none rounded-2xl py-3.5 px-6 focus:ring-2 focus:ring-primary resize-none" rows={3} value={form.observacoes} onChange={e => setForm({...form, observacoes: e.target.value})} /></div>
               </form>
