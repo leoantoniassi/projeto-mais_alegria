@@ -10,18 +10,27 @@ export default function EventosPage() {
   const [showPanel, setShowPanel] = useState(false);
   const [editing, setEditing] = useState(null);
   const [selectedEvento, setSelectedEvento] = useState(null);
+  
+  // 1. Estado do filtro adicionado
+  const [filtroLocal, setFiltroLocal] = useState('');
   const [form, setForm] = useState({ nome: '', dataEvento: '', local: '', clienteId: '', orcamentoId: '', qtdPessoas: 0, qtdAdultos: 0, qtdCriancas: 0, qtdBebes: 0, observacoes: '' });
 
   const fetchData = async () => {
     try {
-      const { data: res } = await api.get('/eventos', { params: { page, limit: 10 } });
+      // 2. Parâmetro local adicionado à requisição
+      const params = { page, limit: 10 };
+      if (filtroLocal) params.local = filtroLocal;
+
+      const { data: res } = await api.get('/eventos', { params });
       const items = Array.isArray(res.data) ? res.data : [];
       setEventos(items);
       setTotal(res.pagination?.total || items.length);
     } catch {}
   };
 
-  useEffect(() => { fetchData(); }, [page]);
+  // 3. fetchData agora reage a mudanças no filtroLocal
+  useEffect(() => { fetchData(); }, [page, filtroLocal]);
+  
   useEffect(() => {
     api.get('/clientes').then(r => { const items = Array.isArray(r.data.data) ? r.data.data : []; setClientes(items); }).catch(() => {});
     api.get('/orcamentos').then(r => { const items = Array.isArray(r.data.data) ? r.data.data : []; setOrcamentos(items); }).catch(() => {});
@@ -59,7 +68,21 @@ export default function EventosPage() {
         {/* Table */}
         <div className="col-span-12 lg:col-span-8 space-y-8">
           <div className="bg-white rounded-3xl p-8 overflow-hidden shadow-sm">
-            <h3 className="text-xl font-bold mb-6 font-headline">Agenda de Eventos</h3>
+            
+            {/* Header e Filtro de Local */}
+            <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-6">
+              <h3 className="text-xl font-bold font-headline">Agenda de Eventos</h3>
+              <select 
+                className="bg-surface-container-low border-none rounded-full py-2 px-4 focus:ring-2 focus:ring-primary text-sm font-medium outline-none"
+                value={filtroLocal}
+                onChange={(e) => setFiltroLocal(e.target.value)}
+              >
+                <option value="">Todos os locais</option>
+                <option value="salão 1">Salão 1</option>
+                <option value="salão 2">Salão 2</option>
+                <option value="externo">Externo</option>
+              </select>
+            </div>
             
             {/* Wrapper adicionado para responsividade no mobile (scroll horizontal) */}
             <div className="overflow-x-auto">
@@ -80,7 +103,7 @@ export default function EventosPage() {
                     <tr key={evt.id} className="group hover:bg-surface-container-low transition-colors cursor-pointer" onClick={() => setSelectedEvento(evt)}>
                       <td className="py-5 px-2 font-bold text-on-surface">{evt.nome}</td>
                       <td className="py-5 px-2 text-sm">{formatDate(evt.dataEvento)} <span className="text-outline block text-[11px]">{formatTime(evt.dataEvento)}</span></td>
-                      <td className="py-5 px-2 text-sm italic">{evt.local}</td>
+                      <td className="py-5 px-2 text-sm italic capitalize">{evt.local || '—'}</td>
                       <td className="py-5 px-2 text-sm">{evt.cliente?.nome || evt.Cliente?.nome || '—'}</td>
                       <td className="py-5 px-2"><span className={`px-3 py-1 ${statusBadge(evt.status)} rounded-full text-xs font-bold uppercase`}>{evt.status}</span></td>
                       <td className="py-5 px-2">
@@ -126,7 +149,7 @@ export default function EventosPage() {
                 <span className="text-[10px] font-bold uppercase tracking-[0.2em] opacity-80 mb-2 block">Evento Selecionado</span>
                 <h3 className="text-3xl font-extrabold leading-tight mb-4">{selectedEvento.nome}</h3>
                 <div className="space-y-4 mb-8">
-                  <div className="flex items-center gap-3"><span className="material-symbols-outlined text-primary filled">location_on</span><p className="text-sm font-medium">{selectedEvento.local}</p></div>
+                  <div className="flex items-center gap-3"><span className="material-symbols-outlined text-primary filled">location_on</span><p className="text-sm font-medium capitalize">{selectedEvento.local || '—'}</p></div>
                   <div className="flex items-center gap-3"><span className="material-symbols-outlined text-primary filled">calendar_today</span><p className="text-sm font-medium">{formatDate(selectedEvento.dataEvento)} • {formatTime(selectedEvento.dataEvento)}</p></div>
                 </div>
                 <div className="bg-white/10 rounded-2xl p-6 backdrop-blur-sm border border-white/10">
@@ -153,13 +176,24 @@ export default function EventosPage() {
       {showPanel && (
         <div className="fixed inset-0 bg-on-surface/40 backdrop-blur-md z-50 flex justify-end fade-in" onClick={() => setShowPanel(false)}>
           <div className="w-full max-w-lg bg-white h-full shadow-2xl flex flex-col slide-in-right rounded-l-3xl" onClick={e => e.stopPropagation()}>
-            <div className="p-8 border-b border-outline-variant/30 flex justify-between"><div><h3 className="text-2xl font-headline font-extrabold">Novo Evento</h3></div><button onClick={() => setShowPanel(false)} className="p-2 hover:bg-surface-container rounded-full"><span className="material-symbols-outlined">close</span></button></div>
+            <div className="p-8 border-b border-outline-variant/30 flex justify-between"><div><h3 className="text-2xl font-headline font-extrabold">{editing ? 'Editar Evento' : 'Novo Evento'}</h3></div><button onClick={() => setShowPanel(false)} className="p-2 hover:bg-surface-container rounded-full"><span className="material-symbols-outlined">close</span></button></div>
             <div className="flex-1 overflow-y-auto p-8">
               <form id="evt-form" className="space-y-5" onSubmit={handleSave}>
                 <div className="space-y-2"><label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-4">Nome do Evento</label><input className="w-full bg-surface-container-low border-none rounded-full py-3.5 px-6 focus:ring-2 focus:ring-primary" value={form.nome} onChange={e => setForm({...form, nome: e.target.value})} required /></div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2"><label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-4">Data e Hora</label><input type="datetime-local" className="w-full bg-surface-container-low border-none rounded-full py-3.5 px-6 focus:ring-2 focus:ring-primary" value={form.dataEvento} onChange={e => setForm({...form, dataEvento: e.target.value})} required /></div>
-                  <div className="space-y-2"><label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-4">Local</label><input className="w-full bg-surface-container-low border-none rounded-full py-3.5 px-6 focus:ring-2 focus:ring-primary" value={form.local} onChange={e => setForm({...form, local: e.target.value})} required /></div>
+                  
+                  {/* Seleção de Local */}
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-4">Local</label>
+                    <select className="w-full bg-surface-container-low border-none rounded-full py-3.5 px-6 focus:ring-2 focus:ring-primary" value={form.local} onChange={e => setForm({...form, local: e.target.value})} required>
+                      <option value="">Selecione o local...</option>
+                      <option value="salão 1">Salão 1</option>
+                      <option value="salão 2">Salão 2</option>
+                      <option value="externo">Externo</option>
+                    </select>
+                  </div>
+
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2"><label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-4">Cliente</label><select className="w-full bg-surface-container-low border-none rounded-full py-3.5 px-6 focus:ring-2 focus:ring-primary" value={form.clienteId} onChange={e => setForm({...form, clienteId: e.target.value})} required><option value="">Selecione...</option>{clientes.map(c => <option key={c.id} value={c.id}>{c.nome}</option>)}</select></div>
@@ -183,7 +217,21 @@ export default function EventosPage() {
                     <input type="number" className="w-full bg-surface-container-low border-none rounded-full py-3 px-4 focus:ring-2 focus:ring-primary text-center" placeholder="0" value={form.qtdBebes || ''} onChange={e => setForm({...form, qtdBebes: e.target.value ? Number(e.target.value) : 0})} />
                   </div>
                 </div>
-                <div className="space-y-2"><label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-4">Observações</label><textarea className="w-full bg-surface-container-low border-none rounded-2xl py-3.5 px-6 focus:ring-2 focus:ring-primary resize-none" rows={3} value={form.observacoes} onChange={e => setForm({...form, observacoes: e.target.value})} /></div>
+                
+                {/* Observações Dinâmicas */}
+                <div className="space-y-2">
+                  <label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-4">
+                    Observações {form.local === 'externo' && '(Digite o endereço do local externo)'}
+                  </label>
+                  <textarea 
+                    className="w-full bg-surface-container-low border-none rounded-2xl py-3.5 px-6 focus:ring-2 focus:ring-primary resize-none" 
+                    rows={3} 
+                    placeholder={form.local === 'externo' ? "Ex: Rua das Flores, 123..." : ""}
+                    value={form.observacoes} 
+                    onChange={e => setForm({...form, observacoes: e.target.value})} 
+                  />
+                </div>
+                
               </form>
             </div>
             <div className="p-8 bg-surface-container-low flex gap-4"><button onClick={() => setShowPanel(false)} className="flex-1 border-2 border-outline-variant text-on-surface-variant py-3.5 rounded-full font-bold">Cancelar</button><button type="submit" form="evt-form" className="flex-[2] bg-primary text-on-primary py-3.5 rounded-full font-bold shadow-xl shadow-primary/30">Salvar</button></div>

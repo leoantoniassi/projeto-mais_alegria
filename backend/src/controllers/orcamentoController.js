@@ -268,12 +268,16 @@ async function confirmarOrcamento(req, res, next) {
       nome: `Evento de ${orcamento.cliente ? orcamento.cliente.nome : "Cliente"}`,
       dataEvento: orcamento.dataValidade || new Date(),
       observacoes: orcamento.observacoes,
-      local: orcamento.local, // Repassa o local para o evento automaticamente
+      local: orcamento.local,
       status: "pendente",
     });
 
-    // remove o orçamento após enviar para eventos
-    await orcamento.destroy();
+    // Adicionamos o deletadoEm para sumir da listagem
+    await orcamento.update({
+      status: "aprovado",
+      deletadoEm: new Date(), // Isso faz ele sumir da tela de orçamentos
+      atualizadoEm: new Date(),
+    });
 
     return res.json({
       success: true,

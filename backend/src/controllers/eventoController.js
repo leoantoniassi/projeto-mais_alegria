@@ -218,7 +218,12 @@ async function atualizar(req, res, next) {
 
     await evento.update({
       clienteId: clienteId || evento.clienteId,
-      orcamentoId: orcamentoId !== undefined ? orcamentoId : evento.orcamentoId,
+      // ALTERAÇÃO: Garante que se vier vazio do select, salve como null
+      orcamentoId: orcamentoId
+        ? orcamentoId
+        : orcamentoId === ""
+          ? null
+          : evento.orcamentoId,
       nome: nome || evento.nome,
       dataEvento: dataEvento || evento.dataEvento,
       local: local !== undefined ? local : evento.local,
