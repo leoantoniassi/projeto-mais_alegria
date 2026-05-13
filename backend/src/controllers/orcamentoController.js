@@ -2,17 +2,31 @@
 // Controller: Orçamentos
 // ============================================================
 const { Op } = require("sequelize");
-const { Orcamento, Cliente, OrcamentoProduto, Produto, Evento } = require("../models");
+const {
+  Orcamento,
+  Cliente,
+  OrcamentoProduto,
+  Produto,
+  Evento,
+} = require("../models");
 
+// GET /api/orcamentos
 // GET /api/orcamentos
 async function listar(req, res, next) {
   try {
-    const { page = 1, limit = 20, status } = req.query;
+    const { page = 1, limit = 20, status, local } = req.query;
     const offset = (page - 1) * limit;
 
     const where = {};
     if (status) {
       where.status = status;
+    }
+
+    // Usando Op.iLike para evitar problemas de maiúscula/minúscula
+    if (local) {
+      where.local = {
+        [Op.iLike]: local,
+      };
     }
 
     const { count, rows } = await Orcamento.findAndCountAll({
@@ -84,6 +98,7 @@ async function criar(req, res, next) {
       dataValidade,
       status,
       observacoes,
+      local, // Adicionado
       produtos,
     } = req.body;
 
@@ -109,6 +124,7 @@ async function criar(req, res, next) {
       dataValidade,
       status: status || "pendente",
       observacoes,
+      local, // Salva o local selecionado
     });
 
     // Se produtos foram enviados, cria os registros na tabela intermediária
@@ -155,7 +171,9 @@ async function atualizar(req, res, next) {
       });
     }
 
-    const { clienteId, valorTotal, dataValidade, observacoes } = req.body;
+    const { clienteId, valorTotal, dataValidade, observacoes, local } =
+      req.body; // Adicionado local
+
     await orcamento.update({
       clienteId: clienteId || orcamento.clienteId,
       valorTotal: valorTotal !== undefined ? valorTotal : orcamento.valorTotal,
@@ -163,6 +181,7 @@ async function atualizar(req, res, next) {
         dataValidade !== undefined ? dataValidade : orcamento.dataValidade,
       observacoes:
         observacoes !== undefined ? observacoes : orcamento.observacoes,
+      local: local !== undefined ? local : orcamento.local, // Atualiza o local
       atualizadoEm: new Date(),
     });
 
@@ -233,25 +252,32 @@ async function remover(req, res, next) {
 async function confirmarOrcamento(req, res, next) {
   try {
     const orcamento = await Orcamento.findByPk(req.params.id, {
-      include: [{ model: Cliente, as: 'cliente' }]
+      include: [{ model: Cliente, as: "cliente" }],
     });
 
     if (!orcamento) {
-      return res.status(404).json({ success: false, message: "Orçamento não encontrado." });
+      return res
+        .status(404)
+        .json({ success: false, message: "Orçamento não encontrado." });
     }
 
     // Cria um evento a partir do orçamento
     const evento = await Evento.create({
       orcamentoId: orcamento.id,
       clienteId: orcamento.clienteId,
-      nome: `Evento de ${orcamento.cliente ? orcamento.cliente.nome : 'Cliente'}`,
+      nome: `Evento de ${orcamento.cliente ? orcamento.cliente.nome : "Cliente"}`,
       dataEvento: orcamento.dataValidade || new Date(),
       observacoes: orcamento.observacoes,
-      status: 'pendente'
+      local: orcamento.local,
+      status: "pendente",
     });
 
-    // remove o orçamento após enviar para eventos
-    await orcamento.destroy();
+    // Adicionamos o deletadoEm para sumir da listagem
+    await orcamento.update({
+      status: "aprovado",
+      deletadoEm: new Date(), // Isso faz ele sumir da tela de orçamentos
+      atualizadoEm: new Date(),
+    });
 
     return res.json({
       success: true,
@@ -268,10 +294,12 @@ async function rejeitarOrcamento(req, res, next) {
   try {
     const orcamento = await Orcamento.findByPk(req.params.id);
     if (!orcamento) {
-      return res.status(404).json({ success: false, message: "Orçamento não encontrado." });
+      return res
+        .status(404)
+        .json({ success: false, message: "Orçamento não encontrado." });
     }
 
-    await orcamento.update({ status: 'reprovado', deletadoEm: new Date() });
+    await orcamento.update({ status: "reprovado", deletadoEm: new Date() });
 
     return res.json({
       success: true,

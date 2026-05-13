@@ -32,15 +32,15 @@ INSERT INTO produtos (prd_nome, prd_categoria, prd_quantidade, prd_unidade_medid
 ('Balões Coloridos', 'Decoração', 500, 'un', 0.20);
 
 -- 4. ORCAMENTOS
-INSERT INTO orcamentos (orc_cli_id, orc_valor_total, orc_data_validade, orc_status, orc_observacoes) VALUES
-((SELECT cli_id FROM clientes WHERE cli_nome = 'João Carlos'), 2500.00, '2026-04-01', 'aprovado', 'Festa infantil completa para 60 pessoas.'),
-((SELECT cli_id FROM clientes WHERE cli_nome = 'Maria Oliveira'), 1200.00, '2026-04-10', 'pendente', 'Apenas salgados e bebidas.'),
-((SELECT cli_id FROM clientes WHERE cli_nome = 'Pedro Santos'), 4000.00, '2026-04-05', 'aprovado', 'Casamento com buffet e recreação infantil.');
+INSERT INTO orcamentos (orc_cli_id, orc_valor_total, orc_data_validade, orc_status, orc_local, orc_observacoes) VALUES
+((SELECT cli_id FROM clientes WHERE cli_nome = 'João Carlos'), 2500.00, '2026-04-01', 'aprovado', 'salão 1', 'Festa infantil completa para 60 pessoas.'),
+((SELECT cli_id FROM clientes WHERE cli_nome = 'Maria Oliveira'), 1200.00, '2026-04-10', 'pendente', 'salão 2', 'Apenas salgados e bebidas.'),
+((SELECT cli_id FROM clientes WHERE cli_nome = 'Pedro Santos'), 4000.00, '2026-04-05', 'aprovado', 'externo', 'Casamento com buffet e recreação infantil.');
 
 -- 5. EVENTOS
 INSERT INTO eventos (evt_cli_id, evt_orc_id, evt_nome, evt_data_evento, evt_local, evt_status, evt_qtd_pessoas, evt_qtd_adultos, evt_qtd_criancas, evt_qtd_bebes, evt_observacoes) VALUES
-((SELECT cli_id FROM clientes WHERE cli_nome = 'João Carlos'), (SELECT orc_id FROM orcamentos WHERE orc_observacoes LIKE '%Festa infantil completa%'), 'Aniversário do Pedrinho - 5 anos', '2026-05-10 14:00:00', 'Salão de Festas Alegria', 'confirmado', 60, 30, 25, 5, 'Tema: Super-heróis. Montagem às 10h.'),
-((SELECT cli_id FROM clientes WHERE cli_nome = 'Pedro Santos'), (SELECT orc_id FROM orcamentos WHERE orc_observacoes LIKE '%Casamento%'), 'Casamento Maria e José', '2026-06-20 19:00:00', 'Chácara das Flores', 'confirmado', 150, 120, 20, 10, 'Buffet completo. Chegar 4 horas antes.');
+((SELECT cli_id FROM clientes WHERE cli_nome = 'João Carlos'), (SELECT orc_id FROM orcamentos WHERE orc_observacoes LIKE '%Festa infantil completa%'), 'Aniversário do Pedrinho - 5 anos', '2026-05-10 14:00:00', 'salão 1', 'confirmado', 60, 30, 25, 5, 'Tema: Super-heróis. Montagem às 10h.'),
+((SELECT cli_id FROM clientes WHERE cli_nome = 'Pedro Santos'), (SELECT orc_id FROM orcamentos WHERE orc_observacoes LIKE '%Casamento%'), 'Casamento Maria e José', '2026-06-20 19:00:00', 'externo', 'confirmado', 150, 120, 20, 10, 'Buffet completo. Chegar 4 horas antes. Endereço: Chácara das Flores');
 
 -- 6. DOCUMENTOS
 INSERT INTO documentos (doc_cli_id, doc_evt_id, doc_nome_arquivo, doc_caminho_url, doc_tipo_arquivo) VALUES
@@ -70,7 +70,6 @@ INSERT INTO orcamento_produto (orp_orc_id, orp_prd_id, orp_quantidade, orp_preco
 ((SELECT orc_id FROM orcamentos WHERE orc_observacoes LIKE '%Festa infantil completa%'), (SELECT prd_id FROM produtos WHERE prd_nome = 'Refrigerante Cola 2L'), 20, 8.50),
 ((SELECT orc_id FROM orcamentos WHERE orc_observacoes LIKE '%Festa infantil completa%'), (SELECT prd_id FROM produtos WHERE prd_nome = 'Copo Descartável 200ml'), 200, 0.05),
 ((SELECT orc_id FROM orcamentos WHERE orc_observacoes LIKE '%Festa infantil completa%'), (SELECT prd_id FROM produtos WHERE prd_nome = 'Salgadinhos Sortidos'), 800, 0.50);
-
 -- 10. CATALOGOS
 INSERT INTO catalogos (cat_titulo, cat_descricao, cat_preco_base, cat_url_externa, cat_ativo) VALUES
 ('Buffet Infantil Completo', 'Ideal para festas de aniversário infantis. Inclui salgadinhos, doces, bolo temático e refrigerantes para até 60 pessoas.', 1800.00, NULL, true),

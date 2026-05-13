@@ -41,13 +41,13 @@ COMMENT ON COLUMN usuarios.usr_role IS 'Papel no sistema: admin, gerente ou oper
 -- 1. CLIENTES
 -- ============================================================
 CREATE TABLE clientes (
-    cli_id           UUID         PRIMARY KEY DEFAULT uuid_generate_v4(),
-    cli_nome         VARCHAR(150) NOT NULL,
-    cli_email        VARCHAR(150) NOT NULL,
-    cli_rgcpf        VARCHAR(20)  NOT NULL,
-    cli_telefone     VARCHAR(20)  NOT NULL,
-    cli_criado_em    TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    cli_atualizado_em TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    cli_id            UUID         PRIMARY KEY DEFAULT uuid_generate_v4(),
+    cli_nome          VARCHAR(150) NOT NULL,
+    cli_email         VARCHAR(150) NOT NULL,
+    cli_rgcpf         VARCHAR(20)  NOT NULL,
+    cli_telefone      VARCHAR(20)  NOT NULL,
+    cli_criado_em     TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    cli_atualizado_em TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     cli_deletado_em   TIMESTAMP,
 
     CONSTRAINT uq_clientes_rgcpf UNIQUE (cli_rgcpf),
@@ -58,13 +58,13 @@ CREATE TABLE clientes (
 -- 2. FUNCIONARIOS
 -- ============================================================
 CREATE TABLE funcionarios (
-    fun_id           UUID         PRIMARY KEY DEFAULT uuid_generate_v4(),
-    fun_nome         VARCHAR(150) NOT NULL,
-    fun_email        VARCHAR(150) NOT NULL,
-    fun_telefone     VARCHAR(20),
-    fun_funcao       VARCHAR(80)  NOT NULL,
-    fun_criado_em    TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    fun_atualizado_em TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    fun_id            UUID         PRIMARY KEY DEFAULT uuid_generate_v4(),
+    fun_nome          VARCHAR(150) NOT NULL,
+    fun_email         VARCHAR(150) NOT NULL,
+    fun_telefone      VARCHAR(20),
+    fun_funcao        VARCHAR(80)  NOT NULL,
+    fun_criado_em     TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    fun_atualizado_em TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     fun_deletado_em   TIMESTAMP,
 
     CONSTRAINT uq_funcionarios_email UNIQUE (fun_email)
@@ -82,7 +82,7 @@ CREATE TABLE produtos (
     prd_custo_unitario  NUMERIC(12,2) NOT NULL DEFAULT 0,
     prd_criado_em       TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     prd_atualizado_em   TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    prd_deletado_em      TIMESTAMP
+    prd_deletado_em     TIMESTAMP
 );
 
 -- ============================================================
@@ -94,10 +94,11 @@ CREATE TABLE orcamentos (
     orc_valor_total     NUMERIC(12,2) NOT NULL DEFAULT 0,
     orc_data_validade   DATE,
     orc_status          VARCHAR(20)   NOT NULL DEFAULT 'pendente',
+    orc_local           VARCHAR(255), -- NOVA COLUNA DE LOCAL AQUI
     orc_observacoes     TEXT,
     orc_criado_em       TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     orc_atualizado_em   TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    orc_deletado_em      TIMESTAMP,
+    orc_deletado_em     TIMESTAMP,
 
     CONSTRAINT fk_orcamentos_cliente
         FOREIGN KEY (orc_cli_id) REFERENCES clientes (cli_id)
@@ -111,21 +112,21 @@ CREATE TABLE orcamentos (
 -- 5. EVENTOS
 -- ============================================================
 CREATE TABLE eventos (
-    evt_id             UUID         PRIMARY KEY DEFAULT uuid_generate_v4(),
-    evt_cli_id         UUID         NOT NULL,
-    evt_orc_id         UUID,
-    evt_nome           VARCHAR(200) NOT NULL,
-    evt_data_evento    TIMESTAMP    NOT NULL,
-    evt_local          VARCHAR(255),
-    evt_status         VARCHAR(30)  NOT NULL DEFAULT 'pendente',
-    evt_qtd_pessoas    INT,
-    evt_qtd_adultos    INT,
-    evt_qtd_criancas   INT,
-    evt_qtd_bebes      INT,
-    evt_observacoes    TEXT,
-    evt_criado_em      TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    evt_atualizado_em  TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    evt_deletado_em    TIMESTAMP,
+    evt_id              UUID          PRIMARY KEY DEFAULT uuid_generate_v4(),
+    evt_cli_id          UUID          NOT NULL,
+    evt_orc_id          UUID,
+    evt_nome            VARCHAR(150)  NOT NULL,
+    evt_data_evento     TIMESTAMP     NOT NULL,
+    evt_local           VARCHAR(255), -- NOVA COLUNA DE LOCAL AQUI
+    evt_status          VARCHAR(20)   NOT NULL DEFAULT 'pendente',
+    evt_qtd_pessoas     INTEGER       NOT NULL DEFAULT 0,
+    evt_qtd_adultos     INTEGER       NOT NULL DEFAULT 0,
+    evt_qtd_criancas    INTEGER       NOT NULL DEFAULT 0,
+    evt_qtd_bebes       INTEGER       NOT NULL DEFAULT 0,
+    evt_observacoes     TEXT,
+    evt_criado_em       TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    evt_atualizado_em   TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    evt_deletado_em     TIMESTAMP,
 
     CONSTRAINT fk_eventos_cliente
         FOREIGN KEY (evt_cli_id) REFERENCES clientes (cli_id)
@@ -136,7 +137,7 @@ CREATE TABLE eventos (
         ON UPDATE CASCADE ON DELETE SET NULL,
 
     CONSTRAINT ck_eventos_status
-        CHECK (evt_status IN ('pendente', 'confirmado', 'concluido', 'cancelado'))
+        CHECK (evt_status IN ('pendente', 'confirmado', 'cancelado', 'concluido'))
 );
 
 -- ============================================================
@@ -189,13 +190,13 @@ COMMENT ON COLUMN catalogos.cat_imagem_url  IS 'URL da imagem de capa do catálo
 -- 8. ESCALA (Evento ↔ Funcionário)
 -- ============================================================
 CREATE TABLE escala (
-    esc_id             UUID      PRIMARY KEY DEFAULT uuid_generate_v4(),
-    esc_evt_id         UUID      NOT NULL,
-    esc_fun_id         UUID      NOT NULL,
-    esc_observacoes    TEXT,
-    esc_criado_em      TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    esc_atualizado_em  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    esc_deletado_em    TIMESTAMP,
+    esc_id            UUID      PRIMARY KEY DEFAULT uuid_generate_v4(),
+    esc_evt_id        UUID      NOT NULL,
+    esc_fun_id        UUID      NOT NULL,
+    esc_observacoes   TEXT,
+    esc_criado_em     TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    esc_atualizado_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    esc_deletado_em   TIMESTAMP,
 
     CONSTRAINT fk_escala_evento
         FOREIGN KEY (esc_evt_id) REFERENCES eventos (evt_id)
@@ -213,13 +214,13 @@ CREATE TABLE escala (
 -- 8. EVENTO_PRODUTO
 -- ============================================================
 CREATE TABLE evento_produto (
-    evp_id           UUID          PRIMARY KEY DEFAULT uuid_generate_v4(),
-    evp_evt_id       UUID          NOT NULL,
-    evp_prd_id       UUID          NOT NULL,
-    evp_quantidade   NUMERIC(10,2) NOT NULL DEFAULT 0,
-    evp_criado_em    TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    evp_atualizado_em TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    evp_deletado_em  TIMESTAMP,
+    evp_id            UUID          PRIMARY KEY DEFAULT uuid_generate_v4(),
+    evp_evt_id        UUID          NOT NULL,
+    evp_prd_id        UUID          NOT NULL,
+    evp_quantidade    NUMERIC(10,2) NOT NULL DEFAULT 0,
+    evp_criado_em     TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    evp_atualizado_em TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    evp_deletado_em   TIMESTAMP,
 
     CONSTRAINT fk_evento_produto_evento
         FOREIGN KEY (evp_evt_id) REFERENCES eventos (evt_id)
@@ -261,14 +262,14 @@ CREATE TABLE orcamento_produto (
 -- ============================================================
 -- ÍNDICES ADICIONAIS
 -- ============================================================
-CREATE INDEX idx_orcamentos_cliente     ON orcamentos       (orc_cli_id);
-CREATE INDEX idx_orcamentos_status      ON orcamentos       (orc_status);
-CREATE INDEX idx_eventos_cliente        ON eventos          (evt_cli_id);
-CREATE INDEX idx_eventos_orcamento      ON eventos          (evt_orc_id);
-CREATE INDEX idx_eventos_data           ON eventos          (evt_data_evento);
-CREATE INDEX idx_documentos_cliente     ON documentos       (doc_cli_id);
-CREATE INDEX idx_documentos_evento      ON documentos       (doc_evt_id);
-CREATE INDEX idx_escala_evento          ON escala           (esc_evt_id);
-CREATE INDEX idx_escala_funcionario     ON escala           (esc_fun_id);
-CREATE INDEX idx_evento_produto_evento  ON evento_produto   (evp_evt_id);
-CREATE INDEX idx_orcamento_produto_orc  ON orcamento_produto(orp_orc_id);
+CREATE INDEX idx_orcamentos_cliente    ON orcamentos      (orc_cli_id);
+CREATE INDEX idx_orcamentos_status     ON orcamentos      (orc_status);
+CREATE INDEX idx_eventos_cliente       ON eventos         (evt_cli_id);
+CREATE INDEX idx_eventos_orcamento     ON eventos         (evt_orc_id);
+CREATE INDEX idx_eventos_data          ON eventos         (evt_data_evento);
+CREATE INDEX idx_documentos_cliente    ON documentos      (doc_cli_id);
+CREATE INDEX idx_documentos_evento     ON documentos      (doc_evt_id);
+CREATE INDEX idx_escala_evento         ON escala          (esc_evt_id);
+CREATE INDEX idx_escala_funcionario    ON escala          (esc_fun_id);
+CREATE INDEX idx_evento_produto_evento ON evento_produto  (evp_evt_id);
+CREATE INDEX idx_orcamento_produto_orc ON orcamento_produto(orp_orc_id);

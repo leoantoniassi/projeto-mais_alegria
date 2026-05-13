@@ -1,31 +1,38 @@
 // ============================================================
 // Controller: Eventos
 // ============================================================
-const { Op } = require('sequelize');
+const { Op } = require("sequelize");
 const {
-  Evento, Cliente, Orcamento, Funcionario,
-  Escala, EventoProduto, Produto, Documento,
-} = require('../models');
+  Evento,
+  Cliente,
+  Orcamento,
+  Funcionario,
+  Escala,
+  EventoProduto,
+  Produto,
+  Documento,
+} = require("../models");
 
 // GET /api/eventos
 async function listar(req, res, next) {
   try {
-    const { page = 1, limit = 20, status } = req.query;
+    const { page = 1, limit = 20, status, local } = req.query; // Adicionado local
     const offset = (page - 1) * limit;
 
-    const where = {};
-    if (status) {
-      where.status = status;
+    const where = { deletadoEm: null };
+    if (status) where.status = status;
+
+    // Lógica do Filtro de Local
+    if (local) {
+      where.local = { [Op.iLike]: local };
     }
 
     const { count, rows } = await Evento.findAndCountAll({
       where,
-      include: [
-        { model: Cliente, as: 'cliente', attributes: ['id', 'nome', 'telefone'] },
-      ],
+      include: [{ model: Cliente, as: "cliente", attributes: ["id", "nome"] }],
       limit: parseInt(limit),
       offset: parseInt(offset),
-      order: [['dataEvento', 'ASC']],
+      order: [["dataEvento", "ASC"]],
     });
 
     return res.json({
@@ -48,26 +55,30 @@ async function buscarPorId(req, res, next) {
   try {
     const evento = await Evento.findByPk(req.params.id, {
       include: [
-        { model: Cliente, as: 'cliente', attributes: ['id', 'nome', 'email', 'telefone'] },
-        { model: Orcamento, as: 'orcamento' },
+        {
+          model: Cliente,
+          as: "cliente",
+          attributes: ["id", "nome", "email", "telefone"],
+        },
+        { model: Orcamento, as: "orcamento" },
         {
           model: Escala,
-          as: 'escala',
-          include: [{ model: Funcionario, as: 'funcionario' }],
+          as: "escala",
+          include: [{ model: Funcionario, as: "funcionario" }],
         },
         {
           model: EventoProduto,
-          as: 'eventoProdutos',
-          include: [{ model: Produto, as: 'produto' }],
+          as: "eventoProdutos",
+          include: [{ model: Produto, as: "produto" }],
         },
-        { model: Documento, as: 'documentos' },
+        { model: Documento, as: "documentos" },
       ],
     });
 
     if (!evento) {
       return res.status(404).json({
         success: false,
-        message: 'Evento não encontrado.',
+        message: "Evento não encontrado.",
       });
     }
 
@@ -81,14 +92,23 @@ async function buscarPorId(req, res, next) {
 async function criar(req, res, next) {
   try {
     const {
-      clienteId, orcamentoId, nome, dataEvento, local,
-      status, qtdPessoas, qtdAdultos, qtdCriancas, qtdBebes, observacoes,
+      clienteId,
+      orcamentoId,
+      nome,
+      dataEvento,
+      local,
+      status,
+      qtdPessoas,
+      qtdAdultos,
+      qtdCriancas,
+      qtdBebes,
+      observacoes,
     } = req.body;
 
     if (!clienteId || !nome || !dataEvento) {
       return res.status(400).json({
         success: false,
-        message: 'Cliente, nome e data do evento são obrigatórios.',
+        message: "Cliente, nome e data do evento são obrigatórios.",
       });
     }
 
@@ -97,20 +117,21 @@ async function criar(req, res, next) {
     if (!cliente) {
       return res.status(404).json({
         success: false,
-        message: 'Cliente não encontrado.',
+        message: "Cliente não encontrado.",
       });
     }
 
     // RN Canvas 2: Evento confirmado requer orçamento aprovado
-    if (status === 'confirmado') {
+    if (status === "confirmado") {
       if (!orcamentoId) {
         return res.status(400).json({
           success: false,
-          message: 'Um evento confirmado precisa de um orçamento aprovado associado.',
+          message:
+            "Um evento confirmado precisa de um orçamento aprovado associado.",
         });
       }
       const orcamento = await Orcamento.findByPk(orcamentoId);
-      if (!orcamento || orcamento.status !== 'aprovado') {
+      if (!orcamento || orcamento.status !== "aprovado") {
         return res.status(400).json({
           success: false,
           message: 'O orçamento associado precisa estar com status "aprovado".',
@@ -123,7 +144,8 @@ async function criar(req, res, next) {
       if (!qtdAdultos && !qtdCriancas && !qtdBebes) {
         return res.status(400).json({
           success: false,
-          message: 'Para eventos com mais de 50 pessoas, é obrigatório informar a quantidade de adultos, crianças e bebês.',
+          message:
+            "Para eventos com mais de 50 pessoas, é obrigatório informar a quantidade de adultos, crianças e bebês.",
         });
       }
     }
@@ -134,7 +156,7 @@ async function criar(req, res, next) {
       nome,
       dataEvento,
       local,
-      status: status || 'pendente',
+      status: status || "pendente",
       qtdPessoas,
       qtdAdultos,
       qtdCriancas,
@@ -144,7 +166,7 @@ async function criar(req, res, next) {
 
     return res.status(201).json({
       success: true,
-      message: 'Evento criado com sucesso!',
+      message: "Evento criado com sucesso!",
       data: evento,
     });
   } catch (error) {
@@ -159,32 +181,49 @@ async function atualizar(req, res, next) {
     if (!evento) {
       return res.status(404).json({
         success: false,
-        message: 'Evento não encontrado.',
+        message: "Evento não encontrado.",
       });
     }
 
     const {
-      clienteId, orcamentoId, nome, dataEvento, local,
-      qtdPessoas, qtdAdultos, qtdCriancas, qtdBebes, observacoes,
+      clienteId,
+      orcamentoId,
+      nome,
+      dataEvento,
+      local,
+      qtdPessoas,
+      qtdAdultos,
+      qtdCriancas,
+      qtdBebes,
+      observacoes,
     } = req.body;
 
     // RN4: Controle de público > 50
-    const novaPessoas = qtdPessoas !== undefined ? qtdPessoas : evento.qtdPessoas;
+    const novaPessoas =
+      qtdPessoas !== undefined ? qtdPessoas : evento.qtdPessoas;
     if (novaPessoas && novaPessoas > 50) {
-      const novoAdultos = qtdAdultos !== undefined ? qtdAdultos : evento.qtdAdultos;
-      const novoCriancas = qtdCriancas !== undefined ? qtdCriancas : evento.qtdCriancas;
+      const novoAdultos =
+        qtdAdultos !== undefined ? qtdAdultos : evento.qtdAdultos;
+      const novoCriancas =
+        qtdCriancas !== undefined ? qtdCriancas : evento.qtdCriancas;
       const novoBebes = qtdBebes !== undefined ? qtdBebes : evento.qtdBebes;
       if (!novoAdultos && !novoCriancas && !novoBebes) {
         return res.status(400).json({
           success: false,
-          message: 'Para eventos com mais de 50 pessoas, é obrigatório informar a quantidade de adultos, crianças e bebês.',
+          message:
+            "Para eventos com mais de 50 pessoas, é obrigatório informar a quantidade de adultos, crianças e bebês.",
         });
       }
     }
 
     await evento.update({
       clienteId: clienteId || evento.clienteId,
-      orcamentoId: orcamentoId !== undefined ? orcamentoId : evento.orcamentoId,
+      // ALTERAÇÃO: Garante que se vier vazio do select, salve como null
+      orcamentoId: orcamentoId
+        ? orcamentoId
+        : orcamentoId === ""
+          ? null
+          : evento.orcamentoId,
       nome: nome || evento.nome,
       dataEvento: dataEvento || evento.dataEvento,
       local: local !== undefined ? local : evento.local,
@@ -198,7 +237,7 @@ async function atualizar(req, res, next) {
 
     return res.json({
       success: true,
-      message: 'Evento atualizado com sucesso!',
+      message: "Evento atualizado com sucesso!",
       data: evento,
     });
   } catch (error) {
@@ -213,29 +252,33 @@ async function mudarStatus(req, res, next) {
     if (!evento) {
       return res.status(404).json({
         success: false,
-        message: 'Evento não encontrado.',
+        message: "Evento não encontrado.",
       });
     }
 
     const { status } = req.body;
-    if (!['pendente', 'confirmado', 'concluido', 'cancelado'].includes(status)) {
+    if (
+      !["pendente", "confirmado", "concluido", "cancelado"].includes(status)
+    ) {
       return res.status(400).json({
         success: false,
-        message: 'Status inválido. Use: pendente, confirmado, concluido ou cancelado.',
+        message:
+          "Status inválido. Use: pendente, confirmado, concluido ou cancelado.",
       });
     }
 
     // RN Canvas 2: Evento confirmado requer orçamento aprovado
-    if (status === 'confirmado' && !evento.orcamentoId) {
+    if (status === "confirmado" && !evento.orcamentoId) {
       return res.status(400).json({
         success: false,
-        message: 'Para confirmar o evento, é necessário um orçamento aprovado associado.',
+        message:
+          "Para confirmar o evento, é necessário um orçamento aprovado associado.",
       });
     }
 
-    if (status === 'confirmado' && evento.orcamentoId) {
+    if (status === "confirmado" && evento.orcamentoId) {
       const orcamento = await Orcamento.findByPk(evento.orcamentoId);
-      if (!orcamento || orcamento.status !== 'aprovado') {
+      if (!orcamento || orcamento.status !== "aprovado") {
         return res.status(400).json({
           success: false,
           message: 'O orçamento associado precisa estar com status "aprovado".',
@@ -262,7 +305,7 @@ async function remover(req, res, next) {
     if (!evento) {
       return res.status(404).json({
         success: false,
-        message: 'Evento não encontrado.',
+        message: "Evento não encontrado.",
       });
     }
 
@@ -270,11 +313,18 @@ async function remover(req, res, next) {
 
     return res.json({
       success: true,
-      message: 'Evento removido com sucesso!',
+      message: "Evento removido com sucesso!",
     });
   } catch (error) {
     return next(error);
   }
 }
 
-module.exports = { listar, buscarPorId, criar, atualizar, mudarStatus, remover };
+module.exports = {
+  listar,
+  buscarPorId,
+  criar,
+  atualizar,
+  mudarStatus,
+  remover,
+};

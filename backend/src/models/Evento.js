@@ -32,10 +32,10 @@ const Evento = sequelize.define('Evento', {
     field: 'evt_data_evento',
   },
   local: {
-    type: DataTypes.STRING(255),
-    allowNull: true,
-    field: 'evt_local',
-  },
+      type: DataTypes.STRING(255),
+      allowNull: true,
+      field: 'evt_local',
+    },
   status: {
     type: DataTypes.STRING(30),
     allowNull: false,
