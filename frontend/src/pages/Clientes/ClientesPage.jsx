@@ -10,6 +10,12 @@ export default function ClientesPage() {
   const [editing, setEditing] = useState(null);
   const [form, setForm] = useState({ nome: '', email: '', telefone: '', rgCpf: '' });
 
+  // Estado do modal de envio de catálogo
+  const [showCatModal, setShowCatModal] = useState(false);
+  const [selectedCliente, setSelectedCliente] = useState(null);
+  const [catalogos, setCatalogos] = useState([]);
+  const [selectedCatalogo, setSelectedCatalogo] = useState(null);
+
   const fetchClientes = async () => {
     try {
       const { data: res } = await api.get('/clientes', { params: { page, limit: 10, busca: search } });
@@ -61,6 +67,42 @@ export default function ClientesPage() {
     } catch {}
   };
 
+  // Abre o modal de catálogo e busca a lista
+  const openCatModal = async (cliente) => {
+    setSelectedCliente(cliente);
+    setSelectedCatalogo(null);
+    try {
+      const { data: res } = await api.get('/catalogos');
+      setCatalogos(Array.isArray(res.data) ? res.data : []);
+    } catch {
+      setCatalogos([]);
+    }
+    setShowCatModal(true);
+  };
+
+  // Gera o link do WhatsApp com a mensagem do catálogo
+  const handleEnviarCatalogo = () => {
+    if (!selectedCatalogo) return;
+
+    const phone = (selectedCliente.telefone || '').replace(/\D/g, '');
+    const nome = selectedCliente.nome?.split(' ')[0] || selectedCliente.nome;
+
+    let msg = `Olá ${nome}! 🎉 Segue nossa opção de buffet:\n\n*${selectedCatalogo.titulo}*`;
+    if (selectedCatalogo.descricao) msg += `\n${selectedCatalogo.descricao}`;
+    if (selectedCatalogo.precoBase) {
+      const preco = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(selectedCatalogo.precoBase);
+      msg += `\n\n💰 A partir de ${preco}`;
+    }
+    if (selectedCatalogo.urlExterna && selectedCatalogo.urlExterna.startsWith('http')) {
+      msg += `\n\n🔗 Confira aqui: ${selectedCatalogo.urlExterna}`;
+    }
+    msg += '\n\nQualquer dúvida, estamos à disposição! 😊';
+
+    const link = `https://wa.me/55${phone}?text=${encodeURIComponent(msg)}`;
+    window.open(link, '_blank');
+    setShowCatModal(false);
+  };
+
   const initials = (name) => (name || 'NA').split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
 
   return (
@@ -103,7 +145,7 @@ export default function ClientesPage() {
             <table className="w-full text-left">
               <thead>
                 <tr className="bg-surface-container text-on-surface-variant text-xs uppercase tracking-[0.15em] font-bold">
-                  <th className="px-6 py-5">Nome & Email</th>
+                  <th className="px-6 py-5">Nome &amp; Email</th>
                   <th className="px-6 py-5">CPF/CNPJ</th>
                   <th className="px-6 py-5">Telefone</th>
                   <th className="px-6 py-5 text-right">Ações</th>
@@ -133,6 +175,9 @@ export default function ClientesPage() {
                         <button onClick={() => handleWhatsApp(c.id)} className="w-9 h-9 rounded-full bg-secondary text-on-secondary flex items-center justify-center hover:scale-110 transition-all shadow-md shadow-secondary/20" title="WhatsApp">
                           <span className="material-symbols-outlined text-lg filled">chat</span>
                         </button>
+                        <button onClick={() => openCatModal(c)} className="w-9 h-9 rounded-full bg-primary/20 text-on-surface flex items-center justify-center hover:bg-primary hover:text-on-primary hover:scale-110 transition-all shadow-md shadow-primary/10" title="Enviar Catálogo">
+                          <span className="material-symbols-outlined text-lg">menu_book</span>
+                        </button>
                         <button onClick={() => handleEdit(c)} className="w-9 h-9 rounded-full bg-surface-container text-on-surface-variant flex items-center justify-center hover:bg-primary/20 transition-all">
                           <span className="material-symbols-outlined text-lg">edit</span>
                         </button>
@@ -161,7 +206,7 @@ export default function ClientesPage() {
         </div>
       </section>
 
-      {/* Slide-over Panel */}
+      {/* Slide-over Panel — Cadastro/Edição de Cliente */}
       {showPanel && (
         <div className="fixed inset-0 bg-on-surface/40 backdrop-blur-md z-50 flex justify-end fade-in" onClick={() => setShowPanel(false)}>
           <div className="w-full max-w-lg bg-white h-full shadow-2xl flex flex-col slide-in-right rounded-l-3xl" onClick={(e) => e.stopPropagation()}>
@@ -199,6 +244,94 @@ export default function ClientesPage() {
             <div className="p-8 bg-surface-container-low flex gap-4 rounded-tl-3xl">
               <button onClick={() => setShowPanel(false)} className="flex-1 border-2 border-outline-variant text-on-surface-variant py-3.5 rounded-full font-bold hover:bg-white transition-all">Cancelar</button>
               <button type="submit" form="client-form" className="flex-[2] bg-primary text-on-primary py-3.5 rounded-full font-bold shadow-xl shadow-primary/30 hover:scale-[1.02] active:scale-95 transition-all">Salvar</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal — Enviar Catálogo por WhatsApp */}
+      {showCatModal && (
+        <div className="fixed inset-0 bg-on-surface/40 backdrop-blur-md z-50 flex items-center justify-center fade-in px-4" onClick={() => setShowCatModal(false)}>
+          <div className="w-full max-w-md bg-white rounded-3xl shadow-2xl flex flex-col overflow-hidden" onClick={(e) => e.stopPropagation()}>
+            {/* Modal Header */}
+            <div className="p-7 border-b border-outline-variant/30 flex justify-between items-start">
+              <div>
+                <h3 className="text-xl font-headline font-extrabold text-on-surface">Enviar Catálogo</h3>
+                <p className="text-sm text-on-surface-variant mt-1">
+                  Para: <span className="font-bold text-on-surface">{selectedCliente?.nome}</span>
+                </p>
+              </div>
+              <button onClick={() => setShowCatModal(false)} className="p-2 hover:bg-surface-container rounded-full transition-colors text-on-surface-variant">
+                <span className="material-symbols-outlined">close</span>
+              </button>
+            </div>
+
+            {/* Lista de Catálogos */}
+            <div className="p-6 max-h-80 overflow-y-auto space-y-3">
+              {catalogos.length === 0 && (
+                <div className="text-center py-8 text-on-surface-variant">
+                  <span className="material-symbols-outlined text-4xl text-outline/30 block mb-2">menu_book</span>
+                  <p className="text-sm">Nenhum catálogo cadastrado.</p>
+                  <p className="text-xs mt-1">Cadastre catálogos na seção <span className="font-bold">Catálogos</span>.</p>
+                </div>
+              )}
+              {catalogos.map((cat) => (
+                <button
+                  key={cat.id}
+                  onClick={() => setSelectedCatalogo(cat)}
+                  className={`w-full text-left p-4 rounded-2xl border-2 transition-all ${
+                    selectedCatalogo?.id === cat.id
+                      ? 'border-primary bg-primary/10'
+                      : 'border-outline-variant/30 hover:border-primary/40 hover:bg-surface-container-low'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className={`w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 ${selectedCatalogo?.id === cat.id ? 'bg-primary text-on-primary' : 'bg-surface-container text-on-surface-variant'}`}>
+                      <span className="material-symbols-outlined text-lg">menu_book</span>
+                    </div>
+                    <div className="overflow-hidden">
+                      <p className="font-bold text-on-surface text-sm truncate">{cat.titulo}</p>
+                      {cat.precoBase && (
+                        <p className="text-xs text-tertiary font-medium">
+                          {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(cat.precoBase)}
+                        </p>
+                      )}
+                    </div>
+                    {selectedCatalogo?.id === cat.id && (
+                      <span className="material-symbols-outlined text-primary ml-auto">check_circle</span>
+                    )}
+                  </div>
+                </button>
+              ))}
+            </div>
+
+            {/* Prévia da mensagem */}
+            {selectedCatalogo && (
+              <div className="px-6 pb-4">
+                <div className="bg-surface-container-low rounded-2xl p-4">
+                  <p className="text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-2">Prévia da mensagem</p>
+                  <p className="text-xs text-on-surface-variant leading-relaxed">
+                    Olá {selectedCliente?.nome?.split(' ')[0]}! 🎉 Segue nossa opção de buffet:{' '}
+                    <strong>{selectedCatalogo.titulo}</strong>
+                    {selectedCatalogo.urlExterna ? ' 🔗 Com link' : ''}
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* Ações */}
+            <div className="p-6 pt-2 flex gap-3">
+              <button onClick={() => setShowCatModal(false)} className="flex-1 border-2 border-outline-variant text-on-surface-variant py-3 rounded-full font-bold hover:bg-surface-container transition-all text-sm">
+                Cancelar
+              </button>
+              <button
+                onClick={handleEnviarCatalogo}
+                disabled={!selectedCatalogo}
+                className="flex-[2] bg-secondary text-on-secondary py-3 rounded-full font-bold shadow-lg shadow-secondary/20 hover:scale-[1.02] active:scale-95 transition-all text-sm flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                <span className="material-symbols-outlined text-lg filled">chat</span>
+                Enviar via WhatsApp
+              </button>
             </div>
           </div>
         </div>

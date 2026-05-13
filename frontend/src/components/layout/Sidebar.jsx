@@ -9,6 +9,7 @@ const navItems = [
   { to: '/eventos', icon: 'event_available', label: 'Eventos' },
   { to: '/estoque', icon: 'inventory_2', label: 'Estoque' },
   { to: '/documentos', icon: 'description', label: 'Documentos' },
+  { to: '/catalogos', icon: 'menu_book', label: 'Catálogos' },
 ];
 
 export default function Sidebar({ isOpen, onClose }) {

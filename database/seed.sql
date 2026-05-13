@@ -2,7 +2,7 @@
 -- PROJETO MAIS ALEGRIA - DADOS FICTÍCIOS COM UUID DINÂMICO
 -- ============================================================
 
-TRUNCATE usuarios, clientes, funcionarios, produtos, orcamentos, eventos, documentos, escala, evento_produto, orcamento_produto RESTART IDENTITY CASCADE;
+TRUNCATE usuarios, clientes, funcionarios, produtos, orcamentos, eventos, documentos, catalogos, escala, evento_produto, orcamento_produto RESTART IDENTITY CASCADE;
 
 -- 0. USUARIOS
 INSERT INTO usuarios (usr_nome, usr_email, usr_senha, usr_role) VALUES
@@ -70,3 +70,9 @@ INSERT INTO orcamento_produto (orp_orc_id, orp_prd_id, orp_quantidade, orp_preco
 ((SELECT orc_id FROM orcamentos WHERE orc_observacoes LIKE '%Festa infantil completa%'), (SELECT prd_id FROM produtos WHERE prd_nome = 'Refrigerante Cola 2L'), 20, 8.50),
 ((SELECT orc_id FROM orcamentos WHERE orc_observacoes LIKE '%Festa infantil completa%'), (SELECT prd_id FROM produtos WHERE prd_nome = 'Copo Descartável 200ml'), 200, 0.05),
 ((SELECT orc_id FROM orcamentos WHERE orc_observacoes LIKE '%Festa infantil completa%'), (SELECT prd_id FROM produtos WHERE prd_nome = 'Salgadinhos Sortidos'), 800, 0.50);
+
+-- 10. CATALOGOS
+INSERT INTO catalogos (cat_titulo, cat_descricao, cat_preco_base, cat_url_externa, cat_ativo) VALUES
+('Buffet Infantil Completo', 'Ideal para festas de aniversário infantis. Inclui salgadinhos, doces, bolo temático e refrigerantes para até 60 pessoas.', 1800.00, NULL, true),
+('Buffet Premium Casamento', 'Buffet sofisticado para casamentos e eventos corporativos. Entrada, prato principal, sobremesa e open bar para até 200 pessoas.', 8500.00, NULL, true),
+('Petiscos & Finger Foods', 'Perfeito para eventos informais e confraternizações. Mix de frios, bruschetas, canapés e drinks especiais.', 950.00, NULL, true);

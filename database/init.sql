@@ -13,6 +13,7 @@ DROP TABLE IF EXISTS orcamento_produto CASCADE;
 DROP TABLE IF EXISTS evento_produto    CASCADE;
 DROP TABLE IF EXISTS escala            CASCADE;
 DROP TABLE IF EXISTS documentos        CASCADE;
+DROP TABLE IF EXISTS catalogos         CASCADE;
 DROP TABLE IF EXISTS eventos           CASCADE;
 DROP TABLE IF EXISTS orcamentos        CASCADE;
 DROP TABLE IF EXISTS produtos          CASCADE;
@@ -165,7 +166,27 @@ CREATE TABLE documentos (
 );
 
 -- ============================================================
--- 7. ESCALA (Evento ↔ Funcionário)
+-- 7. CATÁLOGOS DE BUFFET
+-- ============================================================
+CREATE TABLE catalogos (
+    cat_id           UUID          PRIMARY KEY DEFAULT uuid_generate_v4(),
+    cat_titulo       VARCHAR(200)  NOT NULL,
+    cat_descricao    TEXT,
+    cat_preco_base   NUMERIC(12,2),
+    cat_url_externa  TEXT,
+    cat_imagem_url   TEXT,
+    cat_ativo        BOOLEAN       NOT NULL DEFAULT true,
+    cat_criado_em    TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    cat_atualizado_em TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    cat_deletado_em  TIMESTAMP
+);
+
+COMMENT ON TABLE  catalogos             IS 'Catálogos de buffet para envio via WhatsApp.';
+COMMENT ON COLUMN catalogos.cat_url_externa IS 'Link externo (Google Drive, Canva, etc.) para o catálogo.';
+COMMENT ON COLUMN catalogos.cat_imagem_url  IS 'URL da imagem de capa do catálogo (upload interno).';
+
+-- ============================================================
+-- 8. ESCALA (Evento ↔ Funcionário)
 -- ============================================================
 CREATE TABLE escala (
     esc_id             UUID      PRIMARY KEY DEFAULT uuid_generate_v4(),

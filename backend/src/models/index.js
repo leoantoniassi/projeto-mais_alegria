@@ -8,6 +8,7 @@ const Produto = require('./Produto');
 const Orcamento = require('./Orcamento');
 const Evento = require('./Evento');
 const Documento = require('./Documento');
+const Catalogo = require('./Catalogo');
 const Escala = require('./Escala');
 const EventoProduto = require('./EventoProduto');
 const OrcamentoProduto = require('./OrcamentoProduto');
@@ -98,6 +99,7 @@ module.exports = {
   Orcamento,
   Evento,
   Documento,
+  Catalogo,
   Escala,
   EventoProduto,
   OrcamentoProduto,

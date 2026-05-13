@@ -9,6 +9,7 @@ import EventosPage from './pages/Eventos/EventosPage';
 import EstoquePage from './pages/Estoque/EstoquePage';
 import OrcamentosPage from './pages/Orcamentos/OrcamentosPage';
 import DocumentosPage from './pages/Documentos/DocumentosPage';
+import CatalogosPage from './pages/Catalogos/CatalogosPage';
 
 function ProtectedRoute({ children }) {
   const { isAuthenticated, loading } = useAuth();
@@ -65,6 +66,7 @@ export default function App() {
         <Route path="estoque" element={<EstoquePage />} />
         <Route path="orcamentos" element={<OrcamentosPage />} />
         <Route path="documentos" element={<DocumentosPage />} />
+        <Route path="catalogos" element={<CatalogosPage />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
