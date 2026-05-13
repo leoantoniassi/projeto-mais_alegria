@@ -1,0 +1,338 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-init-scripts
+  namespace: mais-alegria
+# Os scripts SQL são montados em /docker-entrypoint-initdb.d/
+# O PostgreSQL executa AUTOMATICAMENTE todos os .sql desse diretório
+# na primeira vez que o container sobe com um volume vazio.
+# A ordem de execução é alfabética (01-init antes de 02-seed).
+data:
+  01-init.sql: |
+    -- ============================================================
+    -- PROJETO MAIS ALEGRIA - DDL (PostgreSQL)
+    -- Script de inicialização para Docker
+    -- O banco 'projeto_mais_alegria' é criado automaticamente
+    -- pelo Docker via variável POSTGRES_DB
+    -- ============================================================
+
+    -- Ativando a extensão nativa para UUID
+    CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+    -- Remove tabelas existentes (em ordem reversa de dependência)
+    DROP TABLE IF EXISTS orcamento_produto CASCADE;
+    DROP TABLE IF EXISTS evento_produto    CASCADE;
+    DROP TABLE IF EXISTS escala            CASCADE;
+    DROP TABLE IF EXISTS documentos        CASCADE;
+    DROP TABLE IF EXISTS eventos           CASCADE;
+    DROP TABLE IF EXISTS orcamentos        CASCADE;
+    DROP TABLE IF EXISTS produtos          CASCADE;
+    DROP TABLE IF EXISTS funcionarios      CASCADE;
+    DROP TABLE IF EXISTS clientes          CASCADE;
+    DROP TABLE IF EXISTS usuarios          CASCADE;
+
+    -- ============================================================
+    -- 0. USUARIOS
+    -- ============================================================
+    CREATE TABLE usuarios (
+        usr_id        UUID         PRIMARY KEY DEFAULT uuid_generate_v4(),
+        usr_nome      VARCHAR(150) NOT NULL,
+        usr_email     VARCHAR(150) NOT NULL UNIQUE,
+        usr_senha     VARCHAR(255) NOT NULL,
+        usr_role      VARCHAR(20)  NOT NULL DEFAULT 'operador',
+        usr_criado_em TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        CONSTRAINT ck_usuarios_role CHECK (usr_role IN ('admin', 'gerente', 'operador'))
+    );
+
+    COMMENT ON TABLE  usuarios          IS 'Usuários do sistema com controle de acesso por role.';
+    COMMENT ON COLUMN usuarios.usr_role IS 'Papel no sistema: admin, gerente ou operador.';
+
+    -- ============================================================
+    -- 1. CLIENTES
+    -- ============================================================
+    CREATE TABLE clientes (
+        cli_id           UUID         PRIMARY KEY DEFAULT uuid_generate_v4(),
+        cli_nome         VARCHAR(150) NOT NULL,
+        cli_email        VARCHAR(150) NOT NULL,
+        cli_rgcpf        VARCHAR(20)  NOT NULL,
+        cli_telefone     VARCHAR(20)  NOT NULL,
+        cli_criado_em    TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        cli_atualizado_em TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        cli_deletado_em   TIMESTAMP,
+
+        CONSTRAINT uq_clientes_rgcpf UNIQUE (cli_rgcpf),
+        CONSTRAINT uq_clientes_email UNIQUE (cli_email)
+    );
+
+    -- ============================================================
+    -- 2. FUNCIONARIOS
+    -- ============================================================
+    CREATE TABLE funcionarios (
+        fun_id           UUID         PRIMARY KEY DEFAULT uuid_generate_v4(),
+        fun_nome         VARCHAR(150) NOT NULL,
+        fun_email        VARCHAR(150) NOT NULL,
+        fun_telefone     VARCHAR(20),
+        fun_funcao       VARCHAR(80)  NOT NULL,
+        fun_criado_em    TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        fun_atualizado_em TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        fun_deletado_em   TIMESTAMP,
+
+        CONSTRAINT uq_funcionarios_email UNIQUE (fun_email)
+    );
+
+    -- ============================================================
+    -- 3. PRODUTOS (ESTOQUE)
+    -- ============================================================
+    CREATE TABLE produtos (
+        prd_id              UUID          PRIMARY KEY DEFAULT uuid_generate_v4(),
+        prd_nome            VARCHAR(150)  NOT NULL,
+        prd_categoria       VARCHAR(80)   NOT NULL,
+        prd_quantidade      NUMERIC(10,2) NOT NULL DEFAULT 0,
+        prd_unidade_medida  VARCHAR(30)   NOT NULL,
+        prd_custo_unitario  NUMERIC(12,2) NOT NULL DEFAULT 0,
+        prd_criado_em       TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        prd_atualizado_em   TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        prd_deletado_em      TIMESTAMP
+    );
+
+    -- ============================================================
+    -- 4. ORCAMENTOS
+    -- ============================================================
+    CREATE TABLE orcamentos (
+        orc_id              UUID          PRIMARY KEY DEFAULT uuid_generate_v4(),
+        orc_cli_id          UUID          NOT NULL,
+        orc_valor_total     NUMERIC(12,2) NOT NULL DEFAULT 0,
+        orc_data_validade   DATE,
+        orc_status          VARCHAR(20)   NOT NULL DEFAULT 'pendente',
+        orc_observacoes     TEXT,
+        orc_criado_em       TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        orc_atualizado_em   TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        orc_deletado_em      TIMESTAMP,
+
+        CONSTRAINT fk_orcamentos_cliente
+            FOREIGN KEY (orc_cli_id) REFERENCES clientes (cli_id)
+            ON UPDATE CASCADE ON DELETE RESTRICT,
+
+        CONSTRAINT ck_orcamentos_status
+            CHECK (orc_status IN ('pendente', 'aprovado', 'reprovado'))
+    );
+
+    -- ============================================================
+    -- 5. EVENTOS
+    -- ============================================================
+    CREATE TABLE eventos (
+        evt_id             UUID         PRIMARY KEY DEFAULT uuid_generate_v4(),
+        evt_cli_id         UUID         NOT NULL,
+        evt_orc_id         UUID,
+        evt_nome           VARCHAR(200) NOT NULL,
+        evt_data_evento    TIMESTAMP    NOT NULL,
+        evt_local          VARCHAR(255),
+        evt_status         VARCHAR(30)  NOT NULL DEFAULT 'pendente',
+        evt_qtd_pessoas    INT,
+        evt_qtd_adultos    INT,
+        evt_qtd_criancas   INT,
+        evt_qtd_bebes      INT,
+        evt_observacoes    TEXT,
+        evt_criado_em      TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        evt_atualizado_em  TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        evt_deletado_em    TIMESTAMP,
+
+        CONSTRAINT fk_eventos_cliente
+            FOREIGN KEY (evt_cli_id) REFERENCES clientes (cli_id)
+            ON UPDATE CASCADE ON DELETE RESTRICT,
+
+        CONSTRAINT fk_eventos_orcamento
+            FOREIGN KEY (evt_orc_id) REFERENCES orcamentos (orc_id)
+            ON UPDATE CASCADE ON DELETE SET NULL,
+
+        CONSTRAINT ck_eventos_status
+            CHECK (evt_status IN ('pendente', 'confirmado', 'concluido', 'cancelado'))
+    );
+
+    -- ============================================================
+    -- 6. DOCUMENTOS
+    -- ============================================================
+    CREATE TABLE documentos (
+        doc_id           UUID         PRIMARY KEY DEFAULT uuid_generate_v4(),
+        doc_cli_id       UUID,
+        doc_evt_id       UUID,
+        doc_nome_arquivo VARCHAR(255) NOT NULL,
+        doc_caminho_url  TEXT         NOT NULL,
+        doc_tipo_arquivo VARCHAR(10)  NOT NULL,
+        doc_criado_em    TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        doc_atualizado_em TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        doc_deletado_em  TIMESTAMP,
+
+        CONSTRAINT fk_documentos_cliente
+            FOREIGN KEY (doc_cli_id) REFERENCES clientes (cli_id)
+            ON UPDATE CASCADE ON DELETE SET NULL,
+
+        CONSTRAINT fk_documentos_evento
+            FOREIGN KEY (doc_evt_id) REFERENCES eventos (evt_id)
+            ON UPDATE CASCADE ON DELETE SET NULL,
+
+        CONSTRAINT ck_documentos_tipo
+            CHECK (doc_tipo_arquivo IN ('pdf', 'jpg', 'png'))
+    );
+
+    -- ============================================================
+    -- 7. ESCALA (Evento <-> Funcionario)
+    -- ============================================================
+    CREATE TABLE escala (
+        esc_id             UUID      PRIMARY KEY DEFAULT uuid_generate_v4(),
+        esc_evt_id         UUID      NOT NULL,
+        esc_fun_id         UUID      NOT NULL,
+        esc_observacoes    TEXT,
+        esc_criado_em      TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        esc_atualizado_em  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        esc_deletado_em    TIMESTAMP,
+
+        CONSTRAINT fk_escala_evento
+            FOREIGN KEY (esc_evt_id) REFERENCES eventos (evt_id)
+            ON UPDATE CASCADE ON DELETE CASCADE,
+
+        CONSTRAINT fk_escala_funcionario
+            FOREIGN KEY (esc_fun_id) REFERENCES funcionarios (fun_id)
+            ON UPDATE CASCADE ON DELETE CASCADE,
+
+        CONSTRAINT uq_escala_evento_funcionario
+            UNIQUE (esc_evt_id, esc_fun_id)
+    );
+
+    -- ============================================================
+    -- 8. EVENTO_PRODUTO
+    -- ============================================================
+    CREATE TABLE evento_produto (
+        evp_id           UUID          PRIMARY KEY DEFAULT uuid_generate_v4(),
+        evp_evt_id       UUID          NOT NULL,
+        evp_prd_id       UUID          NOT NULL,
+        evp_quantidade   NUMERIC(10,2) NOT NULL DEFAULT 0,
+        evp_criado_em    TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        evp_atualizado_em TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        evp_deletado_em  TIMESTAMP,
+
+        CONSTRAINT fk_evento_produto_evento
+            FOREIGN KEY (evp_evt_id) REFERENCES eventos (evt_id)
+            ON UPDATE CASCADE ON DELETE CASCADE,
+
+        CONSTRAINT fk_evento_produto_produto
+            FOREIGN KEY (evp_prd_id) REFERENCES produtos (prd_id)
+            ON UPDATE CASCADE ON DELETE RESTRICT,
+
+        CONSTRAINT uq_evento_produto
+            UNIQUE (evp_evt_id, evp_prd_id)
+    );
+
+    -- ============================================================
+    -- 9. ORCAMENTO_PRODUTO
+    -- ============================================================
+    CREATE TABLE orcamento_produto (
+        orp_id             UUID          PRIMARY KEY DEFAULT uuid_generate_v4(),
+        orp_orc_id         UUID          NOT NULL,
+        orp_prd_id         UUID          NOT NULL,
+        orp_quantidade     NUMERIC(10,2) NOT NULL DEFAULT 0,
+        orp_preco_unitario NUMERIC(12,2) NOT NULL DEFAULT 0,
+        orp_criado_em      TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        orp_atualizado_em  TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        orp_deletado_em    TIMESTAMP,
+
+        CONSTRAINT fk_orcamento_produto_orcamento
+            FOREIGN KEY (orp_orc_id) REFERENCES orcamentos (orc_id)
+            ON UPDATE CASCADE ON DELETE CASCADE,
+
+        CONSTRAINT fk_orcamento_produto_produto
+            FOREIGN KEY (orp_prd_id) REFERENCES produtos (prd_id)
+            ON UPDATE CASCADE ON DELETE RESTRICT,
+
+        CONSTRAINT uq_orcamento_produto
+            UNIQUE (orp_orc_id, orp_prd_id)
+    );
+
+    -- ============================================================
+    -- INDICES ADICIONAIS
+    -- ============================================================
+    CREATE INDEX idx_orcamentos_cliente     ON orcamentos       (orc_cli_id);
+    CREATE INDEX idx_orcamentos_status      ON orcamentos       (orc_status);
+    CREATE INDEX idx_eventos_cliente        ON eventos          (evt_cli_id);
+    CREATE INDEX idx_eventos_orcamento      ON eventos          (evt_orc_id);
+    CREATE INDEX idx_eventos_data           ON eventos          (evt_data_evento);
+    CREATE INDEX idx_documentos_cliente     ON documentos       (doc_cli_id);
+    CREATE INDEX idx_documentos_evento      ON documentos       (doc_evt_id);
+    CREATE INDEX idx_escala_evento          ON escala           (esc_evt_id);
+    CREATE INDEX idx_escala_funcionario     ON escala           (esc_fun_id);
+    CREATE INDEX idx_evento_produto_evento  ON evento_produto   (evp_evt_id);
+    CREATE INDEX idx_orcamento_produto_orc  ON orcamento_produto(orp_orc_id);
+
+  02-seed.sql: |
+    -- ============================================================
+    -- PROJETO MAIS ALEGRIA - DADOS FICTICIOS COM UUID DINAMICO
+    -- ============================================================
+
+    TRUNCATE usuarios, clientes, funcionarios, produtos, orcamentos, eventos, documentos, escala, evento_produto, orcamento_produto RESTART IDENTITY CASCADE;
+
+    -- 0. USUARIOS
+    INSERT INTO usuarios (usr_nome, usr_email, usr_senha, usr_role) VALUES
+    ('Admin Silva', 'admin@maisalegria.com', '$2y$10$wWwMj.Q9Gq.i0v7Y.9c3.u.V4nB0q0t3eXZ.P1yI0aQ2hE8c3L9oK', 'admin'),
+    ('Gerente Souza', 'gerente@maisalegria.com', '$2y$10$wWwMj.Q9Gq.i0v7Y.9c3.u.V4nB0q0t3eXZ.P1yI0aQ2hE8c3L9oK', 'gerente'),
+    ('Operador Lima', 'operador@maisalegria.com', '$2y$10$wWwMj.Q9Gq.i0v7Y.9c3.u.V4nB0q0t3eXZ.P1yI0aQ2hE8c3L9oK', 'operador');
+
+    -- 1. CLIENTES
+    INSERT INTO clientes (cli_nome, cli_email, cli_rgcpf, cli_telefone) VALUES
+    ('Joao Carlos', 'joao.carlos@email.com', '123.456.789-01', '(11) 98765-4321'),
+    ('Maria Oliveira', 'maria.oliveira@email.com', '987.654.321-09', '(11) 91234-5678'),
+    ('Pedro Santos', 'pedro.santos@email.com', '111.222.333-44', '(11) 99999-8888');
+
+    -- 2. FUNCIONARIOS
+    INSERT INTO funcionarios (fun_nome, fun_email, fun_telefone, fun_funcao) VALUES
+    ('Ana Clara', 'ana.clara@maisalegria.com', '(11) 97777-6666', 'Recreador'),
+    ('Lucas Mendes', 'lucas.mendes@maisalegria.com', '(11) 95555-4444', 'Garcom'),
+    ('Bia Costa', 'bia.costa@maisalegria.com', '(11) 93333-2222', 'Cozinheiro'),
+    ('Marcos Silva', 'marcos.silva@maisalegria.com', '(11) 91111-0000', 'Seguranca');
+
+    -- 3. PRODUTOS (ESTOQUE)
+    INSERT INTO produtos (prd_nome, prd_categoria, prd_quantidade, prd_unidade_medida, prd_custo_unitario) VALUES
+    ('Bolo de Chocolate', 'Alimento', 5, 'un', 150.00),
+    ('Refrigerante Cola 2L', 'Bebida', 50, 'un', 8.50),
+    ('Copo Descartavel 200ml', 'Descartavel', 1000, 'un', 0.05),
+    ('Salgadinhos Sortidos', 'Alimento', 2000, 'un', 0.50),
+    ('Baloes Coloridos', 'Decoracao', 500, 'un', 0.20);
+
+    -- 4. ORCAMENTOS
+    INSERT INTO orcamentos (orc_cli_id, orc_valor_total, orc_data_validade, orc_status, orc_observacoes) VALUES
+    ((SELECT cli_id FROM clientes WHERE cli_nome = 'Joao Carlos'), 2500.00, '2026-04-01', 'aprovado', 'Festa infantil completa para 60 pessoas.'),
+    ((SELECT cli_id FROM clientes WHERE cli_nome = 'Maria Oliveira'), 1200.00, '2026-04-10', 'pendente', 'Apenas salgados e bebidas.'),
+    ((SELECT cli_id FROM clientes WHERE cli_nome = 'Pedro Santos'), 4000.00, '2026-04-05', 'aprovado', 'Casamento com buffet e recreacao infantil.');
+
+    -- 5. EVENTOS
+    INSERT INTO eventos (evt_cli_id, evt_orc_id, evt_nome, evt_data_evento, evt_local, evt_status, evt_qtd_pessoas, evt_qtd_adultos, evt_qtd_criancas, evt_qtd_bebes, evt_observacoes) VALUES
+    ((SELECT cli_id FROM clientes WHERE cli_nome = 'Joao Carlos'), (SELECT orc_id FROM orcamentos WHERE orc_observacoes LIKE '%Festa infantil completa%'), 'Aniversario do Pedrinho - 5 anos', '2026-05-10 14:00:00', 'Salao de Festas Alegria', 'confirmado', 60, 30, 25, 5, 'Tema: Super-herois. Montagem as 10h.'),
+    ((SELECT cli_id FROM clientes WHERE cli_nome = 'Pedro Santos'), (SELECT orc_id FROM orcamentos WHERE orc_observacoes LIKE '%Casamento%'), 'Casamento Maria e Jose', '2026-06-20 19:00:00', 'Chacara das Flores', 'confirmado', 150, 120, 20, 10, 'Buffet completo. Chegar 4 horas antes.');
+
+    -- 6. DOCUMENTOS
+    INSERT INTO documentos (doc_cli_id, doc_evt_id, doc_nome_arquivo, doc_caminho_url, doc_tipo_arquivo) VALUES
+    ((SELECT cli_id FROM clientes WHERE cli_nome = 'Joao Carlos'), (SELECT evt_id FROM eventos WHERE evt_nome LIKE '%Aniversario%'), 'Contrato Assinado - Joao', 'https://storage.mock/contrato_joao.pdf', 'pdf'),
+    ((SELECT cli_id FROM clientes WHERE cli_nome = 'Pedro Santos'), (SELECT evt_id FROM eventos WHERE evt_nome LIKE '%Casamento%'), 'Contrato Casamento - Maria', 'https://storage.mock/contrato_maria_jose.pdf', 'pdf');
+
+    -- 7. ESCALA
+    INSERT INTO escala (esc_evt_id, esc_fun_id, esc_observacoes) VALUES
+    ((SELECT evt_id FROM eventos WHERE evt_nome LIKE '%Aniversario%'), (SELECT fun_id FROM funcionarios WHERE fun_nome = 'Ana Clara'), 'Ficar na area das criancas menores'),
+    ((SELECT evt_id FROM eventos WHERE evt_nome LIKE '%Aniversario%'), (SELECT fun_id FROM funcionarios WHERE fun_nome = 'Lucas Mendes'), 'Servir area vip'),
+    ((SELECT evt_id FROM eventos WHERE evt_nome LIKE '%Aniversario%'), (SELECT fun_id FROM funcionarios WHERE fun_nome = 'Bia Costa'), 'Preparar os salgados e o bolo'),
+    ((SELECT evt_id FROM eventos WHERE evt_nome LIKE '%Casamento%'), (SELECT fun_id FROM funcionarios WHERE fun_nome = 'Ana Clara'), 'Recreacao infantil no salao anexo'),
+    ((SELECT evt_id FROM eventos WHERE evt_nome LIKE '%Casamento%'), (SELECT fun_id FROM funcionarios WHERE fun_nome = 'Lucas Mendes'), 'Coordenar garcons do salao principal');
+
+    -- 8. EVENTO_PRODUTO
+    INSERT INTO evento_produto (evp_evt_id, evp_prd_id, evp_quantidade) VALUES
+    ((SELECT evt_id FROM eventos WHERE evt_nome LIKE '%Aniversario%'), (SELECT prd_id FROM produtos WHERE prd_nome = 'Bolo de Chocolate'), 1),
+    ((SELECT evt_id FROM eventos WHERE evt_nome LIKE '%Aniversario%'), (SELECT prd_id FROM produtos WHERE prd_nome = 'Refrigerante Cola 2L'), 20),
+    ((SELECT evt_id FROM eventos WHERE evt_nome LIKE '%Aniversario%'), (SELECT prd_id FROM produtos WHERE prd_nome = 'Copo Descartavel 200ml'), 200),
+    ((SELECT evt_id FROM eventos WHERE evt_nome LIKE '%Aniversario%'), (SELECT prd_id FROM produtos WHERE prd_nome = 'Salgadinhos Sortidos'), 800),
+    ((SELECT evt_id FROM eventos WHERE evt_nome LIKE '%Casamento%'), (SELECT prd_id FROM produtos WHERE prd_nome = 'Refrigerante Cola 2L'), 50),
+    ((SELECT evt_id FROM eventos WHERE evt_nome LIKE '%Casamento%'), (SELECT prd_id FROM produtos WHERE prd_nome = 'Salgadinhos Sortidos'), 1200);
+
+    -- 9. ORCAMENTO_PRODUTO
+    INSERT INTO orcamento_produto (orp_orc_id, orp_prd_id, orp_quantidade, orp_preco_unitario) VALUES
+    ((SELECT orc_id FROM orcamentos WHERE orc_observacoes LIKE '%Festa infantil completa%'), (SELECT prd_id FROM produtos WHERE prd_nome = 'Bolo de Chocolate'), 1, 150.00),
+    ((SELECT orc_id FROM orcamentos WHERE orc_observacoes LIKE '%Festa infantil completa%'), (SELECT prd_id FROM produtos WHERE prd_nome = 'Refrigerante Cola 2L'), 20, 8.50),
+    ((SELECT orc_id FROM orcamentos WHERE orc_observacoes LIKE '%Festa infantil completa%'), (SELECT prd_id FROM produtos WHERE prd_nome = 'Copo Descartavel 200ml'), 200, 0.05),
+    ((SELECT orc_id FROM orcamentos WHERE orc_observacoes LIKE '%Festa infantil completa%'), (SELECT prd_id FROM produtos WHERE prd_nome = 'Salgadinhos Sortidos'), 800, 0.50);

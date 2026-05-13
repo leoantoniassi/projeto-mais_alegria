@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: backend-uploads-pvc
+  namespace: mais-alegria
+spec:
+  accessModes:
+    - ReadWriteOnce          # Um nó por vez pode escrever
+  resources:
+    requests:
+      storage: 1Gi           # 1 GB para arquivos enviados pelos usuários

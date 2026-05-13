@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: mais-alegria
+  labels:
+    app: mais-alegria
+    environment: development

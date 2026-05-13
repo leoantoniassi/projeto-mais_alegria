@@ -1,0 +1,84 @@
+apiVersion: apps/v1
+# StatefulSet é usado para bancos de dados pois garante
+# identidade estável e ordem de criação/deleção dos pods
+kind: StatefulSet
+metadata:
+  name: postgres
+  namespace: mais-alegria
+spec:
+  serviceName: postgres-service
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:15-alpine
+          ports:
+            - containerPort: 5432
+          # Variáveis de ambiente lidas do Secret
+          env:
+            - name: POSTGRES_DB
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: DB_NAME
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: DB_USER
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: DB_PASS
+          # Volume montado no caminho de dados do PostgreSQL
+          volumeMounts:
+            - name: postgres-data
+              mountPath: /var/lib/postgresql/data
+            # Monta os scripts SQL do ConfigMap — o PostgreSQL executa
+            # automaticamente tudo em /docker-entrypoint-initdb.d/ no 1º boot
+            - name: init-scripts
+              mountPath: /docker-entrypoint-initdb.d
+          # Healthcheck equivalente ao do docker-compose
+          readinessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - pg_isready -U $POSTGRES_USER -d $POSTGRES_DB
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            failureThreshold: 5
+          livenessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - pg_isready -U $POSTGRES_USER -d $POSTGRES_DB
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+      volumes:
+        - name: postgres-data
+          persistentVolumeClaim:
+            claimName: postgres-pvc
+        # Scripts SQL montados do ConfigMap — equivalente ao docker-compose:
+        # volumes: ./database/init.sql:/docker-entrypoint-initdb.d/01-init.sql
+        # O PostgreSQL executa automaticamente todos os .sql dessa pasta
+        # na primeira vez que o container sobe com um volume VAZIO.
+        - name: init-scripts
+          configMap:
+            name: postgres-init-scripts

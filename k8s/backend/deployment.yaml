@@ -1,0 +1,110 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  namespace: mais-alegria
+  labels:
+    app: backend
+spec:
+  replicas: 2              # 2 instâncias rodando em paralelo (alta disponibilidade)
+  selector:
+    matchLabels:
+      app: backend
+  # Estratégia de atualização: garante zero downtime
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0    # Nunca derruba um pod antes de ter o novo pronto
+      maxSurge: 1          # Sobe 1 pod extra durante a atualização
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      # Garante que o postgres esteja pronto antes de iniciar
+      # (initContainer verifica a conexão com o banco)
+      initContainers:
+        - name: wait-for-postgres
+          image: postgres:15-alpine
+          command:
+            - sh
+            - -c
+            - |
+              until pg_isready -h postgres-service -p 5432; do
+                echo "Aguardando PostgreSQL...";
+                sleep 2;
+              done;
+          env:
+            - name: PGUSER
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: DB_USER
+      containers:
+        - name: backend
+          # IMPORTANTE: Trocar pela sua imagem no registry
+          # Para Docker Hub: seu-usuario/mais-alegria-backend:latest
+          # Para desenvolvimento local com Minikube: mais-alegria/backend:latest
+          image: mais-alegria/backend:latest
+          imagePullPolicy: IfNotPresent   # Usa imagem local se disponível
+          ports:
+            - containerPort: 3001
+          # Variáveis do ConfigMap (não-sensíveis)
+          envFrom:
+            - configMapRef:
+                name: backend-config
+          # Variáveis sensíveis do Secret
+          env:
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: backend-secret
+                  key: JWT_SECRET
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: DB_USER
+            - name: DB_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: DB_PASS
+            - name: DB_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: DB_NAME
+          # Volume para uploads persistentes
+          volumeMounts:
+            - name: uploads
+              mountPath: /app/uploads
+          # Verifica se o pod está pronto para receber tráfego
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: 3001
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            failureThreshold: 3
+          # Verifica se o pod ainda está vivo (reinicia se falhar)
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: 3001
+            initialDelaySeconds: 30
+            periodSeconds: 20
+            failureThreshold: 3
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+      volumes:
+        - name: uploads
+          # PVC garante que os uploads sobrevivem ao reinício do pod
+          # equivalente ao volume nomeado 'backend_uploads' do docker-compose
+          persistentVolumeClaim:
+            claimName: backend-uploads-pvc

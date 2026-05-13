@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-service
+  namespace: mais-alegria
+spec:
+  selector:
+    app: frontend
+  ports:
+    - port: 80
+      targetPort: 80
+      # nodePort: 30080   # Porta fixa (opcional, entre 30000-32767)
+  # NodePort: expõe o serviço para fora do cluster
+  # Usado em desenvolvimento com Minikube
+  # Em produção na nuvem, trocar para: LoadBalancer
+  type: NodePort

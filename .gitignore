@@ -5,3 +5,7 @@ dist/
 build/
 coverage/
 *.log
+
+# Kubernetes secrets (contêm credenciais em base64 — NÃO commitar)
+# Use os arquivos secret.example.yaml como template
+k8s/**/secret.yaml

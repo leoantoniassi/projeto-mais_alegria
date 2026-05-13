@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: backend-config
+  namespace: mais-alegria
+data:
+  # Configurações não-sensíveis do backend
+  PORT: "3001"
+  JWT_EXPIRES_IN: "24h"
+  # O host do banco é o nome do Service do PostgreSQL no cluster
+  DB_HOST: "postgres-service"
+  DB_PORT: "5432"

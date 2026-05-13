@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-pvc
+  namespace: mais-alegria
+spec:
+  accessModes:
+    - ReadWriteOnce          # Um nó por vez pode escrever (padrão para banco)
+  resources:
+    requests:
+      storage: 1Gi           # 1 GB de armazenamento persistente

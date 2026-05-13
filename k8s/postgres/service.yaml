@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-service
+  namespace: mais-alegria
+spec:
+  selector:
+    app: postgres           # Seleciona pods com label app=postgres
+  ports:
+    - port: 5432            # Porta do Service (usada pelos outros pods)
+      targetPort: 5432      # Porta dentro do container
+  # ClusterIP = apenas acessível DENTRO do cluster (sem exposição externa)
+  # O backend se conecta usando hostname: postgres-service
+  type: ClusterIP
