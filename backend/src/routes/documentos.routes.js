@@ -9,8 +9,8 @@ const controller = require('../controllers/documentoController');
 router.use(auth);
 
 router.get('/', controller.listar);
-router.post('/upload', controller.upload.single('arquivo'), controller.uploadDocumento);
-router.get('/:id/download', controller.download);
+router.post('/', controller.criar);
+router.put('/:id', controller.atualizar);
 router.delete('/:id', authorize('admin'), controller.remover);
 
 module.exports = router;

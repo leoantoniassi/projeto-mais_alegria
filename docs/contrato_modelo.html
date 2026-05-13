@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Contrato de Prestação de Serviços — Mais Alegria</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Georgia', serif;
+      font-size: 11pt;
+      color: #1a1a1a;
+      background: #fff;
+      line-height: 1.7;
+    }
+
+    .page {
+      max-width: 210mm;
+      margin: 0 auto;
+      padding: 20mm 22mm;
+    }
+
+    /* Cabeçalho */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 3px solid #FEDC57;
+      padding-bottom: 16px;
+      margin-bottom: 24px;
+    }
+
+    .header-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo-circle {
+      width: 52px;
+      height: 52px;
+      background: #FEDC57;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+    }
+
+    .logo-text h1 {
+      font-family: 'Georgia', serif;
+      font-size: 18pt;
+      color: #1a1a1a;
+      font-weight: bold;
+    }
+
+    .logo-text p {
+      font-size: 8pt;
+      letter-spacing: 3px;
+      color: #666;
+      text-transform: uppercase;
+    }
+
+    .header-info {
+      text-align: right;
+      font-size: 9pt;
+      color: #555;
+    }
+
+    .header-info strong {
+      display: block;
+      font-size: 10pt;
+      color: #1a1a1a;
+    }
+
+    /* Título do contrato */
+    .contract-title {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    .contract-title h2 {
+      font-size: 14pt;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #1a1a1a;
+      font-weight: bold;
+    }
+
+    .contract-title .subtitle {
+      font-size: 10pt;
+      color: #555;
+      margin-top: 4px;
+    }
+
+    .divider {
+      border: none;
+      border-top: 1px solid #ddd;
+      margin: 18px 0;
+    }
+
+    /* Seções */
+    .section {
+      margin-bottom: 20px;
+    }
+
+    .section-title {
+      font-size: 10pt;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: #402d00;
+      border-left: 4px solid #FEDC57;
+      padding-left: 10px;
+      margin-bottom: 10px;
+    }
+
+    .section p {
+      text-align: justify;
+      margin-bottom: 8px;
+    }
+
+    .section ol, .section ul {
+      padding-left: 20px;
+      margin-top: 6px;
+    }
+
+    .section li {
+      margin-bottom: 5px;
+    }
+
+    /* Partes */
+    .parties-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 8px;
+    }
+
+    .party-box {
+      background: #fafaf5;
+      border: 1px solid #e8e4d0;
+      border-radius: 8px;
+      padding: 14px;
+    }
+
+    .party-box .role {
+      font-size: 8pt;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: #888;
+      margin-bottom: 6px;
+    }
+
+    .party-box .field {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 3px;
+      font-size: 10pt;
+    }
+
+    .party-box .field label {
+      color: #555;
+      min-width: 55px;
+    }
+
+    .party-box .field .value {
+      font-weight: bold;
+      color: #1a1a1a;
+      border-bottom: 1px dashed #ccc;
+      flex: 1;
+    }
+
+    /* Tabela de serviços */
+    .service-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 10px 0;
+      font-size: 10pt;
+    }
+
+    .service-table th {
+      background: #FEDC57;
+      color: #402d00;
+      text-align: left;
+      padding: 8px 10px;
+      font-size: 9pt;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .service-table td {
+      padding: 8px 10px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .service-table tr:nth-child(even) td {
+      background: #fafaf5;
+    }
+
+    .service-table .total-row td {
+      font-weight: bold;
+      border-top: 2px solid #FEDC57;
+      background: #fffbe8;
+    }
+
+    /* Pagamento */
+    .payment-box {
+      background: #fffbe8;
+      border: 1px solid #FEDC57;
+      border-radius: 8px;
+      padding: 14px;
+      margin: 10px 0;
+      font-size: 10pt;
+    }
+
+    .payment-box .payment-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 5px;
+    }
+
+    .payment-box .payment-row.total {
+      font-weight: bold;
+      font-size: 12pt;
+      border-top: 1px solid #FEDC57;
+      padding-top: 8px;
+      margin-top: 8px;
+    }
+
+    /* Assinaturas */
+    .signatures {
+      margin-top: 40px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+    }
+
+    .sig-block {
+      text-align: center;
+    }
+
+    .sig-line {
+      border-top: 1px solid #333;
+      margin-bottom: 6px;
+    }
+
+    .sig-name {
+      font-weight: bold;
+      font-size: 10pt;
+    }
+
+    .sig-role {
+      font-size: 9pt;
+      color: #666;
+    }
+
+    .sig-cpf {
+      font-size: 9pt;
+      color: #888;
+    }
+
+    /* Rodapé */
+    .footer {
+      margin-top: 30px;
+      border-top: 2px solid #FEDC57;
+      padding-top: 12px;
+      text-align: center;
+      font-size: 8pt;
+      color: #888;
+    }
+
+    .highlight {
+      background: #fffbe8;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: bold;
+    }
+
+    @media print {
+      body { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+      .page { padding: 12mm 18mm; }
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <!-- CABEÇALHO -->
+  <div class="header">
+    <div class="header-logo">
+      <div class="logo-circle">🎉</div>
+      <div class="logo-text">
+        <h1>Mais Alegria</h1>
+        <p>Festive Architect</p>
+      </div>
+    </div>
+    <div class="header-info">
+      <strong>CONTRATO Nº ______ / 2026</strong>
+      Data: _____ / _____ / 2026
+    </div>
+  </div>
+
+  <!-- TÍTULO -->
+  <div class="contract-title">
+    <h2>Contrato de Prestação de Serviços de Buffet e Eventos</h2>
+    <p class="subtitle">Documento vinculativo entre as partes identificadas abaixo</p>
+  </div>
+
+  <hr class="divider" />
+
+  <!-- PARTES -->
+  <div class="section">
+    <div class="section-title">1. Das Partes</div>
+
+    <div class="parties-grid">
+      <div class="party-box">
+        <div class="role">Contratante (Cliente)</div>
+        <div class="field"><label>Nome:</label><span class="value">_________________________</span></div>
+        <div class="field"><label>CPF/CNPJ:</label><span class="value">____________________</span></div>
+        <div class="field"><label>Telefone:</label><span class="value">______________________</span></div>
+        <div class="field"><label>E-mail:</label><span class="value">________________________</span></div>
+        <div class="field"><label>Endereço:</label><span class="value">______________________</span></div>
+      </div>
+      <div class="party-box">
+        <div class="role">Contratada (Prestadora)</div>
+        <div class="field"><label>Empresa:</label><span class="value">Mais Alegria Buffet</span></div>
+        <div class="field"><label>CNPJ:</label><span class="value">XX.XXX.XXX/0001-XX</span></div>
+        <div class="field"><label>Responsável:</label><span class="value">________________</span></div>
+        <div class="field"><label>Telefone:</label><span class="value">______________________</span></div>
+        <div class="field"><label>E-mail:</label><span class="value">contato@maisalegria.com</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- OBJETO -->
+  <div class="section">
+    <div class="section-title">2. Do Objeto do Contrato</div>
+    <p>
+      O presente contrato tem por objeto a prestação de serviços de buffet e organização de eventos,
+      conforme as condições e especificações descritas neste instrumento.
+    </p>
+    <p><strong>Tipo de evento:</strong> <span class="highlight">______________________________</span></p>
+    <p><strong>Data do evento:</strong> <span class="highlight">_____ / _____ / 2026</span> &nbsp;&nbsp; <strong>Horário:</strong> <span class="highlight">_______ às _______</span></p>
+    <p><strong>Local:</strong> <span class="highlight">____________________________________________________________</span></p>
+    <p><strong>Estimativa de convidados:</strong> <span class="highlight">________ pessoas</span> (________ adultos / ________ crianças / ________ bebês)</p>
+  </div>
+
+  <!-- SERVIÇOS -->
+  <div class="section">
+    <div class="section-title">3. Dos Serviços Contratados</div>
+    <table class="service-table">
+      <thead>
+        <tr>
+          <th>Descrição do Serviço</th>
+          <th>Qtd.</th>
+          <th>Valor Unitário</th>
+          <th>Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>________________________________</td>
+          <td>_____</td>
+          <td>R$ __________</td>
+          <td>R$ __________</td>
+        </tr>
+        <tr>
+          <td>________________________________</td>
+          <td>_____</td>
+          <td>R$ __________</td>
+          <td>R$ __________</td>
+        </tr>
+        <tr>
+          <td>________________________________</td>
+          <td>_____</td>
+          <td>R$ __________</td>
+          <td>R$ __________</td>
+        </tr>
+        <tr>
+          <td>________________________________</td>
+          <td>_____</td>
+          <td>R$ __________</td>
+          <td>R$ __________</td>
+        </tr>
+        <tr class="total-row">
+          <td colspan="3"><strong>VALOR TOTAL DO CONTRATO</strong></td>
+          <td><strong>R$ __________</strong></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- PAGAMENTO -->
+  <div class="section">
+    <div class="section-title">4. Das Condições de Pagamento</div>
+    <div class="payment-box">
+      <div class="payment-row"><span>Sinal / Entrada (____%)</span><span>R$ __________ — venc: ___/___/2026</span></div>
+      <div class="payment-row"><span>2ª Parcela (____%)</span><span>R$ __________ — venc: ___/___/2026</span></div>
+      <div class="payment-row"><span>Saldo Final (____%)</span><span>R$ __________ — venc: ___/___/2026</span></div>
+      <div class="payment-row total"><span>TOTAL</span><span>R$ __________</span></div>
+    </div>
+    <p>Forma de pagamento aceita: ( ) PIX &nbsp; ( ) Transferência &nbsp; ( ) Dinheiro &nbsp; ( ) Cartão</p>
+    <p><strong>Chave PIX:</strong> _________________________________</p>
+  </div>
+
+  <!-- OBRIGAÇÕES -->
+  <div class="section">
+    <div class="section-title">5. Das Obrigações das Partes</div>
+    <p><strong>Obrigações da Contratada:</strong></p>
+    <ol>
+      <li>Fornecer todos os itens descritos no Objeto deste contrato com qualidade e pontualidade.</li>
+      <li>Chegar ao local com antecedência mínima de <span class="highlight">____</span> horas para montagem.</li>
+      <li>Manter todos os colaboradores uniformizados e devidamente capacitados.</li>
+      <li>Respeitar as normas higiênico-sanitárias vigentes na preparação e apresentação dos alimentos.</li>
+    </ol>
+    <br/>
+    <p><strong>Obrigações do Contratante:</strong></p>
+    <ol>
+      <li>Realizar os pagamentos nas datas acordadas.</li>
+      <li>Garantir acesso ao local de evento com a antecedência necessária para montagem.</li>
+      <li>Comunicar qualquer alteração no número de convidados com mínimo de <span class="highlight">____</span> dias de antecedência.</li>
+      <li>Fornecer estrutura básica como mesas, cadeiras e tomadas elétricas, salvo acordo contrário.</li>
+    </ol>
+  </div>
+
+  <!-- CANCELAMENTO -->
+  <div class="section">
+    <div class="section-title">6. Do Cancelamento e Multas</div>
+    <ol>
+      <li>Cancelamento com mais de 30 dias de antecedência: devolução de 80% do valor pago.</li>
+      <li>Cancelamento entre 15 e 30 dias: devolução de 50% do valor pago.</li>
+      <li>Cancelamento com menos de 15 dias: não haverá devolução dos valores pagos.</li>
+      <li>Em caso de inadimplência, incidirão juros de 1% ao mês e multa de 2% sobre o saldo devedor.</li>
+    </ol>
+  </div>
+
+  <!-- DISPOSIÇÕES GERAIS -->
+  <div class="section">
+    <div class="section-title">7. Das Disposições Gerais</div>
+    <p>
+      As partes elegem o foro da comarca de <span class="highlight">_________________</span> para dirimir
+      quaisquer dúvidas ou litígios decorrentes deste contrato, com renúncia a qualquer outro,
+      por mais privilegiado que seja. Este contrato é firmado em 2 (duas) vias de igual teor e forma.
+    </p>
+    <p>
+      <strong>Observações adicionais:</strong><br/>
+      ____________________________________________________________________________<br/>
+      ____________________________________________________________________________
+    </p>
+  </div>
+
+  <!-- LOCAL E DATA -->
+  <p style="margin-top: 20px;">
+    _________________________, _____ de _________________________ de 2026.
+  </p>
+
+  <!-- ASSINATURAS -->
+  <div class="signatures">
+    <div class="sig-block">
+      <br/><br/><br/>
+      <div class="sig-line"></div>
+      <div class="sig-name">_______________________________</div>
+      <div class="sig-role">Contratante</div>
+      <div class="sig-cpf">CPF: ___________________________</div>
+    </div>
+    <div class="sig-block">
+      <br/><br/><br/>
+      <div class="sig-line"></div>
+      <div class="sig-name">Mais Alegria Buffet</div>
+      <div class="sig-role">Contratada — Responsável</div>
+      <div class="sig-cpf">CNPJ: XX.XXX.XXX/0001-XX</div>
+    </div>
+  </div>
+
+  <!-- TESTEMUNHAS -->
+  <div class="signatures" style="margin-top: 30px;">
+    <div class="sig-block">
+      <br/><br/>
+      <div class="sig-line"></div>
+      <div class="sig-name">_______________________________</div>
+      <div class="sig-role">Testemunha 1</div>
+      <div class="sig-cpf">CPF: ___________________________</div>
+    </div>
+    <div class="sig-block">
+      <br/><br/>
+      <div class="sig-line"></div>
+      <div class="sig-name">_______________________________</div>
+      <div class="sig-role">Testemunha 2</div>
+      <div class="sig-cpf">CPF: ___________________________</div>
+    </div>
+  </div>
+
+  <!-- RODAPÉ -->
+  <div class="footer">
+    Mais Alegria Buffet &amp; Eventos &nbsp;|&nbsp; contato@maisalegria.com &nbsp;|&nbsp; Este documento tem validade somente com as assinaturas de ambas as partes.
+  </div>
+
+</div>
+</body>
+</html>

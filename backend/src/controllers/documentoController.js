@@ -1,42 +1,17 @@
 // ============================================================
-// Controller: Documentos (Upload / Download)
+// Controller: Documentos (sem upload — caminho/link manual)
 // ============================================================
 const path = require('path');
-const fs = require('fs');
-const multer = require('multer');
 const { Documento, Cliente, Evento } = require('../models');
 
-// ── Configuração do Multer ─────────────────────────────────
-const storage = multer.diskStorage({
-  destination: (_req, _file, cb) => {
-    const uploadDir = path.join(__dirname, '..', '..', 'uploads');
-    // Garante que o diretório existe
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true });
-    }
-    cb(null, uploadDir);
-  },
-  filename: (_req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-    const ext = path.extname(file.originalname);
-    cb(null, `${uniqueSuffix}${ext}`);
-  },
-});
-
-const fileFilter = (_req, file, cb) => {
-  const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png'];
-  if (allowedTypes.includes(file.mimetype)) {
-    cb(null, true);
-  } else {
-    cb(new Error('Tipo de arquivo não permitido. Use PDF, JPG ou PNG.'), false);
-  }
-};
-
-const upload = multer({
-  storage,
-  fileFilter,
-  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
-});
+// Detecta o tipo pelo caminho/URL do arquivo
+function detectarTipo(caminho) {
+  if (!caminho) return 'pdf';
+  const ext = path.extname(caminho).replace('.', '').toLowerCase();
+  if (ext === 'jpg' || ext === 'jpeg') return 'jpg';
+  if (ext === 'png') return 'png';
+  return 'pdf'; // padrão para .pdf, .docx, etc.
+}
 
 // GET /api/documentos
 async function listar(req, res, next) {
@@ -62,33 +37,31 @@ async function listar(req, res, next) {
   }
 }
 
-// POST /api/documentos/upload
-async function uploadDocumento(req, res, next) {
+// POST /api/documentos
+async function criar(req, res, next) {
   try {
-    if (!req.file) {
-      return res.status(400).json({
-        success: false,
-        message: 'Nenhum arquivo enviado.',
-      });
+    const { nomeArquivo, caminhoUrl, clienteId, eventoId } = req.body;
+
+    if (!nomeArquivo) {
+      return res.status(400).json({ success: false, message: 'O nome do documento é obrigatório.' });
+    }
+    if (!caminhoUrl) {
+      return res.status(400).json({ success: false, message: 'A localização do arquivo é obrigatória.' });
     }
 
-    const { clienteId, eventoId, nomeArquivo } = req.body;
-
-    // Determina o tipo do arquivo
-    const ext = path.extname(req.file.originalname).replace('.', '').toLowerCase();
-    const tipoArquivo = ext === 'jpeg' ? 'jpg' : ext;
+    const tipoArquivo = detectarTipo(caminhoUrl);
 
     const documento = await Documento.create({
+      nomeArquivo,
+      caminhoUrl,
+      tipoArquivo,
       clienteId: clienteId || null,
       eventoId: eventoId || null,
-      nomeArquivo: nomeArquivo || req.file.originalname,
-      caminhoUrl: `/uploads/${req.file.filename}`,
-      tipoArquivo,
     });
 
     return res.status(201).json({
       success: true,
-      message: 'Documento enviado com sucesso!',
+      message: 'Documento cadastrado com sucesso!',
       data: documento,
     });
   } catch (error) {
@@ -96,26 +69,32 @@ async function uploadDocumento(req, res, next) {
   }
 }
 
-// GET /api/documentos/:id/download
-async function download(req, res, next) {
+// PUT /api/documentos/:id
+async function atualizar(req, res, next) {
   try {
     const documento = await Documento.findByPk(req.params.id);
     if (!documento) {
-      return res.status(404).json({
-        success: false,
-        message: 'Documento não encontrado.',
-      });
+      return res.status(404).json({ success: false, message: 'Documento não encontrado.' });
     }
 
-    const filePath = path.join(__dirname, '..', '..', documento.caminhoUrl);
-    if (!fs.existsSync(filePath)) {
-      return res.status(404).json({
-        success: false,
-        message: 'Arquivo não encontrado no servidor.',
-      });
-    }
+    const { nomeArquivo, caminhoUrl, clienteId, eventoId } = req.body;
 
-    return res.download(filePath, documento.nomeArquivo);
+    const novoTipo = caminhoUrl ? detectarTipo(caminhoUrl) : documento.tipoArquivo;
+
+    await documento.update({
+      nomeArquivo: nomeArquivo || documento.nomeArquivo,
+      caminhoUrl: caminhoUrl || documento.caminhoUrl,
+      tipoArquivo: novoTipo,
+      clienteId: clienteId !== undefined ? (clienteId || null) : documento.clienteId,
+      eventoId: eventoId !== undefined ? (eventoId || null) : documento.eventoId,
+      atualizadoEm: new Date(),
+    });
+
+    return res.json({
+      success: true,
+      message: 'Documento atualizado com sucesso!',
+      data: documento,
+    });
   } catch (error) {
     return next(error);
   }
@@ -126,21 +105,15 @@ async function remover(req, res, next) {
   try {
     const documento = await Documento.findByPk(req.params.id);
     if (!documento) {
-      return res.status(404).json({
-        success: false,
-        message: 'Documento não encontrado.',
-      });
+      return res.status(404).json({ success: false, message: 'Documento não encontrado.' });
     }
 
     await documento.update({ deletadoEm: new Date() });
 
-    return res.json({
-      success: true,
-      message: 'Documento removido com sucesso!',
-    });
+    return res.json({ success: true, message: 'Documento removido com sucesso!' });
   } catch (error) {
     return next(error);
   }
 }
 
-module.exports = { listar, upload, uploadDocumento, download, remover };
+module.exports = { listar, criar, atualizar, remover };
