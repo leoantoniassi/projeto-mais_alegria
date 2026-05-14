@@ -29,14 +29,14 @@ Desenvolver um sistema web funcional para gerenciar clientes, funcionários, doc
 
 Para o desenvolvimento deste projeto, serão utilizadas as seguintes tecnologias e ferramentas:
 
-- _Frontend:_ ![React](https://img.shields.io/badge/React-20232A?style=flat-square&logo=react&logoColor=61DAFB) ![Vite](https://img.shields.io/badge/Vite-B73BFE?style=flat-square&logo=vite&logoColor=FFD62E) ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=flat-square&logo=tailwind-css&logoColor=white)
-- _Backend:_ ![Node.js](https://img.shields.io/badge/Node.js-339933?style=flat-square&logo=nodedotjs&logoColor=white) ![Express](https://img.shields.io/badge/Express.js-000000?style=flat-square&logo=express&logoColor=white) ![Sequelize](https://img.shields.io/badge/Sequelize-52B0E7?style=flat-square&logo=Sequelize&logoColor=white)
-- _Banco de Dados:_ ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=flat-square&logo=postgresql&logoColor=white)
-- _Infraestrutura:_ ![Docker](https://img.shields.io/badge/Docker-2CA5E0?style=flat-square&logo=docker&logoColor=white)
-- _Testes de API:_ ![Postman](https://img.shields.io/badge/Postman-FF6C37?style=flat-square&logo=Postman&logoColor=white)
-- _Controle de Versão:_ ![Git](https://img.shields.io/badge/Git-F05032?style=flat-square&logo=git&logoColor=white) ![GitHub](https://img.shields.io/badge/GitHub-100000?style=flat-square&logo=github&logoColor=white)
-- _Planejamento:_ [![Trello](https://img.shields.io/badge/Trello-0052CC?style=flat-square&logo=trello&logoColor=white)](https://trello.com/invite/b/69b01781ad27faa14e8f2979/ATTI501c15076f0c0d4f15156e5725ece7a2E7879269/alegria)
-- _UI/UX:_ [![Figma](https://img.shields.io/badge/Figma-F24E1E?style=flat-square&logo=figma&logoColor=white)](https://www.figma.com/design/P2VpQg6U8RSotlZyeOTYm1/Projeto---Alegria?node-id=0-1&t=rr3EdkAum2STFL6b-1)
+- _Frontend:_ React ![React](https://img.shields.io/badge/React-20232A?style=flat-square&logo=react&logoColor=61DAFB), Vite ![Vite](https://img.shields.io/badge/Vite-B73BFE?style=flat-square&logo=vite&logoColor=FFD62E), Tailwind CSS ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=flat-square&logo=tailwind-css&logoColor=white)
+- _Backend:_ Node.js ![Node.js](https://img.shields.io/badge/Node.js-339933?style=flat-square&logo=nodedotjs&logoColor=white), Express ![Express](https://img.shields.io/badge/Express.js-000000?style=flat-square&logo=express&logoColor=white), Sequelize (ORM) ![Sequelize](https://img.shields.io/badge/Sequelize-52B0E7?style=flat-square&logo=Sequelize&logoColor=white)
+- _Banco de Dados:_ Banco de Dados Relacional PostgreSQL ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=flat-square&logo=postgresql&logoColor=white)
+- _Infraestrutura:_ Docker ![Docker](https://img.shields.io/badge/Docker-2CA5E0?style=flat-square&logo=docker&logoColor=white)
+- _Testes de API:_ Postman ![Postman](https://img.shields.io/badge/Postman-FF6C37?style=flat-square&logo=Postman&logoColor=white)
+- _Controle de Versão:_ Git ![Git](https://img.shields.io/badge/Git-F05032?style=flat-square&logo=git&logoColor=white) e GitHub ![GitHub](https://img.shields.io/badge/GitHub-100000?style=flat-square&logo=github&logoColor=white)
+- _Planejamento:_ [Trello [![Trello](https://img.shields.io/badge/Trello-0052CC?style=flat-square&logo=trello&logoColor=white)]](https://trello.com/invite/b/69b01781ad27faa14e8f2979/ATTI501c15076f0c0d4f15156e5725ece7a2E7879269/alegria)
+- _UI/UX:_ [Figma [![Figma](https://img.shields.io/badge/Figma-F24E1E?style=flat-square&logo=figma&logoColor=white)]](https://www.figma.com/design/P2VpQg6U8RSotlZyeOTYm1/Projeto---Alegria?node-id=0-1&t=rr3EdkAum2STFL6b-1)
 - _Metodologia de Desenvolvimento:_ Kanban — abordagem ágil baseada na visualização contínua do fluxo de trabalho, promovendo a eficiência e entregas contínuas.
 
 ---
