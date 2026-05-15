@@ -87,16 +87,16 @@ export default function ClientesPage() {
     const phone = (selectedCliente.telefone || '').replace(/\D/g, '');
     const nome = selectedCliente.nome?.split(' ')[0] || selectedCliente.nome;
 
-    let msg = `Olá ${nome}! 🎉 Segue nossa opção de buffet:\n\n*${selectedCatalogo.titulo}*`;
+    let msg = `Ola ${nome}! Segue nossa opcao de buffet:\n\n${selectedCatalogo.titulo}`;
     if (selectedCatalogo.descricao) msg += `\n${selectedCatalogo.descricao}`;
     if (selectedCatalogo.precoBase) {
       const preco = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(selectedCatalogo.precoBase);
-      msg += `\n\n💰 A partir de ${preco}`;
+      msg += `\n\nA partir de ${preco}`;
     }
     if (selectedCatalogo.urlExterna && selectedCatalogo.urlExterna.startsWith('http')) {
-      msg += `\n\n🔗 Confira aqui: ${selectedCatalogo.urlExterna}`;
+      msg += `\n\nConfira aqui: ${selectedCatalogo.urlExterna}`;
     }
-    msg += '\n\nQualquer dúvida, estamos à disposição! 😊';
+    msg += '\n\nQualquer duvida, estamos a disposicao!';
 
     const link = `https://wa.me/55${phone}?text=${encodeURIComponent(msg)}`;
     window.open(link, '_blank');

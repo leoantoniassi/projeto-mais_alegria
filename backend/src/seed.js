@@ -8,7 +8,7 @@ const sequelize = require('./config/database');
 
 // Importa modelos e associações
 const {
-  Usuario, Cliente, Funcionario, Produto,
+  Usuario, Cliente, Funcionario, Fornecedor, Produto,
   Orcamento, Evento, Documento, Escala,
   EventoProduto, OrcamentoProduto,
 } = require('./models');
@@ -28,6 +28,7 @@ async function seed() {
     await Orcamento.destroy({ where: {}, force: true });
     await Produto.destroy({ where: {}, force: true });
     await Funcionario.destroy({ where: {}, force: true });
+    await Fornecedor.destroy({ where: {}, force: true });
     await Cliente.destroy({ where: {}, force: true });
     await Usuario.destroy({ where: {}, force: true });
 
@@ -48,7 +49,15 @@ async function seed() {
       { nome: 'Pedro Santos', email: 'pedro.santos@email.com', rgCpf: '111.222.333-44', telefone: '(11) 99999-8888' },
     ]);
 
-    // 2. FUNCIONARIOS
+    // 2. FORNECEDORES
+    console.log('🏭 Criando fornecedores...');
+    await Fornecedor.bulkCreate([
+      { nome: 'Doces & Bolos Ltda', email: 'contato@docesebolos.com.br', cnpj: '12.345.678/0001-90', telefone: '(11) 3333-4444', categoria: 'Alimentos' },
+      { nome: 'Balões e Decorações ME', email: 'ola@baloesdecor.com.br', cnpj: '98.765.432/0001-10', telefone: '(11) 4444-5555', categoria: 'Decoração' },
+      { nome: 'Distribuidora de Bebidas Sul', email: 'vendas@bebidasul.com.br', cnpj: '55.444.333/0001-22', telefone: '(11) 5555-6666', categoria: 'Bebidas' },
+    ]);
+
+    // 3. FUNCIONARIOS
     console.log('👷 Criando funcionários...');
     const [ana, lucas, bia, marcos] = await Funcionario.bulkCreate([
       { nome: 'Ana Clara', email: 'ana.clara@maisalegria.com', telefone: '(11) 97777-6666', funcao: 'Recreador' },

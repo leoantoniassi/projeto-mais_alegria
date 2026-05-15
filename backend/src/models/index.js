@@ -4,6 +4,7 @@
 const Usuario = require('./Usuario');
 const Cliente = require('./Cliente');
 const Funcionario = require('./Funcionario');
+const Fornecedor = require('./Fornecedor');
 const Produto = require('./Produto');
 const Orcamento = require('./Orcamento');
 const Evento = require('./Evento');
@@ -95,6 +96,7 @@ module.exports = {
   Usuario,
   Cliente,
   Funcionario,
+  Fornecedor,
   Produto,
   Orcamento,
   Evento,

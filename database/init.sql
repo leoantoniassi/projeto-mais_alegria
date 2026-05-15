@@ -18,6 +18,7 @@ DROP TABLE IF EXISTS eventos           CASCADE;
 DROP TABLE IF EXISTS orcamentos        CASCADE;
 DROP TABLE IF EXISTS produtos          CASCADE;
 DROP TABLE IF EXISTS funcionarios      CASCADE;
+DROP TABLE IF EXISTS fornecedores      CASCADE;
 DROP TABLE IF EXISTS clientes          CASCADE;
 DROP TABLE IF EXISTS usuarios          CASCADE;
 
@@ -55,7 +56,28 @@ CREATE TABLE clientes (
 );
 
 -- ============================================================
--- 2. FUNCIONARIOS
+-- 2. FORNECEDORES
+-- ============================================================
+CREATE TABLE fornecedores (
+    for_id            UUID         PRIMARY KEY DEFAULT uuid_generate_v4(),
+    for_nome          VARCHAR(150) NOT NULL,
+    for_email         VARCHAR(150) NOT NULL,
+    for_cnpj          VARCHAR(20)  NOT NULL,
+    for_telefone      VARCHAR(20)  NOT NULL,
+    for_categoria     VARCHAR(80)  NOT NULL,
+    for_criado_em     TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    for_atualizado_em TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    for_deletado_em   TIMESTAMP,
+
+    CONSTRAINT uq_fornecedores_cnpj  UNIQUE (for_cnpj),
+    CONSTRAINT uq_fornecedores_email UNIQUE (for_email)
+);
+
+COMMENT ON TABLE  fornecedores              IS 'Fornecedores de produtos e serviços para os eventos.';
+COMMENT ON COLUMN fornecedores.for_categoria IS 'Categoria do fornecedor: Alimentos, Bebidas, Decoração, etc.';
+
+-- ============================================================
+-- 3. FUNCIONARIOS
 -- ============================================================
 CREATE TABLE funcionarios (
     fun_id            UUID         PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -262,14 +284,15 @@ CREATE TABLE orcamento_produto (
 -- ============================================================
 -- ÍNDICES ADICIONAIS
 -- ============================================================
-CREATE INDEX idx_orcamentos_cliente    ON orcamentos      (orc_cli_id);
-CREATE INDEX idx_orcamentos_status     ON orcamentos      (orc_status);
-CREATE INDEX idx_eventos_cliente       ON eventos         (evt_cli_id);
-CREATE INDEX idx_eventos_orcamento     ON eventos         (evt_orc_id);
-CREATE INDEX idx_eventos_data          ON eventos         (evt_data_evento);
-CREATE INDEX idx_documentos_cliente    ON documentos      (doc_cli_id);
-CREATE INDEX idx_documentos_evento     ON documentos      (doc_evt_id);
-CREATE INDEX idx_escala_evento         ON escala          (esc_evt_id);
-CREATE INDEX idx_escala_funcionario    ON escala          (esc_fun_id);
-CREATE INDEX idx_evento_produto_evento ON evento_produto  (evp_evt_id);
-CREATE INDEX idx_orcamento_produto_orc ON orcamento_produto(orp_orc_id);
+CREATE INDEX idx_fornecedores_categoria ON fornecedores     (for_categoria);
+CREATE INDEX idx_orcamentos_cliente     ON orcamentos       (orc_cli_id);
+CREATE INDEX idx_orcamentos_status      ON orcamentos       (orc_status);
+CREATE INDEX idx_eventos_cliente        ON eventos          (evt_cli_id);
+CREATE INDEX idx_eventos_orcamento      ON eventos          (evt_orc_id);
+CREATE INDEX idx_eventos_data           ON eventos          (evt_data_evento);
+CREATE INDEX idx_documentos_cliente     ON documentos       (doc_cli_id);
+CREATE INDEX idx_documentos_evento      ON documentos       (doc_evt_id);
+CREATE INDEX idx_escala_evento          ON escala           (esc_evt_id);
+CREATE INDEX idx_escala_funcionario     ON escala           (esc_fun_id);
+CREATE INDEX idx_evento_produto_evento  ON evento_produto   (evp_evt_id);
+CREATE INDEX idx_orcamento_produto_orc  ON orcamento_produto(orp_orc_id);

@@ -2,7 +2,7 @@
 -- PROJETO MAIS ALEGRIA - DADOS FICTÍCIOS COM UUID DINÂMICO
 -- ============================================================
 
-TRUNCATE usuarios, clientes, funcionarios, produtos, orcamentos, eventos, documentos, catalogos, escala, evento_produto, orcamento_produto RESTART IDENTITY CASCADE;
+TRUNCATE usuarios, clientes, funcionarios, fornecedores, produtos, orcamentos, eventos, documentos, catalogos, escala, evento_produto, orcamento_produto RESTART IDENTITY CASCADE;
 
 -- 0. USUARIOS
 INSERT INTO usuarios (usr_nome, usr_email, usr_senha, usr_role) VALUES
@@ -15,6 +15,12 @@ INSERT INTO clientes (cli_nome, cli_email, cli_rgcpf, cli_telefone) VALUES
 ('João Carlos', 'joao.carlos@email.com', '123.456.789-01', '(11) 98765-4321'),
 ('Maria Oliveira', 'maria.oliveira@email.com', '987.654.321-09', '(11) 91234-5678'),
 ('Pedro Santos', 'pedro.santos@email.com', '111.222.333-44', '(11) 99999-8888');
+
+-- 2. FORNECEDORES
+INSERT INTO fornecedores (for_nome, for_email, for_cnpj, for_telefone, for_categoria) VALUES
+('Doces & Bolos Ltda', 'contato@docesebolos.com.br', '12.345.678/0001-90', '(11) 3333-4444', 'Alimentos'),
+('Balões e Decorações ME', 'ola@baloesdecor.com.br', '98.765.432/0001-10', '(11) 4444-5555', 'Decoração'),
+('Distribuidora de Bebidas Sul', 'vendas@bebidasul.com.br', '55.444.333/0001-22', '(11) 5555-6666', 'Bebidas');
 
 -- 2. FUNCIONARIOS
 INSERT INTO funcionarios (fun_nome, fun_email, fun_telefone, fun_funcao) VALUES

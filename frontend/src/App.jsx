@@ -10,6 +10,7 @@ import EstoquePage from './pages/Estoque/EstoquePage';
 import OrcamentosPage from './pages/Orcamentos/OrcamentosPage';
 import DocumentosPage from './pages/Documentos/DocumentosPage';
 import CatalogosPage from './pages/Catalogos/CatalogosPage';
+import FornecedoresPage from './pages/Fornecedores/FornecedoresPage';
 
 function ProtectedRoute({ children }) {
   const { isAuthenticated, loading } = useAuth();
@@ -62,6 +63,7 @@ export default function App() {
         <Route index element={<DashboardPage />} />
         <Route path="clientes" element={<ClientesPage />} />
         <Route path="funcionarios" element={<FuncionariosPage />} />
+        <Route path="fornecedores" element={<FornecedoresPage />} />
         <Route path="eventos" element={<EventosPage />} />
         <Route path="estoque" element={<EstoquePage />} />
         <Route path="orcamentos" element={<OrcamentosPage />} />
