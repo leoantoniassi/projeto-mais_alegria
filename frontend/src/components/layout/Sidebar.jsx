@@ -2,14 +2,15 @@ import { NavLink } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 
 const navItems = [
-  { to: '/', icon: 'dashboard', label: 'Dashboard' },
-  { to: '/clientes', icon: 'group', label: 'Clientes' },
-  { to: '/funcionarios', icon: 'badge', label: 'Colaboradores' },
-  { to: '/orcamentos', icon: 'request_quote', label: 'Orçamentos' },
-  { to: '/eventos', icon: 'event_available', label: 'Eventos' },
-  { to: '/estoque', icon: 'inventory_2', label: 'Estoque' },
-  { to: '/documentos', icon: 'description', label: 'Documentos' },
-  { to: '/catalogos', icon: 'menu_book', label: 'Catálogos' },
+  { to: '/',             icon: 'dashboard',       label: 'Dashboard' },
+  { to: '/clientes',     icon: 'group',            label: 'Clientes' },
+  { to: '/funcionarios', icon: 'badge',            label: 'Colaboradores' },
+  { to: '/fornecedores', icon: 'local_shipping',   label: 'Fornecedores' },
+  { to: '/orcamentos',   icon: 'request_quote',    label: 'Orçamentos' },
+  { to: '/eventos',      icon: 'event_available',  label: 'Eventos' },
+  { to: '/estoque',      icon: 'inventory_2',      label: 'Estoque' },
+  { to: '/documentos',   icon: 'description',      label: 'Documentos' },
+  { to: '/catalogos',    icon: 'menu_book',        label: 'Catálogos' },
 ];
 
 export default function Sidebar({ isOpen, onClose }) {
