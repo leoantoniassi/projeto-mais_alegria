@@ -128,22 +128,26 @@ export default function OrcamentosPage() {
                       <div className="flex justify-end gap-1">
                         {o.status === 'pendente' && <><button onClick={e => { e.stopPropagation(); handleConfirm(o.id); }} className="p-1.5 text-secondary hover:bg-secondary/10 rounded-full" title="Aprovar e Confirmar"><span className="material-symbols-outlined text-lg">check</span></button><button onClick={e => { e.stopPropagation(); handleReject(o.id); }} className="p-1.5 text-error hover:bg-error/10 rounded-full" title="Rejeitar"><span className="material-symbols-outlined text-lg">close</span></button></>}
                         {user?.role !== 'operador' && (
-                          <button onClick={e => { 
-                          e.stopPropagation(); 
-                          setEditing(o.id); 
-                          setForm({
-                            clienteId: o.clienteId || o.cliente?.id || o.Cliente?.id || '',
-                            valorTotal: o.valorTotal || 0,
-                            dataValidade: o.dataValidade ? new Date(new Date(o.dataValidade).getTime() - (new Date().getTimezoneOffset() * 60000)).toISOString().slice(0, 10) : '',
-                            observacoes: o.observacoes || '',
-                            local: o.local || '',
-                            produtos: []
-                          });
-                          setShowPanel(true);
-                        }} className="p-1.5 text-on-surface-variant hover:text-primary rounded-full transition-colors" title="Editar">
-                          <span className="material-symbols-outlined text-lg">edit</span>
-                        </button>
-                        <button onClick={e => { e.stopPropagation(); handleDelete(o.id); }} className="p-1.5 text-on-surface-variant hover:text-error rounded-full"><span className="material-symbols-outlined text-lg">delete</span></button>
+                          <>
+                            <button onClick={e => { 
+                              e.stopPropagation(); 
+                              setEditing(o.id); 
+                              setForm({
+                                clienteId: o.clienteId || o.cliente?.id || o.Cliente?.id || '',
+                                valorTotal: o.valorTotal || 0,
+                                dataValidade: o.dataValidade ? new Date(new Date(o.dataValidade).getTime() - (new Date().getTimezoneOffset() * 60000)).toISOString().slice(0, 10) : '',
+                                observacoes: o.observacoes || '',
+                                local: o.local || '',
+                                produtos: []
+                              });
+                              setShowPanel(true);
+                            }} className="p-1.5 text-on-surface-variant hover:text-primary rounded-full transition-colors" title="Editar">
+                              <span className="material-symbols-outlined text-lg">edit</span>
+                            </button>
+                            <button onClick={e => { e.stopPropagation(); handleDelete(o.id); }} className="p-1.5 text-on-surface-variant hover:text-error rounded-full">
+                              <span className="material-symbols-outlined text-lg">delete</span>
+                            </button>
+                          </>
                         )}
                       </div>
                     </td>
