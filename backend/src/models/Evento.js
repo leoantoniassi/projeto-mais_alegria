@@ -65,6 +65,12 @@ const Evento = sequelize.define('Evento', {
     allowNull: true,
     field: 'evt_qtd_bebes',
   },
+  valorOrcamento: {
+    type: DataTypes.DECIMAL(12, 2),
+    allowNull: false,
+    defaultValue: 0,
+    field: 'evt_orcamento',
+  },
   observacoes: {
     type: DataTypes.TEXT,
     allowNull: true,

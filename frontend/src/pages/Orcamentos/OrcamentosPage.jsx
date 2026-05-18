@@ -75,7 +75,15 @@ export default function OrcamentosPage() {
     return m[s] || 'bg-surface-container text-on-surface-variant';
   };
 
-  const formatDate = (d) => d ? new Date(d).toLocaleDateString('pt-BR') : '';
+  const formatDate = (d) => {
+    if (!d) return '';
+    // Para datas DATEONLY (ex: "2026-05-02"), evita deslocamento de fuso
+    if (typeof d === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(d)) {
+      const [year, month, day] = d.split('-');
+      return new Date(year, month - 1, day).toLocaleDateString('pt-BR');
+    }
+    return new Date(d).toLocaleDateString('pt-BR');
+  };
 
   return (
     <div>

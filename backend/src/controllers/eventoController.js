@@ -16,11 +16,30 @@ const {
 // GET /api/eventos
 async function listar(req, res, next) {
   try {
-    const { page = 1, limit = 20, status, local } = req.query; // Adicionado local
+    // Auto-concluir eventos cuja data já passou (apenas no dia seguinte)
+    const hoje = new Date();
+    hoje.setHours(0, 0, 0, 0);
+    await Evento.update(
+      { status: 'concluido', atualizadoEm: new Date() },
+      {
+        where: {
+          dataEvento: { [Op.lt]: hoje },
+          status: { [Op.in]: ['pendente', 'confirmado'] },
+          deletadoEm: null,
+        },
+      }
+    );
+
+    const { page = 1, limit = 20, status, local, incluirConcluidos } = req.query;
     const offset = (page - 1) * limit;
 
     const where = { deletadoEm: null };
-    if (status) where.status = status;
+    if (status) {
+      where.status = status;
+    } else if (incluirConcluidos !== 'true') {
+      // Por padrão, oculta eventos concluídos
+      where.status = { [Op.ne]: 'concluido' };
+    }
 
     // Lógica do Filtro de Local
     if (local) {
@@ -105,6 +124,9 @@ async function criar(req, res, next) {
       observacoes,
     } = req.body;
 
+    // Aceita valor de orçamento digitado pelo usuário
+    let { orcamento: orcamentoValor } = req.body;
+
     if (!clienteId || !nome || !dataEvento) {
       return res.status(400).json({
         success: false,
@@ -119,6 +141,14 @@ async function criar(req, res, next) {
         success: false,
         message: "Cliente não encontrado.",
       });
+    }
+
+    // Se veio de um orçamento, pega o valorTotal automaticamente
+    if (orcamentoId) {
+      const orcObj = await Orcamento.findByPk(orcamentoId);
+      if (orcObj) {
+        orcamentoValor = Number(orcObj.valorTotal);
+      }
     }
 
     // RN Canvas 2: Evento confirmado requer orçamento aprovado
@@ -161,6 +191,7 @@ async function criar(req, res, next) {
       qtdAdultos,
       qtdCriancas,
       qtdBebes,
+      valorOrcamento: orcamentoValor || 0,
       observacoes,
     });
 
@@ -198,6 +229,17 @@ async function atualizar(req, res, next) {
       observacoes,
     } = req.body;
 
+    let { orcamento: orcamentoValor } = req.body;
+
+    // Se veio de um orçamento, pega o valorTotal automaticamente
+    const novoOrcamentoId = orcamentoId ? orcamentoId : orcamentoId === "" ? null : evento.orcamentoId;
+    if (orcamentoId && orcamentoId !== evento.orcamentoId) {
+      const orcObj = await Orcamento.findByPk(orcamentoId);
+      if (orcObj) {
+        orcamentoValor = Number(orcObj.valorTotal);
+      }
+    }
+
     // RN4: Controle de público > 50
     const novaPessoas =
       qtdPessoas !== undefined ? qtdPessoas : evento.qtdPessoas;
@@ -218,12 +260,7 @@ async function atualizar(req, res, next) {
 
     await evento.update({
       clienteId: clienteId || evento.clienteId,
-      // ALTERAÇÃO: Garante que se vier vazio do select, salve como null
-      orcamentoId: orcamentoId
-        ? orcamentoId
-        : orcamentoId === ""
-          ? null
-          : evento.orcamentoId,
+      orcamentoId: novoOrcamentoId,
       nome: nome || evento.nome,
       dataEvento: dataEvento || evento.dataEvento,
       local: local !== undefined ? local : evento.local,
@@ -231,6 +268,7 @@ async function atualizar(req, res, next) {
       qtdAdultos: qtdAdultos !== undefined ? qtdAdultos : evento.qtdAdultos,
       qtdCriancas: qtdCriancas !== undefined ? qtdCriancas : evento.qtdCriancas,
       qtdBebes: qtdBebes !== undefined ? qtdBebes : evento.qtdBebes,
+      valorOrcamento: orcamentoValor !== undefined ? orcamentoValor : evento.valorOrcamento,
       observacoes: observacoes !== undefined ? observacoes : evento.observacoes,
       atualizadoEm: new Date(),
     });

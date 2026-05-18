@@ -51,7 +51,7 @@ export default function DashboardPage() {
       <section className="flex flex-col md:flex-row justify-between items-end gap-8">
         <div className="max-w-2xl">
           <h1 className="font-headline text-5xl font-extrabold text-on-surface tracking-tight leading-tight">
-            Architecture of <span className="text-tertiary italic">Celebration</span>.
+            Arquitetura da <span className="text-tertiary italic">Festa</span>!
           </h1>
           <p className="mt-4 text-on-surface-variant text-lg max-w-lg">
             Você tem {stats.eventos || 0} eventos agendados e {stats.orcamentosPendentes || 0} orçamentos pendentes.

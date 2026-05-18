@@ -11,11 +11,15 @@ const sequelize = new Sequelize(
     host: process.env.DB_HOST,
     port: process.env.DB_PORT || 5432,
     dialect: 'postgres',
+    timezone: '-03:00',
     logging: process.env.NODE_ENV === 'development' ? console.log : false,
     define: {
       timestamps: false,   // gerenciamos timestamps manualmente conforme DDL
       underscored: true,
       freezeTableName: true,
+    },
+    dialectOptions: {
+      useUTC: false,
     },
     pool: {
       max: 10,

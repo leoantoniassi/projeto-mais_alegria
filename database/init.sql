@@ -145,6 +145,7 @@ CREATE TABLE eventos (
     evt_qtd_adultos     INTEGER       NOT NULL DEFAULT 0,
     evt_qtd_criancas    INTEGER       NOT NULL DEFAULT 0,
     evt_qtd_bebes       INTEGER       NOT NULL DEFAULT 0,
+    evt_orcamento       NUMERIC(12,2) NOT NULL DEFAULT 0,
     evt_observacoes     TEXT,
     evt_criado_em       TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     evt_atualizado_em   TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,

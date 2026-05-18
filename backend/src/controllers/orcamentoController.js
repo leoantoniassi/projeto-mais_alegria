@@ -298,14 +298,25 @@ async function confirmarOrcamento(req, res, next) {
         .json({ success: false, message: "Orçamento não encontrado." });
     }
 
+    // Converte dataValidade (DATEONLY) para TIMESTAMP sem deslocamento de fuso
+    let dataEvento = new Date();
+    if (orcamento.dataValidade) {
+      const dv = String(orcamento.dataValidade);
+      // Se for string DATEONLY (ex: "2026-05-02"), adiciona horário meio-dia
+      dataEvento = /^\d{4}-\d{2}-\d{2}$/.test(dv)
+        ? new Date(dv + 'T12:00:00')
+        : new Date(dv);
+    }
+
     // Cria um evento a partir do orçamento
     const evento = await Evento.create({
       orcamentoId: orcamento.id,
       clienteId: orcamento.clienteId,
       nome: `Evento de ${orcamento.cliente ? orcamento.cliente.nome : "Cliente"}`,
-      dataEvento: orcamento.dataValidade || new Date(),
+      dataEvento,
       observacoes: orcamento.observacoes,
       local: orcamento.local,
+      valorOrcamento: orcamento.valorTotal || 0,
       status: "pendente",
     });
 
