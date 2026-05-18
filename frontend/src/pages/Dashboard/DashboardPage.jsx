@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../../services/api';
+import DashboardCharts from './DashboardCharts';
 
 export default function DashboardPage() {
   const [stats, setStats] = useState({ clientes: 0, funcionarios: 0, eventos: 0, orcamentosPendentes: 0 });
@@ -101,6 +102,11 @@ export default function DashboardPage() {
           </div>
           <p className="text-xs text-outline mt-2">Equipe de eventos</p>
         </div>
+      </section>
+
+      {/* Charts Section */}
+      <section>
+        <DashboardCharts />
       </section>
 
       {/* Events Table */}

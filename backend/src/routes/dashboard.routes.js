@@ -9,5 +9,6 @@ router.use(auth);
 
 router.get('/stats', controller.stats);
 router.get('/proximos-eventos', controller.proximosEventos);
+router.get('/charts', controller.charts);
 
 module.exports = router;

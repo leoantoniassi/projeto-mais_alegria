@@ -1,7 +1,7 @@
 // ============================================================
 // Controller: Dashboard (Dados Agregados)
 // ============================================================
-const { Op } = require('sequelize');
+const { Op, fn, col, literal } = require('sequelize');
 const { Cliente, Funcionario, Produto, Orcamento, Evento } = require('../models');
 
 // GET /api/dashboard/stats
@@ -69,4 +69,63 @@ async function proximosEventos(req, res, next) {
   }
 }
 
-module.exports = { stats, proximosEventos };
+// GET /api/dashboard/charts
+async function charts(req, res, next) {
+  try {
+    const eventos = await Evento.findAll({
+      where: {
+        status: { [Op.ne]: 'cancelado' },
+      },
+      attributes: ['id', 'nome', 'dataEvento', 'qtdPessoas', 'local'],
+      include: [
+        { model: Orcamento, as: 'orcamento', attributes: ['valorTotal'] }
+      ]
+    });
+
+    // 1. Scatter (Convidados vs Custo)
+    const scatter = eventos
+      .filter(e => e.qtdPessoas > 0 && e.orcamento && e.orcamento.valorTotal > 0)
+      .map(e => ({
+        convidados: e.qtdPessoas,
+        custo: Number(e.orcamento.valorTotal),
+        nome: e.nome
+      }));
+
+    // 2. TimeSeries (Sazonalidade - Agrupado por Mês do ano atual)
+    const currentYear = new Date().getFullYear();
+    const months = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+    const timeSeriesMap = {};
+    months.forEach(m => timeSeriesMap[m] = 0);
+
+    eventos.forEach(e => {
+      if (e.dataEvento) {
+        const d = new Date(e.dataEvento);
+        if (d.getFullYear() === currentYear) {
+          const monthName = months[d.getMonth()];
+          timeSeriesMap[monthName]++;
+        }
+      }
+    });
+    const timeSeries = months.map(m => ({ mes: m, eventos: timeSeriesMap[m] }));
+
+    // 3. Infra (Pie Chart - Local do Evento)
+    const infraMap = {};
+    eventos.forEach(e => {
+      const loc = e.local ? e.local.toLowerCase() : 'não definido';
+      infraMap[loc] = (infraMap[loc] || 0) + 1;
+    });
+    const infra = Object.keys(infraMap).map(k => ({
+      name: k.charAt(0).toUpperCase() + k.slice(1),
+      value: infraMap[k]
+    }));
+
+    return res.json({
+      success: true,
+      data: { scatter, timeSeries, infra }
+    });
+  } catch (error) {
+    return next(error);
+  }
+}
+
+module.exports = { stats, proximosEventos, charts };
