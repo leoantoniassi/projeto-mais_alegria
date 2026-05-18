@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import api from '../../services/api';
+import { useAuth } from '../../contexts/AuthContext';
 
 export default function ClientesPage() {
+  const { user } = useAuth();
   const [clientes, setClientes] = useState([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
@@ -181,9 +183,11 @@ export default function ClientesPage() {
                         <button onClick={() => handleEdit(c)} className="w-9 h-9 rounded-full bg-surface-container text-on-surface-variant flex items-center justify-center hover:bg-primary/20 transition-all">
                           <span className="material-symbols-outlined text-lg">edit</span>
                         </button>
-                        <button onClick={() => handleDelete(c.id)} className="w-9 h-9 rounded-full bg-error-container/20 text-error flex items-center justify-center hover:bg-error hover:text-white transition-all">
-                          <span className="material-symbols-outlined text-lg">delete</span>
-                        </button>
+                        {user?.role !== 'operador' && (
+                          <button onClick={() => handleDelete(c.id)} className="w-9 h-9 rounded-full bg-error-container/20 text-error flex items-center justify-center hover:bg-error hover:text-white transition-all">
+                            <span className="material-symbols-outlined text-lg">delete</span>
+                          </button>
+                        )}
                       </div>
                     </td>
                   </tr>

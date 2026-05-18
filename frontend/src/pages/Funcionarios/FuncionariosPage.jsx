@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import api from '../../services/api';
+import { useAuth } from '../../contexts/AuthContext';
 
 export default function FuncionariosPage() {
+  const { user } = useAuth();
   const [funcionarios, setFuncionarios] = useState([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
@@ -93,7 +95,9 @@ export default function FuncionariosPage() {
                       <td className="px-6 py-5"><span className={`px-3 py-1 ${funcaoColor(f.funcao)} text-xs font-bold rounded-full uppercase tracking-tight`}>{f.funcao}</span></td>
                       <td className="px-6 py-5 text-right">
                         <button onClick={() => handleEdit(f)} className="p-2 text-on-surface-variant hover:text-tertiary transition-colors"><span className="material-symbols-outlined">edit</span></button>
-                        <button onClick={() => handleDelete(f.id)} className="p-2 text-on-surface-variant hover:text-error transition-colors"><span className="material-symbols-outlined">delete</span></button>
+                        {user?.role !== 'operador' && (
+                          <button onClick={() => handleDelete(f.id)} className="p-2 text-on-surface-variant hover:text-error transition-colors"><span className="material-symbols-outlined">delete</span></button>
+                        )}
                       </td>
                     </tr>
                   ))}

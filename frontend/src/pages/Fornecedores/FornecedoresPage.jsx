@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import api from '../../services/api';
+import { useAuth } from '../../contexts/AuthContext';
 
 const CATEGORIAS = [
   'Alimentos',
@@ -13,6 +14,7 @@ const CATEGORIAS = [
 ];
 
 export default function FornecedoresPage() {
+  const { user } = useAuth();
   const [fornecedores, setFornecedores] = useState([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
@@ -181,9 +183,11 @@ export default function FornecedoresPage() {
                         <button onClick={() => handleEdit(f)} className="w-9 h-9 rounded-full bg-surface-container text-on-surface-variant flex items-center justify-center hover:bg-primary/20 transition-all" title="Editar">
                           <span className="material-symbols-outlined text-lg">edit</span>
                         </button>
-                        <button onClick={() => handleDelete(f.id)} className="w-9 h-9 rounded-full bg-error-container/20 text-error flex items-center justify-center hover:bg-error hover:text-white transition-all" title="Excluir">
-                          <span className="material-symbols-outlined text-lg">delete</span>
-                        </button>
+                        {user?.role !== 'operador' && (
+                          <button onClick={() => handleDelete(f.id)} className="w-9 h-9 rounded-full bg-error-container/20 text-error flex items-center justify-center hover:bg-error hover:text-white transition-all" title="Excluir">
+                            <span className="material-symbols-outlined text-lg">delete</span>
+                          </button>
+                        )}
                       </div>
                     </td>
                   </tr>

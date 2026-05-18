@@ -14,5 +14,6 @@ router.use('/documentos',   require('./documentos.routes'));
 router.use('/catalogos',    require('./catalogos.routes'));
 router.use('/escala',       require('./escala.routes'));
 router.use('/dashboard',    require('./dashboard.routes'));
+router.use('/usuarios',     require('./usuarios.routes'));
 
 module.exports = router;

@@ -6,7 +6,6 @@ TRUNCATE usuarios, clientes, funcionarios, fornecedores, produtos, orcamentos, e
 
 -- 0. USUARIOS
 INSERT INTO usuarios (usr_nome, usr_email, usr_senha, usr_role) VALUES
-('Admin Silva', 'admin@maisalegria.com', '$2y$10$wWwMj.Q9Gq.i0v7Y.9c3.u.V4nB0q0t3eXZ.P1yI0aQ2hE8c3L9oK', 'admin'),
 ('Gerente Souza', 'gerente@maisalegria.com', '$2y$10$wWwMj.Q9Gq.i0v7Y.9c3.u.V4nB0q0t3eXZ.P1yI0aQ2hE8c3L9oK', 'gerente'),
 ('Operador Lima', 'operador@maisalegria.com', '$2y$10$wWwMj.Q9Gq.i0v7Y.9c3.u.V4nB0q0t3eXZ.P1yI0aQ2hE8c3L9oK', 'operador');
 

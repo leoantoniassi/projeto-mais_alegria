@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import api from '../../services/api';
+import { useAuth } from '../../contexts/AuthContext';
 
 export default function CatalogosPage() {
+  const { user } = useAuth();
   const [catalogos, setCatalogos] = useState([]);
   const [showPanel, setShowPanel] = useState(false);
   const [editing, setEditing] = useState(null);
@@ -169,9 +171,11 @@ export default function CatalogosPage() {
                         <button onClick={() => openEdit(c)} className="w-9 h-9 rounded-full bg-surface-container text-on-surface-variant flex items-center justify-center hover:bg-primary/20 transition-all" title="Editar">
                           <span className="material-symbols-outlined text-lg">edit</span>
                         </button>
-                        <button onClick={() => handleDelete(c.id)} className="w-9 h-9 rounded-full bg-error-container/20 text-error flex items-center justify-center hover:bg-error hover:text-white transition-all" title="Excluir">
-                          <span className="material-symbols-outlined text-lg">delete</span>
-                        </button>
+                        {user?.role !== 'operador' && (
+                          <button onClick={() => handleDelete(c.id)} className="w-9 h-9 rounded-full bg-error-container/20 text-error flex items-center justify-center hover:bg-error hover:text-white transition-all" title="Excluir">
+                            <span className="material-symbols-outlined text-lg">delete</span>
+                          </button>
+                        )}
                       </div>
                     </td>
                   </tr>

@@ -32,11 +32,11 @@ CREATE TABLE usuarios (
     usr_senha     VARCHAR(255) NOT NULL,
     usr_role      VARCHAR(20)  NOT NULL DEFAULT 'operador',
     usr_criado_em TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT ck_usuarios_role CHECK (usr_role IN ('admin', 'gerente', 'operador'))
+    CONSTRAINT ck_usuarios_role CHECK (usr_role IN ('gerente', 'operador'))
 );
 
 COMMENT ON TABLE  usuarios          IS 'Usuários do sistema com controle de acesso por role.';
-COMMENT ON COLUMN usuarios.usr_role IS 'Papel no sistema: admin, gerente ou operador.';
+COMMENT ON COLUMN usuarios.usr_role IS 'Papel no sistema: gerente ou operador.';
 
 -- ============================================================
 -- 1. CLIENTES

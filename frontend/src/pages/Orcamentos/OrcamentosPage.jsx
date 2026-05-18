@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import api from '../../services/api';
+import { useAuth } from '../../contexts/AuthContext';
 
 export default function OrcamentosPage() {
+  const { user } = useAuth();
   const [orcamentos, setOrcamentos] = useState([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
@@ -125,7 +127,9 @@ export default function OrcamentosPage() {
                     <td className="py-4 px-4 text-right">
                       <div className="flex justify-end gap-1">
                         {o.status === 'pendente' && <><button onClick={e => { e.stopPropagation(); handleConfirm(o.id); }} className="p-1.5 text-secondary hover:bg-secondary/10 rounded-full" title="Aprovar e Confirmar"><span className="material-symbols-outlined text-lg">check</span></button><button onClick={e => { e.stopPropagation(); handleReject(o.id); }} className="p-1.5 text-error hover:bg-error/10 rounded-full" title="Rejeitar"><span className="material-symbols-outlined text-lg">close</span></button></>}
-                        <button onClick={e => { e.stopPropagation(); handleDelete(o.id); }} className="p-1.5 text-on-surface-variant hover:text-error rounded-full"><span className="material-symbols-outlined text-lg">delete</span></button>
+                        {user?.role !== 'operador' && (
+                          <button onClick={e => { e.stopPropagation(); handleDelete(o.id); }} className="p-1.5 text-on-surface-variant hover:text-error rounded-full"><span className="material-symbols-outlined text-lg">delete</span></button>
+                        )}
                       </div>
                     </td>
                   </tr>

@@ -11,6 +11,7 @@ import OrcamentosPage from './pages/Orcamentos/OrcamentosPage';
 import DocumentosPage from './pages/Documentos/DocumentosPage';
 import CatalogosPage from './pages/Catalogos/CatalogosPage';
 import FornecedoresPage from './pages/Fornecedores/FornecedoresPage';
+import UsuariosPage from './pages/Usuarios/UsuariosPage';
 
 function ProtectedRoute({ children }) {
   const { isAuthenticated, loading } = useAuth();
@@ -69,6 +70,7 @@ export default function App() {
         <Route path="orcamentos" element={<OrcamentosPage />} />
         <Route path="documentos" element={<DocumentosPage />} />
         <Route path="catalogos" element={<CatalogosPage />} />
+        <Route path="usuarios" element={<UsuariosPage />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

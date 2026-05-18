@@ -35,8 +35,7 @@ async function seed() {
     // 0. USUARIOS
     console.log('👤 Criando usuários...');
     const senhaHash = await bcrypt.hash('123456', 10);
-    const [admin, gerente] = await Usuario.bulkCreate([
-      { nome: 'Admin Silva', email: 'admin@maisalegria.com', senha: senhaHash, role: 'admin' },
+    const [gerente, operador] = await Usuario.bulkCreate([
       { nome: 'Gerente Souza', email: 'gerente@maisalegria.com', senha: senhaHash, role: 'gerente' },
       { nome: 'Operador Lima', email: 'operador@maisalegria.com', senha: senhaHash, role: 'operador' },
     ]);
@@ -148,7 +147,6 @@ async function seed() {
     console.log('✅ Seed concluído com sucesso!');
     console.log('');
     console.log('📌 Credenciais de acesso:');
-    console.log('   Admin:    admin@maisalegria.com    / 123456');
     console.log('   Gerente:  gerente@maisalegria.com  / 123456');
     console.log('   Operador: operador@maisalegria.com / 123456');
     console.log('');

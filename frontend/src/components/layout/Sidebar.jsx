@@ -11,6 +11,7 @@ const navItems = [
   { to: '/estoque',      icon: 'inventory_2',      label: 'Estoque' },
   { to: '/documentos',   icon: 'description',      label: 'Documentos' },
   { to: '/catalogos',    icon: 'menu_book',        label: 'Catálogos' },
+  { to: '/usuarios',     icon: 'admin_panel_settings', label: 'Usuários' },
 ];
 
 export default function Sidebar({ isOpen, onClose }) {
@@ -47,7 +48,7 @@ export default function Sidebar({ isOpen, onClose }) {
 
           {/* Nav Items */}
           <nav className="space-y-1">
-            {navItems.map(({ to, icon, label }) => (
+            {navItems.filter(item => item.to !== '/usuarios' || user?.role === 'gerente').map(({ to, icon, label }) => (
               <NavLink
                 key={to}
                 to={to}

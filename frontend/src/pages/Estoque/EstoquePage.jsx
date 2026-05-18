@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import api from '../../services/api';
+import { useAuth } from '../../contexts/AuthContext';
 
 export default function EstoquePage() {
+  const { user } = useAuth();
   const [produtos, setProdutos] = useState([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
@@ -68,7 +70,11 @@ export default function EstoquePage() {
                 <td className="px-8 py-6"><span className={`px-4 py-1.5 ${catColor(p.categoria)} rounded-full text-xs font-bold`}>{p.categoria}</span></td>
                 <td className="px-8 py-6"><div className="flex items-center gap-2"><span className={`font-bold text-lg ${p.quantidade < 20 ? 'text-error' : 'text-on-surface'}`}>{p.quantidade}</span><span className="text-on-surface-variant text-xs font-medium">{p.unidadeMedida}</span></div></td>
                 <td className="px-8 py-6 font-medium text-on-surface">R$ {Number(p.custoUnitario).toFixed(2)}</td>
-                <td className="px-8 py-6"><div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity"><button onClick={() => handleEdit(p)} className="p-2 hover:bg-white rounded-full text-on-surface-variant"><span className="material-symbols-outlined">edit</span></button><button onClick={() => handleDelete(p.id)} className="p-2 hover:bg-error/10 rounded-full text-error"><span className="material-symbols-outlined">delete</span></button></div></td>
+                <td className="px-8 py-6"><div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity"><button onClick={() => handleEdit(p)} className="p-2 hover:bg-white rounded-full text-on-surface-variant"><span className="material-symbols-outlined">edit</span></button>
+                  {user?.role !== 'operador' && (
+                    <button onClick={() => handleDelete(p.id)} className="p-2 hover:bg-error/10 rounded-full text-error"><span className="material-symbols-outlined">delete</span></button>
+                  )}
+                </div></td>
               </tr>
             ))}
           </tbody>

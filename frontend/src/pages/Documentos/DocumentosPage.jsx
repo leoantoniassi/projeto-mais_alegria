@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import api from '../../services/api';
+import { useAuth } from '../../contexts/AuthContext';
 
 export default function DocumentosPage() {
+  const { user } = useAuth();
   const [docs, setDocs] = useState([]);
   const [clientes, setClientes] = useState([]);
   const [eventos, setEventos] = useState([]);
@@ -193,13 +195,15 @@ export default function DocumentosPage() {
                       <span className="material-symbols-outlined text-lg">edit</span>
                     </button>
                   </div>
-                  <button
-                    onClick={() => handleDelete(doc.id)}
-                    className="p-2 hover:bg-error/10 rounded-full text-error transition-colors"
-                    title="Excluir"
-                  >
-                    <span className="material-symbols-outlined text-lg">delete</span>
-                  </button>
+                  {user?.role !== 'operador' && (
+                    <button
+                      onClick={() => handleDelete(doc.id)}
+                      className="p-2 hover:bg-error/10 rounded-full text-error transition-colors"
+                      title="Excluir"
+                    >
+                      <span className="material-symbols-outlined text-lg">delete</span>
+                    </button>
+                  )}
                 </div>
               </div>
             </div>
