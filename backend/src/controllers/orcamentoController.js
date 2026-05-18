@@ -248,6 +248,43 @@ async function remover(req, res, next) {
   }
 }
 
+// função de editar orçamento
+// PUT /api/orcamentos/:id
+async function atualizar(req, res, next) {
+  try {
+    const orcamento = await Orcamento.findByPk(req.params.id);
+    if (!orcamento) {
+      return res.status(404).json({
+        success: false,
+        message: "Orçamento não encontrado.",
+      });
+    }
+
+    const { clienteId, valorTotal, dataValidade, observacoes, local } =
+      req.body;
+
+    await orcamento.update({
+      clienteId: clienteId || orcamento.clienteId,
+      valorTotal: valorTotal !== undefined ? valorTotal : orcamento.valorTotal,
+      dataValidade:
+        dataValidade !== undefined ? dataValidade : orcamento.dataValidade,
+      observacoes:
+        observacoes !== undefined ? observacoes : orcamento.observacoes,
+      // ADICIONE ESTA LINHA:
+      local: local !== undefined ? local : orcamento.local,
+      atualizadoEm: new Date(),
+    });
+
+    return res.json({
+      success: true,
+      message: "Orçamento atualizado com sucesso!",
+      data: orcamento,
+    });
+  } catch (error) {
+    return next(error);
+  }
+}
+
 // Confirma o orçamento e envia para Eventos
 async function confirmarOrcamento(req, res, next) {
   try {

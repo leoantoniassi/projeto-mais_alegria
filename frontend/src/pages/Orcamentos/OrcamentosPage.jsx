@@ -25,13 +25,13 @@ export default function OrcamentosPage() {
       const items = Array.isArray(res.data) ? res.data : [];
       setOrcamentos(items);
       setTotal(res.pagination?.total || items.length);
-    } catch {}
+    } catch { }
   };
 
   // 3. Atualiza os dados sempre que o page ou o filtroLocal mudarem
   useEffect(() => { fetchData(); }, [page, filtroLocal]);
-  
-  useEffect(() => { api.get('/clientes').then(r => { const items = Array.isArray(r.data.data) ? r.data.data : []; setClientes(items); }).catch(() => {}); }, []);
+
+  useEffect(() => { api.get('/clientes').then(r => { const items = Array.isArray(r.data.data) ? r.data.data : []; setClientes(items); }).catch(() => { }); }, []);
 
   const handleSave = async (e) => {
     e.preventDefault();
@@ -87,11 +87,11 @@ export default function OrcamentosPage() {
       <div className="grid grid-cols-12 gap-6 mb-8">
         {/* Table */}
         <div className="col-span-12 lg:col-span-8 bg-white p-6 rounded-2xl shadow-sm border border-outline-variant/30">
-          
+
           {/* Header e Filtro de Local */}
           <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-6">
             <h3 className="text-xl font-bold font-headline">Listagem</h3>
-            <select 
+            <select
               className="bg-surface-container-low border-none rounded-full py-2 px-4 focus:ring-2 focus:ring-primary text-sm font-medium outline-none"
               value={filtroLocal}
               onChange={(e) => setFiltroLocal(e.target.value)}
@@ -128,7 +128,22 @@ export default function OrcamentosPage() {
                       <div className="flex justify-end gap-1">
                         {o.status === 'pendente' && <><button onClick={e => { e.stopPropagation(); handleConfirm(o.id); }} className="p-1.5 text-secondary hover:bg-secondary/10 rounded-full" title="Aprovar e Confirmar"><span className="material-symbols-outlined text-lg">check</span></button><button onClick={e => { e.stopPropagation(); handleReject(o.id); }} className="p-1.5 text-error hover:bg-error/10 rounded-full" title="Rejeitar"><span className="material-symbols-outlined text-lg">close</span></button></>}
                         {user?.role !== 'operador' && (
-                          <button onClick={e => { e.stopPropagation(); handleDelete(o.id); }} className="p-1.5 text-on-surface-variant hover:text-error rounded-full"><span className="material-symbols-outlined text-lg">delete</span></button>
+                          <button onClick={e => { 
+                          e.stopPropagation(); 
+                          setEditing(o.id); 
+                          setForm({
+                            clienteId: o.clienteId || o.cliente?.id || o.Cliente?.id || '',
+                            valorTotal: o.valorTotal || 0,
+                            dataValidade: o.dataValidade ? new Date(new Date(o.dataValidade).getTime() - (new Date().getTimezoneOffset() * 60000)).toISOString().slice(0, 10) : '',
+                            observacoes: o.observacoes || '',
+                            local: o.local || '',
+                            produtos: []
+                          });
+                          setShowPanel(true);
+                        }} className="p-1.5 text-on-surface-variant hover:text-primary rounded-full transition-colors" title="Editar">
+                          <span className="material-symbols-outlined text-lg">edit</span>
+                        </button>
+                        <button onClick={e => { e.stopPropagation(); handleDelete(o.id); }} className="p-1.5 text-on-surface-variant hover:text-error rounded-full"><span className="material-symbols-outlined text-lg">delete</span></button>
                         )}
                       </div>
                     </td>
@@ -169,12 +184,12 @@ export default function OrcamentosPage() {
             <div className="p-8 border-b border-outline-variant/30 flex justify-between"><div><h3 className="text-2xl font-headline font-extrabold">{editing ? 'Editar Orçamento' : 'Novo Orçamento'}</h3></div><button onClick={() => setShowPanel(false)} className="p-2 hover:bg-surface-container rounded-full"><span className="material-symbols-outlined">close</span></button></div>
             <div className="flex-1 overflow-y-auto p-8">
               <form id="orc-form" className="space-y-6" onSubmit={handleSave}>
-                <div className="space-y-2"><label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-4">Cliente</label><select className="w-full bg-surface-container-low border-none rounded-full py-3.5 px-6 focus:ring-2 focus:ring-primary" value={form.clienteId} onChange={e => setForm({...form, clienteId: e.target.value})} required><option value="">Selecione...</option>{clientes.map(c => <option key={c.id} value={c.id}>{c.nome}</option>)}</select></div>
-                
+                <div className="space-y-2"><label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-4">Cliente</label><select className="w-full bg-surface-container-low border-none rounded-full py-3.5 px-6 focus:ring-2 focus:ring-primary" value={form.clienteId} onChange={e => setForm({ ...form, clienteId: e.target.value })} required><option value="">Selecione...</option>{clientes.map(c => <option key={c.id} value={c.id}>{c.nome}</option>)}</select></div>
+
                 {/* Seleção do Local */}
                 <div className="space-y-2">
                   <label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-4">Local</label>
-                  <select className="w-full bg-surface-container-low border-none rounded-full py-3.5 px-6 focus:ring-2 focus:ring-primary" value={form.local} onChange={e => setForm({...form, local: e.target.value})} required>
+                  <select className="w-full bg-surface-container-low border-none rounded-full py-3.5 px-6 focus:ring-2 focus:ring-primary" value={form.local} onChange={e => setForm({ ...form, local: e.target.value })} required>
                     <option value="">Selecione o local...</option>
                     <option value="salão 1">Salão 1</option>
                     <option value="salão 2">Salão 2</option>
@@ -184,12 +199,12 @@ export default function OrcamentosPage() {
 
                 <div className="grid grid-cols-2 gap-4">
                   {/* Atualizado com o Placeholder */}
-                  <div className="space-y-2"><label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-4">Valor Total</label><input type="number" step="0.01" placeholder="0.00" className="w-full bg-surface-container-low border-none rounded-full py-3.5 px-6 focus:ring-2 focus:ring-primary" value={form.valorTotal || ''} onChange={e => setForm({...form, valorTotal: e.target.value ? Number(e.target.value) : 0})} required /></div>
-                  <div className="space-y-2"><label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-4">Validade</label><input type="date" className="w-full bg-surface-container-low border-none rounded-full py-3.5 px-6 focus:ring-2 focus:ring-primary" value={form.dataValidade} onChange={e => setForm({...form, dataValidade: e.target.value})} required /></div>
+                  <div className="space-y-2"><label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-4">Valor Total</label><input type="number" step="0.01" placeholder="0.00" className="w-full bg-surface-container-low border-none rounded-full py-3.5 px-6 focus:ring-2 focus:ring-primary" value={form.valorTotal || ''} onChange={e => setForm({ ...form, valorTotal: e.target.value ? Number(e.target.value) : 0 })} required /></div>
+                  <div className="space-y-2"><label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-4">Validade</label><input type="date" className="w-full bg-surface-container-low border-none rounded-full py-3.5 px-6 focus:ring-2 focus:ring-primary" value={form.dataValidade} onChange={e => setForm({ ...form, dataValidade: e.target.value })} required /></div>
                 </div>
                 <div className="space-y-2">
                   <label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-4">Observações {form.local === 'externo' && '(Digite o endereço do local externo)'}</label>
-                  <textarea className="w-full bg-surface-container-low border-none rounded-2xl py-3.5 px-6 focus:ring-2 focus:ring-primary resize-none" rows={3} placeholder={form.local === 'externo' ? "Ex: Rua das Flores, 123..." : ""} value={form.observacoes} onChange={e => setForm({...form, observacoes: e.target.value})} />
+                  <textarea className="w-full bg-surface-container-low border-none rounded-2xl py-3.5 px-6 focus:ring-2 focus:ring-primary resize-none" rows={3} placeholder={form.local === 'externo' ? "Ex: Rua das Flores, 123..." : ""} value={form.observacoes} onChange={e => setForm({ ...form, observacoes: e.target.value })} />
                 </div>
               </form>
             </div>
