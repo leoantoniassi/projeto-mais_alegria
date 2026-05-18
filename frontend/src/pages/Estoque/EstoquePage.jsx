@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
 import api from '../../services/api';
 import { useAuth } from '../../contexts/AuthContext';
+import { useConfirm } from '../../contexts/ConfirmContext';
 
 export default function EstoquePage() {
   const { user } = useAuth();
+  const confirm = useConfirm();
   const [produtos, setProdutos] = useState([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
@@ -32,7 +34,7 @@ export default function EstoquePage() {
   };
 
   const handleEdit = (p) => { setForm({ nome: p.nome, categoria: p.categoria, quantidade: p.quantidade, unidadeMedida: p.unidadeMedida, custoUnitario: p.custoUnitario }); setEditing(p.id); setShowPanel(true); };
-  const handleDelete = async (id) => { if (!confirm('Excluir item?')) return; try { await api.delete(`/produtos/${id}`); fetchData(); } catch (err) { alert(err.response?.data?.error || 'Erro'); } };
+  const handleDelete = async (id) => { if (!(await confirm('Excluir item?'))) return; try { await api.delete(`/produtos/${id}`); fetchData(); } catch (err) { alert(err.response?.data?.error || 'Erro'); } };
 
   const catColor = (c) => {
     const m = { Alimento: 'bg-primary/30 text-on-primary-container', Bebida: 'bg-tertiary-container text-on-tertiary-container', Descartável: 'bg-surface-container-highest text-on-surface-variant', Decoração: 'bg-secondary-container text-on-secondary-container' };

@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
 import api from '../../services/api';
 import { useAuth } from '../../contexts/AuthContext';
+import { useConfirm } from '../../contexts/ConfirmContext';
 
 export default function FuncionariosPage() {
   const { user } = useAuth();
+  const confirm = useConfirm();
   const [funcionarios, setFuncionarios] = useState([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
@@ -33,7 +35,7 @@ export default function FuncionariosPage() {
   };
 
   const handleEdit = (f) => { setForm({ nome: f.nome, email: f.email, telefone: f.telefone, funcao: f.funcao }); setEditing(f.id); setShowPanel(true); };
-  const handleDelete = async (id) => { if (!confirm('Excluir funcionário?')) return; try { await api.delete(`/funcionarios/${id}`); fetchData(); } catch (err) { alert(err.response?.data?.message || 'Erro'); } };
+  const handleDelete = async (id) => { if (!(await confirm('Excluir funcionário?'))) return; try { await api.delete(`/funcionarios/${id}`); fetchData(); } catch (err) { alert(err.response?.data?.message || 'Erro'); } };
   const initials = (n) => (n || 'NA').split(' ').map(x => x[0]).join('').slice(0, 2).toUpperCase();
 
   const funcaoColor = (f) => {

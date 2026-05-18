@@ -1,5 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { useAuth } from './contexts/AuthContext';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { ConfirmProvider } from './contexts/ConfirmContext';
 import AppLayout from './components/layout/AppLayout';
 import LoginPage from './pages/Login/LoginPage';
 import DashboardPage from './pages/Dashboard/DashboardPage';
@@ -49,7 +50,7 @@ function LoginRoute() {
   return <LoginPage />;
 }
 
-export default function App() {
+function AppRoutes() {
   return (
     <Routes>
       <Route path="/login" element={<LoginRoute />} />
@@ -74,5 +75,15 @@ export default function App() {
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
+  );
+}
+
+export default function App() {
+  return (
+    <AuthProvider>
+      <ConfirmProvider>
+        <AppRoutes />
+      </ConfirmProvider>
+    </AuthProvider>
   );
 }

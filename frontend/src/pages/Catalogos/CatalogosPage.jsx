@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
 import api from '../../services/api';
 import { useAuth } from '../../contexts/AuthContext';
+import { useConfirm } from '../../contexts/ConfirmContext';
 
 export default function CatalogosPage() {
   const { user } = useAuth();
+  const confirm = useConfirm();
   const [catalogos, setCatalogos] = useState([]);
   const [showPanel, setShowPanel] = useState(false);
   const [editing, setEditing] = useState(null);
@@ -63,7 +65,7 @@ export default function CatalogosPage() {
   };
 
   const handleDelete = async (id) => {
-    if (!confirm('Deseja realmente excluir este catálogo?')) return;
+    if (!(await confirm('Deseja realmente excluir este catálogo?'))) return;
     try {
       await api.delete(`/catalogos/${id}`);
       fetchCatalogos();

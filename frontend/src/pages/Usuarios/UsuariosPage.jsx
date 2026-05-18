@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
 import api from '../../services/api';
 import { useAuth } from '../../contexts/AuthContext';
+import { useConfirm } from '../../contexts/ConfirmContext';
 
 export default function UsuariosPage() {
   const { user } = useAuth();
+  const confirm = useConfirm();
   const [usuarios, setUsuarios] = useState([]);
   const [total, setTotal] = useState(0);
   const [showPanel, setShowPanel] = useState(false);
@@ -55,7 +57,7 @@ export default function UsuariosPage() {
   };
 
   const handleDelete = async (id) => {
-    if (!confirm('Excluir este usuário permanentemente?')) return;
+    if (!(await confirm('Excluir este usuário permanentemente?'))) return;
     try {
       await api.delete(`/usuarios/${id}`);
       fetchData();

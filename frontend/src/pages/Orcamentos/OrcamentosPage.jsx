@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
 import api from '../../services/api';
 import { useAuth } from '../../contexts/AuthContext';
+import { useConfirm } from '../../contexts/ConfirmContext';
 
 export default function OrcamentosPage() {
   const { user } = useAuth();
+  const confirm = useConfirm();
   const [orcamentos, setOrcamentos] = useState([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
@@ -46,10 +48,10 @@ export default function OrcamentosPage() {
     try { await api.patch(`/orcamentos/${id}/status`, { status }); fetchData(); } catch (err) { alert(err.response?.data?.error || 'Erro'); }
   };
 
-  const handleDelete = async (id) => { if (!confirm('Excluir orçamento?')) return; try { await api.delete(`/orcamentos/${id}`); fetchData(); } catch (err) { alert(err.response?.data?.error || 'Erro'); } };
+  const handleDelete = async (id) => { if (!(await confirm('Excluir orçamento?'))) return; try { await api.delete(`/orcamentos/${id}`); fetchData(); } catch (err) { alert(err.response?.data?.error || 'Erro'); } };
 
   const handleConfirm = async (id) => {
-    if (!window.confirm('Você tem certeza que deseja confirmar este orçamento? Ele será convertido em um evento automaticamente.')) return;
+    if (!(await confirm('Você tem certeza que deseja confirmar este orçamento? Ele será convertido em um evento automaticamente.', { title: 'Confirmar Orçamento', isDanger: false }))) return;
     try {
       await api.post(`/orcamentos/${id}/confirmar`);
       fetchData();
@@ -59,7 +61,7 @@ export default function OrcamentosPage() {
   };
 
   const handleReject = async (id) => {
-    if (!window.confirm('Você tem certeza que deseja rejeitar este orçamento? Ele será marcado como reprovado e removido.')) return;
+    if (!(await confirm('Você tem certeza que deseja rejeitar este orçamento? Ele será marcado como reprovado e removido.', { title: 'Rejeitar Orçamento', isDanger: true }))) return;
     try {
       await api.post(`/orcamentos/${id}/rejeitar`);
       fetchData();

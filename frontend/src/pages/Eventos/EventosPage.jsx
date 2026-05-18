@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
 import api from '../../services/api';
 import { useAuth } from '../../contexts/AuthContext';
+import { useConfirm } from '../../contexts/ConfirmContext';
 
 export default function EventosPage() {
   const { user } = useAuth();
+  const confirm = useConfirm();
   const [eventos, setEventos] = useState([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
@@ -47,7 +49,7 @@ export default function EventosPage() {
     } catch (err) { alert(err.response?.data?.error || 'Erro'); }
   };
 
-  const handleDelete = async (id) => { if (!confirm('Excluir evento?')) return; try { await api.delete(`/eventos/${id}`); fetchData(); } catch (err) { alert(err.response?.data?.error || 'Erro'); } };
+  const handleDelete = async (id) => { if (!(await confirm('Excluir evento?'))) return; try { await api.delete(`/eventos/${id}`); fetchData(); } catch (err) { alert(err.response?.data?.error || 'Erro'); } };
 
   const statusBadge = (s) => {
     const m = { confirmado: 'bg-secondary-container text-on-secondary-container', pendente: 'bg-primary-container text-on-primary-container', planejamento: 'bg-primary-container text-on-primary-container', cancelado: 'bg-error-container text-on-error-container' };

@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
 import api from '../../services/api';
 import { useAuth } from '../../contexts/AuthContext';
+import { useConfirm } from '../../contexts/ConfirmContext';
 
 export default function DocumentosPage() {
   const { user } = useAuth();
+  const confirm = useConfirm();
   const [docs, setDocs] = useState([]);
   const [clientes, setClientes] = useState([]);
   const [eventos, setEventos] = useState([]);
@@ -74,7 +76,7 @@ export default function DocumentosPage() {
   };
 
   const handleDelete = async (id) => {
-    if (!confirm('Deseja realmente excluir este documento?')) return;
+    if (!(await confirm('Deseja realmente excluir este documento?'))) return;
     try {
       await api.delete(`/documentos/${id}`);
       fetchData();

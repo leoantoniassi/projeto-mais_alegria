@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import api from '../../services/api';
 import { useAuth } from '../../contexts/AuthContext';
+import { useConfirm } from '../../contexts/ConfirmContext';
 
 const CATEGORIAS = [
   'Alimentos',
@@ -15,6 +16,7 @@ const CATEGORIAS = [
 
 export default function FornecedoresPage() {
   const { user } = useAuth();
+  const confirm = useConfirm();
   const [fornecedores, setFornecedores] = useState([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
@@ -61,7 +63,7 @@ export default function FornecedoresPage() {
   };
 
   const handleDelete = async (id) => {
-    if (!confirm('Deseja realmente excluir este fornecedor?')) return;
+    if (!(await confirm('Deseja realmente excluir este fornecedor?'))) return;
     try {
       await api.delete(`/fornecedores/${id}`);
       fetchFornecedores();
