@@ -5,28 +5,25 @@ const { Op } = require("sequelize");
 const {
   Orcamento,
   Cliente,
+  Local,
   OrcamentoProduto,
   Produto,
+  CategoriaProduto,
   Evento,
 } = require("../models");
 
 // GET /api/orcamentos
-// GET /api/orcamentos
 async function listar(req, res, next) {
   try {
-    const { page = 1, limit = 20, status, local } = req.query;
+    const { page = 1, limit = 20, status, localId } = req.query;
     const offset = (page - 1) * limit;
 
     const where = {};
     if (status) {
       where.status = status;
     }
-
-    // Usando Op.iLike para evitar problemas de maiúscula/minúscula
-    if (local) {
-      where.local = {
-        [Op.iLike]: local,
-      };
+    if (localId) {
+      where.localId = localId;
     }
 
     const { count, rows } = await Orcamento.findAndCountAll({
@@ -36,6 +33,11 @@ async function listar(req, res, next) {
           model: Cliente,
           as: "cliente",
           attributes: ["id", "nome", "email", "telefone"],
+        },
+        {
+          model: Local,
+          as: "local",
+          attributes: ["id", "nome", "cidade", "estado"],
         },
       ],
       limit: parseInt(limit),
@@ -69,9 +71,13 @@ async function buscarPorId(req, res, next) {
           attributes: ["id", "nome", "email", "telefone"],
         },
         {
+          model: Local,
+          as: "local",
+        },
+        {
           model: OrcamentoProduto,
           as: "orcamentoProdutos",
-          include: [{ model: Produto, as: "produto" }],
+          include: [{ model: Produto, as: "produto", include: [{ model: CategoriaProduto, as: 'categoria' }] }],
         },
       ],
     });
@@ -94,11 +100,11 @@ async function criar(req, res, next) {
   try {
     const {
       clienteId,
+      localId,
       valorTotal,
       dataValidade,
       status,
       observacoes,
-      local, // Adicionado
       produtos,
     } = req.body;
 
@@ -109,7 +115,6 @@ async function criar(req, res, next) {
       });
     }
 
-    // Verifica se cliente existe
     const cliente = await Cliente.findByPk(clienteId);
     if (!cliente) {
       return res.status(404).json({
@@ -118,30 +123,36 @@ async function criar(req, res, next) {
       });
     }
 
+    if (localId) {
+      const localExiste = await Local.findByPk(localId);
+      if (!localExiste) {
+        return res.status(404).json({ success: false, message: "Local não encontrado." });
+      }
+    }
+
     const orcamento = await Orcamento.create({
       clienteId,
+      localId: localId || null,
       valorTotal: valorTotal || 0,
       dataValidade,
       status: status || "pendente",
       observacoes,
-      local, // Salva o local selecionado
     });
 
-    // Se produtos foram enviados, cria os registros na tabela intermediária
     if (produtos && Array.isArray(produtos) && produtos.length > 0) {
       const orcamentoProdutos = produtos.map((p) => ({
         orcamentoId: orcamento.id,
-        produtoId: p.produtoId,
-        quantidade: p.quantidade || 0,
+        produtoId:   p.produtoId,
+        quantidade:  p.quantidade  || 0,
         precoUnitario: p.precoUnitario || 0,
       }));
       await OrcamentoProduto.bulkCreate(orcamentoProdutos);
     }
 
-    // Retorna com produtos incluídos
     const orcamentoCompleto = await Orcamento.findByPk(orcamento.id, {
       include: [
         { model: Cliente, as: "cliente", attributes: ["id", "nome"] },
+        { model: Local,   as: "local",   attributes: ["id", "nome", "cidade", "estado"] },
         {
           model: OrcamentoProduto,
           as: "orcamentoProdutos",
@@ -171,17 +182,21 @@ async function atualizar(req, res, next) {
       });
     }
 
-    const { clienteId, valorTotal, dataValidade, observacoes, local } =
-      req.body; // Adicionado local
+    const { clienteId, localId, valorTotal, dataValidade, observacoes } = req.body;
+
+    if (localId !== undefined && localId !== null) {
+      const localExiste = await Local.findByPk(localId);
+      if (!localExiste) {
+        return res.status(404).json({ success: false, message: "Local não encontrado." });
+      }
+    }
 
     await orcamento.update({
-      clienteId: clienteId || orcamento.clienteId,
-      valorTotal: valorTotal !== undefined ? valorTotal : orcamento.valorTotal,
-      dataValidade:
-        dataValidade !== undefined ? dataValidade : orcamento.dataValidade,
-      observacoes:
-        observacoes !== undefined ? observacoes : orcamento.observacoes,
-      local: local !== undefined ? local : orcamento.local, // Atualiza o local
+      clienteId:    clienteId    || orcamento.clienteId,
+      localId:      localId      !== undefined ? localId      : orcamento.localId,
+      valorTotal:   valorTotal   !== undefined ? valorTotal   : orcamento.valorTotal,
+      dataValidade: dataValidade !== undefined ? dataValidade : orcamento.dataValidade,
+      observacoes:  observacoes  !== undefined ? observacoes  : orcamento.observacoes,
       atualizadoEm: new Date(),
     });
 
@@ -248,43 +263,6 @@ async function remover(req, res, next) {
   }
 }
 
-// função de editar orçamento
-// PUT /api/orcamentos/:id
-async function atualizar(req, res, next) {
-  try {
-    const orcamento = await Orcamento.findByPk(req.params.id);
-    if (!orcamento) {
-      return res.status(404).json({
-        success: false,
-        message: "Orçamento não encontrado.",
-      });
-    }
-
-    const { clienteId, valorTotal, dataValidade, observacoes, local } =
-      req.body;
-
-    await orcamento.update({
-      clienteId: clienteId || orcamento.clienteId,
-      valorTotal: valorTotal !== undefined ? valorTotal : orcamento.valorTotal,
-      dataValidade:
-        dataValidade !== undefined ? dataValidade : orcamento.dataValidade,
-      observacoes:
-        observacoes !== undefined ? observacoes : orcamento.observacoes,
-      // ADICIONE ESTA LINHA:
-      local: local !== undefined ? local : orcamento.local,
-      atualizadoEm: new Date(),
-    });
-
-    return res.json({
-      success: true,
-      message: "Orçamento atualizado com sucesso!",
-      data: orcamento,
-    });
-  } catch (error) {
-    return next(error);
-  }
-}
-
 // Confirma o orçamento e envia para Eventos
 async function confirmarOrcamento(req, res, next) {
   try {
@@ -302,28 +280,26 @@ async function confirmarOrcamento(req, res, next) {
     let dataEvento = new Date();
     if (orcamento.dataValidade) {
       const dv = String(orcamento.dataValidade);
-      // Se for string DATEONLY (ex: "2026-05-02"), adiciona horário meio-dia
       dataEvento = /^\d{4}-\d{2}-\d{2}$/.test(dv)
         ? new Date(dv + 'T12:00:00')
         : new Date(dv);
     }
 
-    // Cria um evento a partir do orçamento
+    // Cria um evento a partir do orçamento, herdando o local
     const evento = await Evento.create({
-      orcamentoId: orcamento.id,
-      clienteId: orcamento.clienteId,
-      nome: `Evento de ${orcamento.cliente ? orcamento.cliente.nome : "Cliente"}`,
+      orcamentoId:   orcamento.id,
+      clienteId:     orcamento.clienteId,
+      localId:       orcamento.localId || null,
+      nome:          `Evento de ${orcamento.cliente ? orcamento.cliente.nome : "Cliente"}`,
       dataEvento,
-      observacoes: orcamento.observacoes,
-      local: orcamento.local,
+      observacoes:   orcamento.observacoes,
       valorOrcamento: orcamento.valorTotal || 0,
-      status: "pendente",
+      status:        "pendente",
     });
 
-    // Adicionamos o deletadoEm para sumir da listagem
     await orcamento.update({
-      status: "aprovado",
-      deletadoEm: new Date(), // Isso faz ele sumir da tela de orçamentos
+      status:       "aprovado",
+      deletadoEm:   new Date(),
       atualizadoEm: new Date(),
     });
 

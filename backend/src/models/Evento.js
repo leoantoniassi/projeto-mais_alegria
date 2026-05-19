@@ -21,6 +21,12 @@ const Evento = sequelize.define('Evento', {
     allowNull: true,
     field: 'evt_orc_id',
   },
+  // FK para locais
+  localId: {
+    type: DataTypes.UUID,
+    allowNull: true,
+    field: 'evt_loc_id',
+  },
   nome: {
     type: DataTypes.STRING(200),
     allowNull: false,
@@ -31,11 +37,6 @@ const Evento = sequelize.define('Evento', {
     allowNull: false,
     field: 'evt_data_evento',
   },
-  local: {
-      type: DataTypes.STRING(255),
-      allowNull: true,
-      field: 'evt_local',
-    },
   status: {
     type: DataTypes.STRING(30),
     allowNull: false,

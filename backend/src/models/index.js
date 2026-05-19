@@ -3,6 +3,10 @@
 // ============================================================
 const Usuario = require('./Usuario');
 const Cliente = require('./Cliente');
+const Local = require('./Local');
+const Funcao = require('./Funcao');
+const CategoriaFornecedor = require('./CategoriaFornecedor');
+const CategoriaProduto = require('./CategoriaProduto');
 const Funcionario = require('./Funcionario');
 const Fornecedor = require('./Fornecedor');
 const Produto = require('./Produto');
@@ -14,27 +18,47 @@ const Escala = require('./Escala');
 const EventoProduto = require('./EventoProduto');
 const OrcamentoProduto = require('./OrcamentoProduto');
 
-// ── Cliente 1:N Orcamento ──────────────────────────────────
+// ── Funcao 1:N Funcionario ────────────────────────────────────
+Funcao.hasMany(Funcionario, { foreignKey: 'funcaoId', as: 'funcionarios' });
+Funcionario.belongsTo(Funcao, { foreignKey: 'funcaoId', as: 'funcao' });
+
+// ── CategoriaFornecedor 1:N Fornecedor ───────────────────────
+CategoriaFornecedor.hasMany(Fornecedor, { foreignKey: 'categoriaId', as: 'fornecedores' });
+Fornecedor.belongsTo(CategoriaFornecedor, { foreignKey: 'categoriaId', as: 'categoria' });
+
+// ── CategoriaProduto 1:N Produto ─────────────────────────────
+CategoriaProduto.hasMany(Produto, { foreignKey: 'categoriaId', as: 'produtos' });
+Produto.belongsTo(CategoriaProduto, { foreignKey: 'categoriaId', as: 'categoria' });
+
+// ── Local 1:N Orcamento ───────────────────────────────────────
+Local.hasMany(Orcamento, { foreignKey: 'localId', as: 'orcamentos' });
+Orcamento.belongsTo(Local, { foreignKey: 'localId', as: 'local' });
+
+// ── Local 1:N Evento ──────────────────────────────────────────
+Local.hasMany(Evento, { foreignKey: 'localId', as: 'eventos' });
+Evento.belongsTo(Local, { foreignKey: 'localId', as: 'local' });
+
+// ── Cliente 1:N Orcamento ─────────────────────────────────────
 Cliente.hasMany(Orcamento, { foreignKey: 'clienteId', as: 'orcamentos' });
 Orcamento.belongsTo(Cliente, { foreignKey: 'clienteId', as: 'cliente' });
 
-// ── Cliente 1:N Evento ─────────────────────────────────────
+// ── Cliente 1:N Evento ────────────────────────────────────────
 Cliente.hasMany(Evento, { foreignKey: 'clienteId', as: 'eventos' });
 Evento.belongsTo(Cliente, { foreignKey: 'clienteId', as: 'cliente' });
 
-// ── Orcamento 1:N Evento ───────────────────────────────────
+// ── Orcamento 1:N Evento ──────────────────────────────────────
 Orcamento.hasMany(Evento, { foreignKey: 'orcamentoId', as: 'eventos' });
 Evento.belongsTo(Orcamento, { foreignKey: 'orcamentoId', as: 'orcamento' });
 
-// ── Cliente 1:N Documento ──────────────────────────────────
+// ── Cliente 1:N Documento ─────────────────────────────────────
 Cliente.hasMany(Documento, { foreignKey: 'clienteId', as: 'documentos' });
 Documento.belongsTo(Cliente, { foreignKey: 'clienteId', as: 'cliente' });
 
-// ── Evento 1:N Documento ───────────────────────────────────
+// ── Evento 1:N Documento ──────────────────────────────────────
 Evento.hasMany(Documento, { foreignKey: 'eventoId', as: 'documentos' });
 Documento.belongsTo(Evento, { foreignKey: 'eventoId', as: 'evento' });
 
-// ── Evento N:M Funcionario (via Escala) ────────────────────
+// ── Evento N:M Funcionario (via Escala) ───────────────────────
 Evento.belongsToMany(Funcionario, {
   through: Escala,
   foreignKey: 'eventoId',
@@ -54,7 +78,7 @@ Escala.belongsTo(Funcionario, { foreignKey: 'funcionarioId', as: 'funcionario' }
 Evento.hasMany(Escala, { foreignKey: 'eventoId', as: 'escala' });
 Funcionario.hasMany(Escala, { foreignKey: 'funcionarioId', as: 'escala' });
 
-// ── Evento N:M Produto (via EventoProduto) ─────────────────
+// ── Evento N:M Produto (via EventoProduto) ────────────────────
 Evento.belongsToMany(Produto, {
   through: EventoProduto,
   foreignKey: 'eventoId',
@@ -73,7 +97,7 @@ EventoProduto.belongsTo(Produto, { foreignKey: 'produtoId', as: 'produto' });
 Evento.hasMany(EventoProduto, { foreignKey: 'eventoId', as: 'eventoProdutos' });
 Produto.hasMany(EventoProduto, { foreignKey: 'produtoId', as: 'eventoProdutos' });
 
-// ── Orcamento N:M Produto (via OrcamentoProduto) ───────────
+// ── Orcamento N:M Produto (via OrcamentoProduto) ─────────────
 Orcamento.belongsToMany(Produto, {
   through: OrcamentoProduto,
   foreignKey: 'orcamentoId',
@@ -95,6 +119,10 @@ Produto.hasMany(OrcamentoProduto, { foreignKey: 'produtoId', as: 'orcamentoProdu
 module.exports = {
   Usuario,
   Cliente,
+  Local,
+  Funcao,
+  CategoriaFornecedor,
+  CategoriaProduto,
   Funcionario,
   Fornecedor,
   Produto,

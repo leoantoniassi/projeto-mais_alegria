@@ -1,0 +1,36 @@
+// ============================================================
+// Model: Funcao (tabela: funcoes) — lookup de funções de colaboradores
+// ============================================================
+const { DataTypes } = require('sequelize');
+const sequelize = require('../config/database');
+
+const Funcao = sequelize.define('Funcao', {
+  id: {
+    type: DataTypes.UUID,
+    defaultValue: DataTypes.UUIDV4,
+    primaryKey: true,
+    field: 'fnc_id',
+  },
+  nome: {
+    type: DataTypes.STRING(80),
+    allowNull: false,
+    unique: true,
+    field: 'fnc_nome',
+  },
+  descricao: {
+    type: DataTypes.TEXT,
+    allowNull: true,
+    field: 'fnc_descricao',
+  },
+  criadoEm: {
+    type: DataTypes.DATE,
+    allowNull: false,
+    defaultValue: DataTypes.NOW,
+    field: 'fnc_criado_em',
+  },
+}, {
+  tableName: 'funcoes',
+  timestamps: false,
+});
+
+module.exports = Funcao;

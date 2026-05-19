@@ -27,10 +27,11 @@ const Funcionario = sequelize.define('Funcionario', {
     allowNull: true,
     field: 'fun_telefone',
   },
-  funcao: {
-    type: DataTypes.STRING(80),
+  // FK para funcoes
+  funcaoId: {
+    type: DataTypes.UUID,
     allowNull: false,
-    field: 'fun_funcao',
+    field: 'fun_fnc_id',
   },
   criadoEm: {
     type: DataTypes.DATE,

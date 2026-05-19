@@ -2,7 +2,7 @@
 // Controller: Dashboard (Dados Agregados)
 // ============================================================
 const { Op, fn, col, literal } = require('sequelize');
-const { Cliente, Funcionario, Produto, Orcamento, Evento } = require('../models');
+const { Cliente, Funcionario, Produto, Orcamento, Evento, Local } = require('../models');
 
 // GET /api/dashboard/stats
 async function stats(req, res, next) {
@@ -76,9 +76,10 @@ async function charts(req, res, next) {
       where: {
         status: { [Op.ne]: 'cancelado' },
       },
-      attributes: ['id', 'nome', 'dataEvento', 'qtdPessoas', 'local'],
+      attributes: ['id', 'nome', 'dataEvento', 'qtdPessoas'],
       include: [
-        { model: Orcamento, as: 'orcamento', attributes: ['valorTotal'] }
+        { model: Orcamento, as: 'orcamento', attributes: ['valorTotal'] },
+        { model: Local,     as: 'local',     attributes: ['nome'] },
       ]
     });
 
@@ -111,7 +112,7 @@ async function charts(req, res, next) {
     // 3. Infra (Pie Chart - Local do Evento)
     const infraMap = {};
     eventos.forEach(e => {
-      const loc = e.local ? e.local.toLowerCase() : 'não definido';
+      const loc = e.local ? e.local.nome.toLowerCase() : 'não definido';
       infraMap[loc] = (infraMap[loc] || 0) + 1;
     });
     const infra = Object.keys(infraMap).map(k => ({

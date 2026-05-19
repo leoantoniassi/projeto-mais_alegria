@@ -2,13 +2,13 @@
 // Controller: Fornecedores
 // ============================================================
 const { Op } = require('sequelize');
-const { Fornecedor } = require('../models');
+const { Fornecedor, CategoriaFornecedor } = require('../models');
 const { gerarLinkWhatsApp } = require('../utils/whatsapp');
 
 // GET /api/fornecedores
 async function listar(req, res, next) {
   try {
-    const { page = 1, limit = 20, busca, categoria } = req.query;
+    const { page = 1, limit = 20, busca, categoriaId } = req.query;
     const offset = (page - 1) * limit;
 
     const where = {};
@@ -19,12 +19,13 @@ async function listar(req, res, next) {
         { cnpj:  { [Op.iLike]: `%${busca}%` } },
       ];
     }
-    if (categoria) {
-      where.categoria = categoria;
+    if (categoriaId) {
+      where.categoriaId = categoriaId;
     }
 
     const { count, rows } = await Fornecedor.findAndCountAll({
       where,
+      include: [{ model: CategoriaFornecedor, as: 'categoria', attributes: ['id', 'nome'] }],
       limit: parseInt(limit),
       offset: parseInt(offset),
       order: [['nome', 'ASC']],
@@ -48,7 +49,9 @@ async function listar(req, res, next) {
 // GET /api/fornecedores/:id
 async function buscarPorId(req, res, next) {
   try {
-    const fornecedor = await Fornecedor.findByPk(req.params.id);
+    const fornecedor = await Fornecedor.findByPk(req.params.id, {
+      include: [{ model: CategoriaFornecedor, as: 'categoria', attributes: ['id', 'nome'] }],
+    });
 
     if (!fornecedor) {
       return res.status(404).json({
@@ -66,21 +69,29 @@ async function buscarPorId(req, res, next) {
 // POST /api/fornecedores
 async function criar(req, res, next) {
   try {
-    const { nome, email, cnpj, telefone, categoria } = req.body;
+    const { nome, email, cnpj, telefone, categoriaId } = req.body;
 
-    if (!nome || !email || !cnpj || !telefone || !categoria) {
+    if (!nome || !email || !cnpj || !telefone || !categoriaId) {
       return res.status(400).json({
         success: false,
         message: 'Nome, email, CNPJ, telefone e categoria são obrigatórios.',
       });
     }
 
-    const fornecedor = await Fornecedor.create({ nome, email, cnpj, telefone, categoria });
+    const categoriaExiste = await CategoriaFornecedor.findByPk(categoriaId);
+    if (!categoriaExiste) {
+      return res.status(404).json({ success: false, message: 'Categoria não encontrada.' });
+    }
+
+    const fornecedor = await Fornecedor.create({ nome, email, cnpj, telefone, categoriaId });
+    const fornecedorCompleto = await Fornecedor.findByPk(fornecedor.id, {
+      include: [{ model: CategoriaFornecedor, as: 'categoria', attributes: ['id', 'nome'] }],
+    });
 
     return res.status(201).json({
       success: true,
       message: 'Fornecedor criado com sucesso!',
-      data: fornecedor,
+      data: fornecedorCompleto,
     });
   } catch (error) {
     return next(error);
@@ -98,13 +109,21 @@ async function atualizar(req, res, next) {
       });
     }
 
-    const { nome, email, cnpj, telefone, categoria } = req.body;
+    const { nome, email, cnpj, telefone, categoriaId } = req.body;
+
+    if (categoriaId) {
+      const categoriaExiste = await CategoriaFornecedor.findByPk(categoriaId);
+      if (!categoriaExiste) {
+        return res.status(404).json({ success: false, message: 'Categoria não encontrada.' });
+      }
+    }
+
     await fornecedor.update({
-      nome:      nome      || fornecedor.nome,
-      email:     email     || fornecedor.email,
-      cnpj:      cnpj      || fornecedor.cnpj,
-      telefone:  telefone  || fornecedor.telefone,
-      categoria: categoria || fornecedor.categoria,
+      nome:        nome        || fornecedor.nome,
+      email:       email       || fornecedor.email,
+      cnpj:        cnpj        || fornecedor.cnpj,
+      telefone:    telefone    || fornecedor.telefone,
+      categoriaId: categoriaId || fornecedor.categoriaId,
       atualizadoEm: new Date(),
     });
 

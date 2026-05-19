@@ -1,69 +1,80 @@
 // ============================================================
-// Model: Produto (tabela: produtos)
+// Model: Local (tabela: locais)
 // ============================================================
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
 
-const Produto = sequelize.define('Produto', {
+const Local = sequelize.define('Local', {
   id: {
     type: DataTypes.UUID,
     defaultValue: DataTypes.UUIDV4,
     primaryKey: true,
-    field: 'prd_id',
+    field: 'loc_id',
   },
   nome: {
     type: DataTypes.STRING(150),
     allowNull: false,
-    field: 'prd_nome',
+    field: 'loc_nome',
   },
-  // FK para categorias_produto
-  categoriaId: {
-    type: DataTypes.UUID,
+  logradouro: {
+    type: DataTypes.STRING(200),
     allowNull: false,
-    field: 'prd_cap_id',
+    field: 'loc_logradouro',
   },
-  quantidade: {
-    type: DataTypes.DECIMAL(10, 2),
+  numero: {
+    type: DataTypes.STRING(10),
     allowNull: false,
-    defaultValue: 0,
-    field: 'prd_quantidade',
+    field: 'loc_numero',
   },
-  estoqueMinimo: {
-    type: DataTypes.DECIMAL(10, 2),
-    allowNull: false,
-    defaultValue: 0,
-    field: 'prd_estoque_minimo',
+  complemento: {
+    type: DataTypes.STRING(100),
+    allowNull: true,
+    field: 'loc_complemento',
   },
-  unidadeMedida: {
-    type: DataTypes.STRING(30),
+  bairro: {
+    type: DataTypes.STRING(100),
     allowNull: false,
-    field: 'prd_unidade_medida',
+    field: 'loc_bairro',
   },
-  custoUnitario: {
-    type: DataTypes.DECIMAL(12, 2),
+  cidade: {
+    type: DataTypes.STRING(100),
     allowNull: false,
-    defaultValue: 0,
-    field: 'prd_custo_unitario',
+    field: 'loc_cidade',
+  },
+  estado: {
+    type: DataTypes.CHAR(2),
+    allowNull: false,
+    field: 'loc_estado',
+  },
+  cep: {
+    type: DataTypes.STRING(9),
+    allowNull: false,
+    field: 'loc_cep',
+  },
+  observacoes: {
+    type: DataTypes.TEXT,
+    allowNull: true,
+    field: 'loc_observacoes',
   },
   criadoEm: {
     type: DataTypes.DATE,
     allowNull: false,
     defaultValue: DataTypes.NOW,
-    field: 'prd_criado_em',
+    field: 'loc_criado_em',
   },
   atualizadoEm: {
     type: DataTypes.DATE,
     allowNull: false,
     defaultValue: DataTypes.NOW,
-    field: 'prd_atualizado_em',
+    field: 'loc_atualizado_em',
   },
   deletadoEm: {
     type: DataTypes.DATE,
     allowNull: true,
-    field: 'prd_deletado_em',
+    field: 'loc_deletado_em',
   },
 }, {
-  tableName: 'produtos',
+  tableName: 'locais',
   timestamps: false,
   defaultScope: {
     where: { deletadoEm: null },
@@ -73,4 +84,4 @@ const Produto = sequelize.define('Produto', {
   },
 });
 
-module.exports = Produto;
+module.exports = Local;

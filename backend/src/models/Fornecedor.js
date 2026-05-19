@@ -33,10 +33,11 @@ const Fornecedor = sequelize.define('Fornecedor', {
     allowNull: false,
     field: 'for_telefone',
   },
-  categoria: {
-    type: DataTypes.STRING(80),
+  // FK para categorias_fornecedor
+  categoriaId: {
+    type: DataTypes.UUID,
     allowNull: false,
-    field: 'for_categoria',
+    field: 'for_caf_id',
   },
   criadoEm: {
     type: DataTypes.DATE,

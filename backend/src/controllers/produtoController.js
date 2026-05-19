@@ -2,24 +2,31 @@
 // Controller: Produtos (Estoque)
 // ============================================================
 const { Op } = require('sequelize');
-const { Produto } = require('../models');
+const { Produto, CategoriaProduto } = require('../models');
 
 // GET /api/produtos
 async function listar(req, res, next) {
   try {
-    const { page = 1, limit = 20, busca, categoria } = req.query;
+    const { page = 1, limit = 20, busca, categoriaId, estoqueBaixo } = req.query;
     const offset = (page - 1) * limit;
 
     const where = {};
     if (busca) {
       where.nome = { [Op.iLike]: `%${busca}%` };
     }
-    if (categoria) {
-      where.categoria = { [Op.iLike]: `%${categoria}%` };
+    if (categoriaId) {
+      where.categoriaId = categoriaId;
+    }
+    // Filtra apenas itens com estoque abaixo do mínimo
+    if (estoqueBaixo === 'true') {
+      where[Op.and] = [
+        Op.where(Op.col('prd_quantidade'), Op.lte, Op.col('prd_estoque_minimo'))
+      ];
     }
 
     const { count, rows } = await Produto.findAndCountAll({
       where,
+      include: [{ model: CategoriaProduto, as: 'categoria', attributes: ['id', 'nome'] }],
       limit: parseInt(limit),
       offset: parseInt(offset),
       order: [['nome', 'ASC']],
@@ -43,7 +50,9 @@ async function listar(req, res, next) {
 // GET /api/produtos/:id
 async function buscarPorId(req, res, next) {
   try {
-    const produto = await Produto.findByPk(req.params.id);
+    const produto = await Produto.findByPk(req.params.id, {
+      include: [{ model: CategoriaProduto, as: 'categoria', attributes: ['id', 'nome'] }],
+    });
     if (!produto) {
       return res.status(404).json({
         success: false,
@@ -60,27 +69,37 @@ async function buscarPorId(req, res, next) {
 // POST /api/produtos
 async function criar(req, res, next) {
   try {
-    const { nome, categoria, quantidade, unidadeMedida, custoUnitario } = req.body;
+    const { nome, categoriaId, quantidade, estoqueMinimo, unidadeMedida, custoUnitario } = req.body;
 
-    if (!nome || !categoria || !unidadeMedida) {
+    if (!nome || !categoriaId || !unidadeMedida) {
       return res.status(400).json({
         success: false,
         message: 'Nome, categoria e unidade de medida são obrigatórios.',
       });
     }
 
+    const categoriaExiste = await CategoriaProduto.findByPk(categoriaId);
+    if (!categoriaExiste) {
+      return res.status(404).json({ success: false, message: 'Categoria não encontrada.' });
+    }
+
     const produto = await Produto.create({
       nome,
-      categoria,
-      quantidade: quantidade || 0,
+      categoriaId,
+      quantidade:     quantidade     ?? 0,
+      estoqueMinimo:  estoqueMinimo  ?? 0,
       unidadeMedida,
-      custoUnitario: custoUnitario || 0,
+      custoUnitario:  custoUnitario  ?? 0,
+    });
+
+    const produtoCompleto = await Produto.findByPk(produto.id, {
+      include: [{ model: CategoriaProduto, as: 'categoria', attributes: ['id', 'nome'] }],
     });
 
     return res.status(201).json({
       success: true,
       message: 'Produto criado com sucesso!',
-      data: produto,
+      data: produtoCompleto,
     });
   } catch (error) {
     return next(error);
@@ -98,11 +117,20 @@ async function atualizar(req, res, next) {
       });
     }
 
-    const { nome, categoria, quantidade, unidadeMedida, custoUnitario } = req.body;
+    const { nome, categoriaId, quantidade, estoqueMinimo, unidadeMedida, custoUnitario } = req.body;
+
+    if (categoriaId) {
+      const categoriaExiste = await CategoriaProduto.findByPk(categoriaId);
+      if (!categoriaExiste) {
+        return res.status(404).json({ success: false, message: 'Categoria não encontrada.' });
+      }
+    }
+
     await produto.update({
-      nome: nome || produto.nome,
-      categoria: categoria || produto.categoria,
-      quantidade: quantidade !== undefined ? quantidade : produto.quantidade,
+      nome:          nome          || produto.nome,
+      categoriaId:   categoriaId   || produto.categoriaId,
+      quantidade:    quantidade    !== undefined ? quantidade    : produto.quantidade,
+      estoqueMinimo: estoqueMinimo !== undefined ? estoqueMinimo : produto.estoqueMinimo,
       unidadeMedida: unidadeMedida || produto.unidadeMedida,
       custoUnitario: custoUnitario !== undefined ? custoUnitario : produto.custoUnitario,
       atualizadoEm: new Date(),

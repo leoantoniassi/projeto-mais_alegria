@@ -18,6 +18,12 @@ const Orcamento = sequelize.define(
       allowNull: false,
       field: "orc_cli_id",
     },
+    // FK para locais
+    localId: {
+      type: DataTypes.UUID,
+      allowNull: true,
+      field: "orc_loc_id",
+    },
     valorTotal: {
       type: DataTypes.DECIMAL(12, 2),
       allowNull: false,
@@ -37,11 +43,6 @@ const Orcamento = sequelize.define(
       validate: {
         isIn: [["pendente", "aprovado", "reprovado"]],
       },
-    },
-    local: {
-      type: DataTypes.STRING(255),
-      allowNull: true,
-      field: "orc_local",
     },
     observacoes: {
       type: DataTypes.TEXT,

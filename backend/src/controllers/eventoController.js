@@ -5,18 +5,21 @@ const { Op } = require("sequelize");
 const {
   Evento,
   Cliente,
+  Local,
   Orcamento,
   Funcionario,
+  Funcao,
   Escala,
   EventoProduto,
   Produto,
+  CategoriaProduto,
   Documento,
 } = require("../models");
 
 // GET /api/eventos
 async function listar(req, res, next) {
   try {
-    // Auto-concluir eventos cuja data já passou (apenas no dia seguinte)
+    // Auto-concluir eventos cuja data já passou
     const hoje = new Date();
     hoje.setHours(0, 0, 0, 0);
     await Evento.update(
@@ -30,25 +33,25 @@ async function listar(req, res, next) {
       }
     );
 
-    const { page = 1, limit = 20, status, local, incluirConcluidos } = req.query;
+    const { page = 1, limit = 20, status, localId, incluirConcluidos } = req.query;
     const offset = (page - 1) * limit;
 
     const where = { deletadoEm: null };
     if (status) {
       where.status = status;
     } else if (incluirConcluidos !== 'true') {
-      // Por padrão, oculta eventos concluídos
       where.status = { [Op.ne]: 'concluido' };
     }
-
-    // Lógica do Filtro de Local
-    if (local) {
-      where.local = { [Op.iLike]: local };
+    if (localId) {
+      where.localId = localId;
     }
 
     const { count, rows } = await Evento.findAndCountAll({
       where,
-      include: [{ model: Cliente, as: "cliente", attributes: ["id", "nome"] }],
+      include: [
+        { model: Cliente, as: "cliente", attributes: ["id", "nome"] },
+        { model: Local,   as: "local",   attributes: ["id", "nome", "cidade", "estado"] },
+      ],
       limit: parseInt(limit),
       offset: parseInt(offset),
       order: [["dataEvento", "ASC"]],
@@ -79,16 +82,20 @@ async function buscarPorId(req, res, next) {
           as: "cliente",
           attributes: ["id", "nome", "email", "telefone"],
         },
+        {
+          model: Local,
+          as: "local",
+        },
         { model: Orcamento, as: "orcamento" },
         {
           model: Escala,
           as: "escala",
-          include: [{ model: Funcionario, as: "funcionario" }],
+          include: [{ model: Funcionario, as: "funcionario", include: [{ model: Funcao, as: 'funcao' }] }],
         },
         {
           model: EventoProduto,
           as: "eventoProdutos",
-          include: [{ model: Produto, as: "produto" }],
+          include: [{ model: Produto, as: "produto", include: [{ model: CategoriaProduto, as: 'categoria' }] }],
         },
         { model: Documento, as: "documentos" },
       ],
@@ -113,9 +120,9 @@ async function criar(req, res, next) {
     const {
       clienteId,
       orcamentoId,
+      localId,
       nome,
       dataEvento,
-      local,
       status,
       qtdPessoas,
       qtdAdultos,
@@ -124,7 +131,6 @@ async function criar(req, res, next) {
       observacoes,
     } = req.body;
 
-    // Aceita valor de orçamento digitado pelo usuário
     let { orcamento: orcamentoValor } = req.body;
 
     if (!clienteId || !nome || !dataEvento) {
@@ -134,7 +140,6 @@ async function criar(req, res, next) {
       });
     }
 
-    // Verifica se cliente existe
     const cliente = await Cliente.findByPk(clienteId);
     if (!cliente) {
       return res.status(404).json({
@@ -143,7 +148,13 @@ async function criar(req, res, next) {
       });
     }
 
-    // Se veio de um orçamento, pega o valorTotal automaticamente
+    if (localId) {
+      const localExiste = await Local.findByPk(localId);
+      if (!localExiste) {
+        return res.status(404).json({ success: false, message: "Local não encontrado." });
+      }
+    }
+
     if (orcamentoId) {
       const orcObj = await Orcamento.findByPk(orcamentoId);
       if (orcObj) {
@@ -156,8 +167,7 @@ async function criar(req, res, next) {
       if (!orcamentoId) {
         return res.status(400).json({
           success: false,
-          message:
-            "Um evento confirmado precisa de um orçamento aprovado associado.",
+          message: "Um evento confirmado precisa de um orçamento aprovado associado.",
         });
       }
       const orcamento = await Orcamento.findByPk(orcamentoId);
@@ -174,8 +184,7 @@ async function criar(req, res, next) {
       if (!qtdAdultos && !qtdCriancas && !qtdBebes) {
         return res.status(400).json({
           success: false,
-          message:
-            "Para eventos com mais de 50 pessoas, é obrigatório informar a quantidade de adultos, crianças e bebês.",
+          message: "Para eventos com mais de 50 pessoas, é obrigatório informar a quantidade de adultos, crianças e bebês.",
         });
       }
     }
@@ -183,9 +192,9 @@ async function criar(req, res, next) {
     const evento = await Evento.create({
       clienteId,
       orcamentoId: orcamentoId || null,
+      localId:     localId     || null,
       nome,
       dataEvento,
-      local,
       status: status || "pendente",
       qtdPessoas,
       qtdAdultos,
@@ -219,9 +228,9 @@ async function atualizar(req, res, next) {
     const {
       clienteId,
       orcamentoId,
+      localId,
       nome,
       dataEvento,
-      local,
       qtdPessoas,
       qtdAdultos,
       qtdCriancas,
@@ -231,7 +240,13 @@ async function atualizar(req, res, next) {
 
     let { orcamento: orcamentoValor } = req.body;
 
-    // Se veio de um orçamento, pega o valorTotal automaticamente
+    if (localId !== undefined && localId !== null) {
+      const localExiste = await Local.findByPk(localId);
+      if (!localExiste) {
+        return res.status(404).json({ success: false, message: "Local não encontrado." });
+      }
+    }
+
     const novoOrcamentoId = orcamentoId ? orcamentoId : orcamentoId === "" ? null : evento.orcamentoId;
     if (orcamentoId && orcamentoId !== evento.orcamentoId) {
       const orcObj = await Orcamento.findByPk(orcamentoId);
@@ -241,35 +256,31 @@ async function atualizar(req, res, next) {
     }
 
     // RN4: Controle de público > 50
-    const novaPessoas =
-      qtdPessoas !== undefined ? qtdPessoas : evento.qtdPessoas;
+    const novaPessoas = qtdPessoas !== undefined ? qtdPessoas : evento.qtdPessoas;
     if (novaPessoas && novaPessoas > 50) {
-      const novoAdultos =
-        qtdAdultos !== undefined ? qtdAdultos : evento.qtdAdultos;
-      const novoCriancas =
-        qtdCriancas !== undefined ? qtdCriancas : evento.qtdCriancas;
-      const novoBebes = qtdBebes !== undefined ? qtdBebes : evento.qtdBebes;
+      const novoAdultos  = qtdAdultos  !== undefined ? qtdAdultos  : evento.qtdAdultos;
+      const novoCriancas = qtdCriancas !== undefined ? qtdCriancas : evento.qtdCriancas;
+      const novoBebes    = qtdBebes    !== undefined ? qtdBebes    : evento.qtdBebes;
       if (!novoAdultos && !novoCriancas && !novoBebes) {
         return res.status(400).json({
           success: false,
-          message:
-            "Para eventos com mais de 50 pessoas, é obrigatório informar a quantidade de adultos, crianças e bebês.",
+          message: "Para eventos com mais de 50 pessoas, é obrigatório informar a quantidade de adultos, crianças e bebês.",
         });
       }
     }
 
     await evento.update({
-      clienteId: clienteId || evento.clienteId,
-      orcamentoId: novoOrcamentoId,
-      nome: nome || evento.nome,
-      dataEvento: dataEvento || evento.dataEvento,
-      local: local !== undefined ? local : evento.local,
-      qtdPessoas: qtdPessoas !== undefined ? qtdPessoas : evento.qtdPessoas,
-      qtdAdultos: qtdAdultos !== undefined ? qtdAdultos : evento.qtdAdultos,
-      qtdCriancas: qtdCriancas !== undefined ? qtdCriancas : evento.qtdCriancas,
-      qtdBebes: qtdBebes !== undefined ? qtdBebes : evento.qtdBebes,
+      clienteId:     clienteId     || evento.clienteId,
+      orcamentoId:   novoOrcamentoId,
+      localId:       localId       !== undefined ? localId       : evento.localId,
+      nome:          nome          || evento.nome,
+      dataEvento:    dataEvento    || evento.dataEvento,
+      qtdPessoas:    qtdPessoas    !== undefined ? qtdPessoas    : evento.qtdPessoas,
+      qtdAdultos:    qtdAdultos    !== undefined ? qtdAdultos    : evento.qtdAdultos,
+      qtdCriancas:   qtdCriancas   !== undefined ? qtdCriancas   : evento.qtdCriancas,
+      qtdBebes:      qtdBebes      !== undefined ? qtdBebes      : evento.qtdBebes,
       valorOrcamento: orcamentoValor !== undefined ? orcamentoValor : evento.valorOrcamento,
-      observacoes: observacoes !== undefined ? observacoes : evento.observacoes,
+      observacoes:   observacoes   !== undefined ? observacoes   : evento.observacoes,
       atualizadoEm: new Date(),
     });
 
@@ -295,13 +306,10 @@ async function mudarStatus(req, res, next) {
     }
 
     const { status } = req.body;
-    if (
-      !["pendente", "confirmado", "concluido", "cancelado"].includes(status)
-    ) {
+    if (!["pendente", "confirmado", "concluido", "cancelado"].includes(status)) {
       return res.status(400).json({
         success: false,
-        message:
-          "Status inválido. Use: pendente, confirmado, concluido ou cancelado.",
+        message: "Status inválido. Use: pendente, confirmado, concluido ou cancelado.",
       });
     }
 
@@ -309,8 +317,7 @@ async function mudarStatus(req, res, next) {
     if (status === "confirmado" && !evento.orcamentoId) {
       return res.status(400).json({
         success: false,
-        message:
-          "Para confirmar o evento, é necessário um orçamento aprovado associado.",
+        message: "Para confirmar o evento, é necessário um orçamento aprovado associado.",
       });
     }
 
