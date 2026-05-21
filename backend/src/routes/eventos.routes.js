@@ -14,5 +14,7 @@ router.post('/', controller.criar);
 router.put('/:id', controller.atualizar);
 router.patch('/:id/status', authorize('gerente'), controller.mudarStatus);
 router.delete('/:id', authorize('gerente'), controller.remover);
+router.get('/:id/whatsapp', controller.whatsapp);
+
 
 module.exports = router;

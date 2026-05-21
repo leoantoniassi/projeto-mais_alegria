@@ -3,6 +3,7 @@
 // ============================================================
 const { Op } = require('sequelize');
 const { Funcionario, Funcao } = require('../models');
+const { gerarLinkWhatsApp } = require('../utils/whatsapp');
 
 // GET /api/funcionarios
 async function listar(req, res, next) {
@@ -155,4 +156,36 @@ async function remover(req, res, next) {
   }
 }
 
-module.exports = { listar, buscarPorId, criar, atualizar, remover };
+// GET /api/funcionarios/:id/whatsapp
+async function whatsapp(req, res, next) {
+  try {
+    const funcionario = await Funcionario.findByPk(req.params.id);
+    if (!funcionario) {
+      return res.status(404).json({
+        success: false,
+        message: 'Funcionário não encontrado.',
+      });
+    }
+
+    if (!funcionario.telefone) {
+      return res.status(400).json({
+        success: false,
+        message: 'Funcionário não possui telefone cadastrado.',
+      });
+    }
+
+    const link = gerarLinkWhatsApp(
+      funcionario.telefone,
+      `Olá ${funcionario.nome}, aqui é a equipe Mais Alegria.`
+    );
+
+    return res.json({
+      success: true,
+      data: { link, telefone: funcionario.telefone },
+    });
+  } catch (error) {
+    return next(error);
+  }
+}
+
+module.exports = { listar, buscarPorId, criar, atualizar, remover, whatsapp };

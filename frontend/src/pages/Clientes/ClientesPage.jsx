@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import api from '../../services/api';
 import { useAuth } from '../../contexts/AuthContext';
 import { useConfirm } from '../../contexts/ConfirmContext';
+import { validarCpfCnpj } from '../../utils/validators';
 
 export default function ClientesPage() {
   const { user } = useAuth();
@@ -33,6 +34,12 @@ export default function ClientesPage() {
 
   const handleSave = async (e) => {
     e.preventDefault();
+    
+    if (!validarCpfCnpj(form.rgCpf)) {
+      alert('CPF ou CNPJ inválido!');
+      return;
+    }
+
     try {
       if (editing) {
         await api.put(`/clientes/${editing}`, form);

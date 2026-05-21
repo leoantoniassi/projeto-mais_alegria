@@ -97,6 +97,15 @@ export default function EventosPage() {
     }
   };
 
+  const handleWhatsApp = async (id) => {
+    try {
+      const { data: res } = await api.get(`/eventos/${id}/whatsapp`);
+      window.open(res.data?.link || res.url, '_blank');
+    } catch (err) {
+      alert('Erro ao abrir o WhatsApp');
+    }
+  };
+
   const statusBadge = (s) => {
     const m = {
       confirmado: "bg-secondary-container text-on-secondary-container",
@@ -244,6 +253,16 @@ export default function EventosPage() {
                     </td>
                     <td className="py-4 px-4 text-right">
                       <div className="flex justify-end gap-1">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleWhatsApp(evt.id);
+                          }}
+                          className="w-8 h-8 rounded-full bg-secondary text-on-secondary flex items-center justify-center hover:scale-110 transition-all shadow-md shadow-secondary/20 mr-1"
+                          title="WhatsApp"
+                        >
+                          <span className="material-symbols-outlined text-sm filled">chat</span>
+                        </button>
                         <button
                           onClick={(e) => {
                             e.stopPropagation();

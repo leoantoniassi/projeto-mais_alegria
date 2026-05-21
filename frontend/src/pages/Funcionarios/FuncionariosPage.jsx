@@ -46,6 +46,16 @@ export default function FuncionariosPage() {
 
   const handleEdit = (f) => { setForm({ nome: f.nome, email: f.email, telefone: f.telefone, funcaoId: f.funcaoId || f.funcao?.id || '' }); setEditing(f.id); setShowPanel(true); };
   const handleDelete = async (id) => { if (!(await confirm('Excluir funcionário?'))) return; try { await api.delete(`/funcionarios/${id}`); fetchData(); } catch (err) { alert(err.response?.data?.message || 'Erro'); } };
+  
+  const handleWhatsApp = async (id) => {
+    try {
+      const { data: res } = await api.get(`/funcionarios/${id}/whatsapp`);
+      window.open(res.data?.link || res.url, '_blank');
+    } catch (err) {
+      alert('Erro ao abrir o WhatsApp');
+    }
+  };
+
   const initials = (n) => (n || 'NA').split(' ').map(x => x[0]).join('').slice(0, 2).toUpperCase();
 
   const funcaoColor = (f) => {
@@ -106,10 +116,15 @@ export default function FuncionariosPage() {
                       <td className="px-6 py-5"><p className="text-sm font-medium text-on-surface">{f.email}</p><p className="text-xs text-on-surface-variant">{f.telefone}</p></td>
                       <td className="px-6 py-5"><span className={`px-3 py-1 ${funcaoColor(f.funcao?.nome)} text-xs font-bold rounded-full uppercase tracking-tight`}>{f.funcao?.nome || '—'}</span></td>
                       <td className="px-6 py-5 text-right">
-                        <button onClick={() => handleEdit(f)} className="p-2 text-on-surface-variant hover:text-tertiary transition-colors"><span className="material-symbols-outlined">edit</span></button>
-                        {user?.role !== 'operador' && (
-                          <button onClick={() => handleDelete(f.id)} className="p-2 text-on-surface-variant hover:text-error transition-colors"><span className="material-symbols-outlined">delete</span></button>
-                        )}
+                        <div className="flex justify-end gap-1">
+                          <button onClick={() => handleWhatsApp(f.id)} className="p-2 text-secondary hover:bg-secondary/10 rounded-full transition-colors" title="WhatsApp">
+                            <span className="material-symbols-outlined text-sm filled">chat</span>
+                          </button>
+                          <button onClick={() => handleEdit(f)} className="p-2 text-on-surface-variant hover:text-tertiary transition-colors"><span className="material-symbols-outlined">edit</span></button>
+                          {user?.role !== 'operador' && (
+                            <button onClick={() => handleDelete(f.id)} className="p-2 text-on-surface-variant hover:text-error transition-colors"><span className="material-symbols-outlined">delete</span></button>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   ))}

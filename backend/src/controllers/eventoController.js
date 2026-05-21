@@ -15,6 +15,7 @@ const {
   CategoriaProduto,
   Documento,
 } = require("../models");
+const { gerarLinkWhatsApp } = require('../utils/whatsapp');
 
 // GET /api/eventos
 async function listar(req, res, next) {
@@ -365,6 +366,41 @@ async function remover(req, res, next) {
   }
 }
 
+// GET /api/eventos/:id/whatsapp
+async function whatsapp(req, res, next) {
+  try {
+    const evento = await Evento.findByPk(req.params.id, {
+      include: [{ model: Cliente, as: 'cliente' }]
+    });
+
+    if (!evento) {
+      return res.status(404).json({
+        success: false,
+        message: 'Evento não encontrado.',
+      });
+    }
+
+    if (!evento.cliente || !evento.cliente.telefone) {
+      return res.status(400).json({
+        success: false,
+        message: 'Cliente do evento não possui telefone cadastrado.',
+      });
+    }
+
+    const link = gerarLinkWhatsApp(
+      evento.cliente.telefone,
+      `Olá ${evento.cliente.nome}, aqui é a equipe Mais Alegria falando sobre o evento "${evento.nome}".`
+    );
+
+    return res.json({
+      success: true,
+      data: { link, telefone: evento.cliente.telefone },
+    });
+  } catch (error) {
+    return next(error);
+  }
+}
+
 module.exports = {
   listar,
   buscarPorId,
@@ -372,4 +408,5 @@ module.exports = {
   atualizar,
   mudarStatus,
   remover,
+  whatsapp,
 };

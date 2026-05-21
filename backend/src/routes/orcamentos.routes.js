@@ -16,5 +16,7 @@ router.patch('/:id/status', authorize('gerente'), controller.mudarStatus);
 router.post('/:id/confirmar', authorize('gerente'), controller.confirmarOrcamento);
 router.post('/:id/rejeitar', authorize('gerente'), controller.rejeitarOrcamento);
 router.delete('/:id', authorize('gerente'), controller.remover);
+router.get('/:id/whatsapp', controller.whatsapp);
+
 
 module.exports = router;

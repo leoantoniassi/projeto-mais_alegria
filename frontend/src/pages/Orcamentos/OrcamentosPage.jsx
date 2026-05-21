@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import api from '../../services/api';
 import { useAuth } from '../../contexts/AuthContext';
 import { useConfirm } from '../../contexts/ConfirmContext';
+import { formatCurrency } from '../../utils/formatters';
 
 export default function OrcamentosPage() {
   const { user } = useAuth();
@@ -78,6 +79,15 @@ export default function OrcamentosPage() {
     }
   };
 
+  const handleWhatsApp = async (id) => {
+    try {
+      const { data: res } = await api.get(`/orcamentos/${id}/whatsapp`);
+      window.open(res.data?.link || res.url, '_blank');
+    } catch (err) {
+      alert('Erro ao abrir o WhatsApp');
+    }
+  };
+
   const statusBadge = (s) => {
     const m = { aprovado: 'bg-secondary-container text-on-secondary-container', pendente: 'bg-primary-container text-on-primary-container', rejeitado: 'bg-error-container text-on-error-container', reprovado: 'bg-error-container text-on-error-container' };
     return m[s] || 'bg-surface-container text-on-surface-variant';
@@ -138,10 +148,13 @@ export default function OrcamentosPage() {
                     <td className="py-4 px-4 font-semibold text-sm">{o.cliente?.nome || o.Cliente?.nome || '—'}</td>
                     <td className="py-4 px-4 text-sm capitalize">{o.local?.nome || o.local || '—'}</td>
                     <td className="py-4 px-4 text-sm opacity-80">{formatDate(o.dataValidade)}</td>
-                    <td className="py-4 px-4 font-bold text-sm">R$ {Number(o.valorTotal).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td>
+                    <td className="py-4 px-4 font-bold text-sm">{formatCurrency(o.valorTotal)}</td>
                     <td className="py-4 px-4"><span className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium ${statusBadge(o.status)}`}>{o.status}</span></td>
                     <td className="py-4 px-4 text-right">
                       <div className="flex justify-end gap-1">
+                        <button onClick={(e) => { e.stopPropagation(); handleWhatsApp(o.id); }} className="w-8 h-8 rounded-full bg-secondary text-on-secondary flex items-center justify-center hover:scale-110 transition-all shadow-md shadow-secondary/20 mr-1" title="WhatsApp">
+                          <span className="material-symbols-outlined text-sm filled">chat</span>
+                        </button>
                         {o.status === 'pendente' && <><button onClick={e => { e.stopPropagation(); handleConfirm(o.id); }} className="p-1.5 text-secondary hover:bg-secondary/10 rounded-full" title="Aprovar e Confirmar"><span className="material-symbols-outlined text-lg">check</span></button><button onClick={e => { e.stopPropagation(); handleReject(o.id); }} className="p-1.5 text-error hover:bg-error/10 rounded-full" title="Rejeitar"><span className="material-symbols-outlined text-lg">close</span></button></>}
                         {user?.role !== 'operador' && (
                           <>
@@ -183,7 +196,7 @@ export default function OrcamentosPage() {
                 <p className="text-sm opacity-80 mb-6">{selected.Cliente?.nome || selected.cliente?.nome || 'Cliente'}</p>
                 <div className="space-y-4">
                   <div className="flex justify-between text-sm border-b border-white/10 pb-2"><span>Local</span><span className="font-bold capitalize">{selected.local?.nome || selected.local || '—'}</span></div>
-                  <div className="flex justify-between text-sm border-b border-white/10 pb-2"><span>Valor Total</span><span className="font-bold text-primary">R$ {Number(selected.valorTotal).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span></div>
+                  <div className="flex justify-between text-sm border-b border-white/10 pb-2"><span>Valor Total</span><span className="font-bold text-primary">{formatCurrency(selected.valorTotal)}</span></div>
                   <div className="flex justify-between text-sm border-b border-white/10 pb-2"><span>Validade</span><span className="font-bold">{formatDate(selected.dataValidade)}</span></div>
                   <div className="flex justify-between text-sm"><span>Status</span><span className="font-bold uppercase">{selected.status}</span></div>
                 </div>

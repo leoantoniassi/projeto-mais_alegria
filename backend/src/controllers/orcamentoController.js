@@ -11,6 +11,7 @@ const {
   CategoriaProduto,
   Evento,
 } = require("../models");
+const { gerarLinkWhatsApp } = require('../utils/whatsapp');
 
 // GET /api/orcamentos
 async function listar(req, res, next) {
@@ -334,6 +335,41 @@ async function rejeitarOrcamento(req, res, next) {
   }
 }
 
+// GET /api/orcamentos/:id/whatsapp
+async function whatsapp(req, res, next) {
+  try {
+    const orcamento = await Orcamento.findByPk(req.params.id, {
+      include: [{ model: Cliente, as: 'cliente' }]
+    });
+
+    if (!orcamento) {
+      return res.status(404).json({
+        success: false,
+        message: 'Orçamento não encontrado.',
+      });
+    }
+
+    if (!orcamento.cliente || !orcamento.cliente.telefone) {
+      return res.status(400).json({
+        success: false,
+        message: 'Cliente do orçamento não possui telefone cadastrado.',
+      });
+    }
+
+    const link = gerarLinkWhatsApp(
+      orcamento.cliente.telefone,
+      `Olá ${orcamento.cliente.nome}, aqui é a equipe Mais Alegria falando sobre o seu orçamento.`
+    );
+
+    return res.json({
+      success: true,
+      data: { link, telefone: orcamento.cliente.telefone },
+    });
+  } catch (error) {
+    return next(error);
+  }
+}
+
 module.exports = {
   listar,
   buscarPorId,
@@ -343,4 +379,5 @@ module.exports = {
   remover,
   confirmarOrcamento,
   rejeitarOrcamento,
+  whatsapp,
 };
