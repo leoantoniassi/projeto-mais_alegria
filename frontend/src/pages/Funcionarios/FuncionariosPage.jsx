@@ -12,7 +12,17 @@ export default function FuncionariosPage() {
   const [search, setSearch] = useState('');
   const [showPanel, setShowPanel] = useState(false);
   const [editing, setEditing] = useState(null);
-  const [form, setForm] = useState({ nome: '', email: '', telefone: '', funcao: '' });
+  const [form, setForm] = useState({ nome: '', email: '', telefone: '', funcaoId: '' });
+  const [funcoes, setFuncoes] = useState([]);
+
+  useEffect(() => {
+    api.get('/lookup/funcoes')
+      .then(r => {
+        const items = Array.isArray(r.data.data) ? r.data.data : [];
+        setFuncoes(items);
+      })
+      .catch(() => {});
+  }, []);
 
   const fetchData = async () => {
     try {
@@ -30,11 +40,11 @@ export default function FuncionariosPage() {
     try {
       if (editing) await api.put(`/funcionarios/${editing}`, form);
       else await api.post('/funcionarios', form);
-      setShowPanel(false); setEditing(null); setForm({ nome: '', email: '', telefone: '', funcao: '' }); fetchData();
+      setShowPanel(false); setEditing(null); setForm({ nome: '', email: '', telefone: '', funcaoId: '' }); fetchData();
     } catch (err) { alert(err.response?.data?.message || 'Erro ao salvar'); }
   };
 
-  const handleEdit = (f) => { setForm({ nome: f.nome, email: f.email, telefone: f.telefone, funcao: f.funcao }); setEditing(f.id); setShowPanel(true); };
+  const handleEdit = (f) => { setForm({ nome: f.nome, email: f.email, telefone: f.telefone, funcaoId: f.funcaoId || f.funcao?.id || '' }); setEditing(f.id); setShowPanel(true); };
   const handleDelete = async (id) => { if (!(await confirm('Excluir funcionário?'))) return; try { await api.delete(`/funcionarios/${id}`); fetchData(); } catch (err) { alert(err.response?.data?.message || 'Erro'); } };
   const initials = (n) => (n || 'NA').split(' ').map(x => x[0]).join('').slice(0, 2).toUpperCase();
 
@@ -50,7 +60,7 @@ export default function FuncionariosPage() {
           <h2 className="text-4xl font-extrabold text-on-surface tracking-tight font-headline">Colaboradores</h2>
           <p className="text-on-surface-variant font-medium">Gerencie sua equipe de festas e eventos.</p>
         </div>
-        <button onClick={() => { setEditing(null); setForm({ nome: '', email: '', telefone: '', funcao: '' }); setShowPanel(true); }} className="inline-flex items-center gap-2 px-8 py-4 bg-primary text-on-primary rounded-full font-bold shadow-lg shadow-primary/30 hover:scale-[1.02] active:scale-[0.98] transition-all">
+        <button onClick={() => { setEditing(null); setForm({ nome: '', email: '', telefone: '', funcaoId: '' }); setShowPanel(true); }} className="inline-flex items-center gap-2 px-8 py-4 bg-primary text-on-primary rounded-full font-bold shadow-lg shadow-primary/30 hover:scale-[1.02] active:scale-[0.98] transition-all">
           <span className="material-symbols-outlined">person_add</span> Novo Colaborador
         </button>
       </div>
@@ -94,7 +104,7 @@ export default function FuncionariosPage() {
                         </div>
                       </td>
                       <td className="px-6 py-5"><p className="text-sm font-medium text-on-surface">{f.email}</p><p className="text-xs text-on-surface-variant">{f.telefone}</p></td>
-                      <td className="px-6 py-5"><span className={`px-3 py-1 ${funcaoColor(f.funcao)} text-xs font-bold rounded-full uppercase tracking-tight`}>{f.funcao}</span></td>
+                      <td className="px-6 py-5"><span className={`px-3 py-1 ${funcaoColor(f.funcao?.nome)} text-xs font-bold rounded-full uppercase tracking-tight`}>{f.funcao?.nome || '—'}</span></td>
                       <td className="px-6 py-5 text-right">
                         <button onClick={() => handleEdit(f)} className="p-2 text-on-surface-variant hover:text-tertiary transition-colors"><span className="material-symbols-outlined">edit</span></button>
                         {user?.role !== 'operador' && (
@@ -130,13 +140,9 @@ export default function FuncionariosPage() {
                 <div className="space-y-2"><label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-4">Email</label><input type="email" className="w-full bg-surface-container-low border-none rounded-full py-3.5 px-6 focus:ring-2 focus:ring-primary" value={form.email} onChange={e => setForm({...form, email: e.target.value})} required /></div>
                 <div className="space-y-2"><label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-4">Telefone</label><input className="w-full bg-surface-container-low border-none rounded-full py-3.5 px-6 focus:ring-2 focus:ring-primary" value={form.telefone} onChange={e => setForm({...form, telefone: e.target.value})} required /></div>
                 <div className="space-y-2"><label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-4">Função</label>
-                  <select className="w-full bg-surface-container-low border-none rounded-full py-3.5 px-6 focus:ring-2 focus:ring-primary" value={form.funcao} onChange={e => setForm({...form, funcao: e.target.value})} required>
+                  <select className="w-full bg-surface-container-low border-none rounded-full py-3.5 px-6 focus:ring-2 focus:ring-primary" value={form.funcaoId} onChange={e => setForm({...form, funcaoId: e.target.value})} required>
                     <option value="">Selecione...</option>
-                    <option value="Recreador">Recreador</option>
-                    <option value="Garçom">Garçom</option>
-                    <option value="Cozinheiro">Cozinheiro</option>
-                    <option value="Segurança">Segurança</option>
-                    <option value="Decorador">Decorador</option>
+                    {funcoes.map(fn => <option key={fn.id} value={fn.id}>{fn.nome}</option>)}
                   </select>
                 </div>
               </form>

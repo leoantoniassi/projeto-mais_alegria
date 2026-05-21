@@ -11,6 +11,7 @@ export default function EventosPage() {
   const [page, setPage] = useState(1);
   const [clientes, setClientes] = useState([]);
   const [orcamentos, setOrcamentos] = useState([]);
+  const [locais, setLocais] = useState([]);
   const [showPanel, setShowPanel] = useState(false);
   const [editing, setEditing] = useState(null);
   const [selectedEvento, setSelectedEvento] = useState(null);
@@ -21,7 +22,7 @@ export default function EventosPage() {
   const [form, setForm] = useState({
     nome: "",
     dataEvento: "",
-    local: "",
+    localId: "",
     clienteId: "",
     orcamentoId: "",
     orcamento: "",
@@ -35,7 +36,7 @@ export default function EventosPage() {
   const fetchData = async () => {
     try {
       const params = { page, limit: 10 };
-      if (filtroLocal) params.local = filtroLocal;
+      if (filtroLocal) params.localId = filtroLocal;
       if (mostrarConcluidos) params.incluirConcluidos = "true";
 
       const { data: res } = await api.get("/eventos", { params });
@@ -62,6 +63,13 @@ export default function EventosPage() {
       .then((r) => {
         const items = Array.isArray(r.data.data) ? r.data.data : [];
         setOrcamentos(items);
+      })
+      .catch(() => {});
+    api
+      .get("/locais?limit=100")
+      .then((r) => {
+        const items = Array.isArray(r.data.data) ? r.data.data : [];
+        setLocais(items);
       })
       .catch(() => {});
   }, []);
@@ -147,7 +155,7 @@ export default function EventosPage() {
             setForm({
               nome: "",
               dataEvento: "",
-              local: "",
+              localId: "",
               clienteId: "",
               orcamentoId: "",
               orcamento: "",
@@ -189,9 +197,7 @@ export default function EventosPage() {
                 onChange={(e) => setFiltroLocal(e.target.value)}
               >
                 <option value="">Todos os locais</option>
-                <option value="salão 1">Salão 1</option>
-                <option value="salão 2">Salão 2</option>
-                <option value="externo">Externo</option>
+                {locais.map(loc => <option key={loc.id} value={loc.id}>{loc.nome}</option>)}
               </select>
             </div>
           </div>
@@ -229,7 +235,7 @@ export default function EventosPage() {
                         {formatTime(evt.dataEvento)}
                       </span>
                     </td>
-                    <td className="py-4 px-4 text-sm capitalize">{evt.local || "—"}</td>
+                    <td className="py-4 px-4 text-sm capitalize">{evt.local?.nome || evt.local || "—"}</td>
                     <td className="py-4 px-4 text-sm">{evt.cliente?.nome || evt.Cliente?.nome || "—"}</td>
                     <td className="py-4 px-4">
                       <span className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium ${statusBadge(evt.status)}`}>
@@ -252,7 +258,7 @@ export default function EventosPage() {
                                     .toISOString()
                                     .slice(0, 16)
                                 : "",
-                              local: evt.local || "",
+                              localId: evt.localId || evt.local?.id || "",
                               clienteId: evt.clienteId || "",
                               orcamentoId: evt.orcamentoId || "",
                               orcamento: evt.valorOrcamento || "",
@@ -300,7 +306,7 @@ export default function EventosPage() {
                 <div className="space-y-4">
                   <div className="flex justify-between text-sm border-b border-white/10 pb-2">
                     <span>Local</span>
-                    <span className="font-bold capitalize">{selectedEvento.local || "—"}</span>
+                    <span className="font-bold capitalize">{selectedEvento.local?.nome || selectedEvento.local || "—"}</span>
                   </div>
                   <div className="flex justify-between text-sm border-b border-white/10 pb-2">
                     <span>Data</span>
@@ -369,11 +375,9 @@ export default function EventosPage() {
                   {/* Seleção de Local */}
                   <div className="space-y-2">
                     <label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-4">Local</label>
-                    <select className="w-full bg-surface-container-low border-none rounded-full py-3.5 px-6 focus:ring-2 focus:ring-primary" value={form.local} onChange={e => setForm({ ...form, local: e.target.value })} required>
+                    <select className="w-full bg-surface-container-low border-none rounded-full py-3.5 px-6 focus:ring-2 focus:ring-primary" value={form.localId} onChange={e => setForm({ ...form, localId: e.target.value })} required>
                       <option value="">Selecione o local...</option>
-                      <option value="salão 1">Salão 1</option>
-                      <option value="salão 2">Salão 2</option>
-                      <option value="externo">Externo</option>
+                      {locais.map(loc => <option key={loc.id} value={loc.id}>{loc.nome}</option>)}
                     </select>
                   </div>
                 </div>
@@ -424,8 +428,8 @@ export default function EventosPage() {
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-4">Observações {form.local === "externo" && "(Digite o endereço do local externo)"}</label>
-                  <textarea className="w-full bg-surface-container-low border-none rounded-2xl py-3.5 px-6 focus:ring-2 focus:ring-primary resize-none" rows={3} placeholder={form.local === "externo" ? "Ex: Rua das Flores, 123..." : ""} value={form.observacoes} onChange={e => setForm({ ...form, observacoes: e.target.value })} />
+                  <label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-4">Observações</label>
+                  <textarea className="w-full bg-surface-container-low border-none rounded-2xl py-3.5 px-6 focus:ring-2 focus:ring-primary resize-none" rows={3} value={form.observacoes} onChange={e => setForm({ ...form, observacoes: e.target.value })} />
                 </div>
               </form>
             </div>

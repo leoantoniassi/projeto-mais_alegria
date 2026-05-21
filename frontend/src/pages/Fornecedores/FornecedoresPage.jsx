@@ -3,16 +3,6 @@ import api from '../../services/api';
 import { useAuth } from '../../contexts/AuthContext';
 import { useConfirm } from '../../contexts/ConfirmContext';
 
-const CATEGORIAS = [
-  'Alimentos',
-  'Bebidas',
-  'Decoração',
-  'Mobiliário',
-  'Audiovisual',
-  'Limpeza',
-  'Segurança',
-  'Outros',
-];
 
 export default function FornecedoresPage() {
   const { user } = useAuth();
@@ -24,12 +14,22 @@ export default function FornecedoresPage() {
   const [categoriaFiltro, setCategoriaFiltro] = useState('');
   const [showPanel, setShowPanel] = useState(false);
   const [editing, setEditing] = useState(null);
-  const [form, setForm] = useState({ nome: '', email: '', telefone: '', cnpj: '', categoria: '' });
+  const [form, setForm] = useState({ nome: '', email: '', telefone: '', cnpj: '', categoriaId: '' });
+  const [categorias, setCategorias] = useState([]);
+
+  useEffect(() => {
+    api.get('/lookup/categorias-fornecedor')
+      .then(r => {
+        const items = Array.isArray(r.data.data) ? r.data.data : [];
+        setCategorias(items);
+      })
+      .catch(() => {});
+  }, []);
 
   const fetchFornecedores = async () => {
     try {
       const params = { page, limit: 10, busca: search };
-      if (categoriaFiltro) params.categoria = categoriaFiltro;
+      if (categoriaFiltro) params.categoriaId = categoriaFiltro;
       const { data: res } = await api.get('/fornecedores', { params });
       const items = Array.isArray(res.data) ? res.data : (res.rows || []);
       setFornecedores(items);
@@ -49,7 +49,7 @@ export default function FornecedoresPage() {
       }
       setShowPanel(false);
       setEditing(null);
-      setForm({ nome: '', email: '', telefone: '', cnpj: '', categoria: '' });
+      setForm({ nome: '', email: '', telefone: '', cnpj: '', categoriaId: '' });
       fetchFornecedores();
     } catch (err) {
       alert(err.response?.data?.message || 'Erro ao salvar');
@@ -57,7 +57,7 @@ export default function FornecedoresPage() {
   };
 
   const handleEdit = (f) => {
-    setForm({ nome: f.nome, email: f.email, telefone: f.telefone, cnpj: f.cnpj, categoria: f.categoria });
+    setForm({ nome: f.nome, email: f.email, telefone: f.telefone, cnpj: f.cnpj, categoriaId: f.categoriaId || f.categoria?.id || '' });
     setEditing(f.id);
     setShowPanel(true);
   };
@@ -81,7 +81,7 @@ export default function FornecedoresPage() {
 
   const initials = (name) => (name || 'NA').split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
 
-  const categoriaBadgeColor = (cat) => {
+  const categoriaBadgeColor = (catName) => {
     const map = {
       'Alimentos':   'bg-green-100 text-green-700',
       'Bebidas':     'bg-blue-100 text-blue-700',
@@ -91,7 +91,7 @@ export default function FornecedoresPage() {
       'Limpeza':     'bg-cyan-100 text-cyan-700',
       'Segurança':   'bg-red-100 text-red-700',
     };
-    return map[cat] || 'bg-surface-container text-on-surface-variant';
+    return map[catName] || 'bg-surface-container text-on-surface-variant';
   };
 
   return (
@@ -104,7 +104,7 @@ export default function FornecedoresPage() {
             <p className="text-on-surface-variant">Gerencie os fornecedores de produtos e serviços para os eventos.</p>
           </div>
           <button
-            onClick={() => { setEditing(null); setForm({ nome: '', email: '', telefone: '', cnpj: '', categoria: '' }); setShowPanel(true); }}
+            onClick={() => { setEditing(null); setForm({ nome: '', email: '', telefone: '', cnpj: '', categoriaId: '' }); setShowPanel(true); }}
             className="bg-primary text-on-primary px-8 py-3 rounded-full font-bold flex items-center gap-2 shadow-xl shadow-primary/30 hover:scale-[1.05] active:scale-95 transition-all"
           >
             <span className="material-symbols-outlined">add_circle</span>
@@ -133,8 +133,8 @@ export default function FornecedoresPage() {
               onChange={(e) => { setCategoriaFiltro(e.target.value); setPage(1); }}
             >
               <option value="">Todas as categorias</option>
-              {CATEGORIAS.map((cat) => (
-                <option key={cat} value={cat}>{cat}</option>
+              {categorias.map((cat) => (
+                <option key={cat.id} value={cat.id}>{cat.nome}</option>
               ))}
             </select>
           </div>
@@ -173,8 +173,8 @@ export default function FornecedoresPage() {
                     <td className="px-6 py-4 text-sm text-on-surface-variant font-mono">{f.cnpj}</td>
                     <td className="px-6 py-4 text-sm text-on-surface-variant">{f.telefone}</td>
                     <td className="px-6 py-4">
-                      <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold ${categoriaBadgeColor(f.categoria)}`}>
-                        {f.categoria}
+                      <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold ${categoriaBadgeColor(f.categoria?.nome)}`}>
+                        {f.categoria?.nome || '—'}
                       </span>
                     </td>
                     <td className="px-6 py-4 text-right">
@@ -249,13 +249,13 @@ export default function FornecedoresPage() {
                   <label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-4">Categoria</label>
                   <select
                     className="w-full bg-surface-container-low border-none rounded-full py-3.5 px-6 focus:bg-white focus:ring-2 focus:ring-primary transition-all appearance-none"
-                    value={form.categoria}
-                    onChange={(e) => setForm({ ...form, categoria: e.target.value })}
+                    value={form.categoriaId}
+                    onChange={(e) => setForm({ ...form, categoriaId: e.target.value })}
                     required
                   >
                     <option value="" disabled>Selecione uma categoria...</option>
-                    {CATEGORIAS.map((cat) => (
-                      <option key={cat} value={cat}>{cat}</option>
+                    {categorias.map((cat) => (
+                      <option key={cat.id} value={cat.id}>{cat.nome}</option>
                     ))}
                   </select>
                 </div>

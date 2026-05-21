@@ -11,7 +11,17 @@ export default function EstoquePage() {
   const [page, setPage] = useState(1);
   const [showPanel, setShowPanel] = useState(false);
   const [editing, setEditing] = useState(null);
-  const [form, setForm] = useState({ nome: '', categoria: '', quantidade: 0, unidadeMedida: 'un', custoUnitario: 0 });
+  const [form, setForm] = useState({ nome: '', categoriaId: '', quantidade: 0, unidadeMedida: 'un', custoUnitario: 0 });
+  const [categorias, setCategorias] = useState([]);
+
+  useEffect(() => {
+    api.get('/lookup/categorias-produto')
+      .then(r => {
+        const items = Array.isArray(r.data.data) ? r.data.data : [];
+        setCategorias(items);
+      })
+      .catch(() => {});
+  }, []);
 
   const fetchData = async () => {
     try {
@@ -29,11 +39,11 @@ export default function EstoquePage() {
     try {
       if (editing) await api.put(`/produtos/${editing}`, form);
       else await api.post('/produtos', form);
-      setShowPanel(false); setEditing(null); setForm({ nome: '', categoria: '', quantidade: 0, unidadeMedida: 'un', custoUnitario: 0 }); fetchData();
+      setShowPanel(false); setEditing(null); setForm({ nome: '', categoriaId: '', quantidade: 0, unidadeMedida: 'un', custoUnitario: 0 }); fetchData();
     } catch (err) { alert(err.response?.data?.error || 'Erro'); }
   };
 
-  const handleEdit = (p) => { setForm({ nome: p.nome, categoria: p.categoria, quantidade: p.quantidade, unidadeMedida: p.unidadeMedida, custoUnitario: p.custoUnitario }); setEditing(p.id); setShowPanel(true); };
+  const handleEdit = (p) => { setForm({ nome: p.nome, categoriaId: p.categoriaId || p.categoria?.id || '', quantidade: p.quantidade, unidadeMedida: p.unidadeMedida, custoUnitario: p.custoUnitario }); setEditing(p.id); setShowPanel(true); };
   const handleDelete = async (id) => { if (!(await confirm('Excluir item?'))) return; try { await api.delete(`/produtos/${id}`); fetchData(); } catch (err) { alert(err.response?.data?.error || 'Erro'); } };
 
   const catColor = (c) => {
@@ -47,7 +57,7 @@ export default function EstoquePage() {
     <div>
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
         <div><h2 className="text-4xl font-extrabold text-on-surface tracking-tight mb-2 font-headline">Estoque</h2><p className="text-on-surface-variant font-medium">Controle de insumos, materiais e equipamentos.</p></div>
-        <button onClick={() => { setEditing(null); setForm({ nome: '', categoria: '', quantidade: 0, unidadeMedida: 'un', custoUnitario: 0 }); setShowPanel(true); }} className="flex items-center gap-2 px-8 py-3.5 bg-primary text-on-primary rounded-full font-bold shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all">
+        <button onClick={() => { setEditing(null); setForm({ nome: '', categoriaId: '', quantidade: 0, unidadeMedida: 'un', custoUnitario: 0 }); setShowPanel(true); }} className="flex items-center gap-2 px-8 py-3.5 bg-primary text-on-primary rounded-full font-bold shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all">
           <span className="material-symbols-outlined">add</span> Adicionar Item
         </button>
       </div>
@@ -56,7 +66,7 @@ export default function EstoquePage() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
         <div className="p-6 bg-white rounded-2xl border-b-4 border-primary"><p className="text-xs uppercase tracking-widest text-on-surface-variant font-bold mb-4">Total de Itens</p><div className="flex items-end justify-between"><span className="text-4xl font-extrabold text-on-surface">{total}</span><span className="material-symbols-outlined text-primary/40 text-4xl">inventory</span></div></div>
         <div className="p-6 bg-white rounded-2xl border-b-4 border-error"><p className="text-xs uppercase tracking-widest text-on-surface-variant font-bold mb-4">Estoque Baixo</p><div className="flex items-end justify-between"><span className="text-4xl font-extrabold text-error">{produtos.filter(p => p.quantidade < 20).length}</span><span className="material-symbols-outlined text-error/30 text-4xl">warning</span></div></div>
-        <div className="p-6 bg-white rounded-2xl border-b-4 border-tertiary"><p className="text-xs uppercase tracking-widest text-on-surface-variant font-bold mb-4">Categorias</p><div className="flex items-end justify-between"><span className="text-4xl font-extrabold text-tertiary">{[...new Set(produtos.map(p => p.categoria))].length}</span><span className="material-symbols-outlined text-tertiary/20 text-4xl">category</span></div></div>
+        <div className="p-6 bg-white rounded-2xl border-b-4 border-tertiary"><p className="text-xs uppercase tracking-widest text-on-surface-variant font-bold mb-4">Categorias</p><div className="flex items-end justify-between"><span className="text-4xl font-extrabold text-tertiary">{[...new Set(produtos.map(p => p.categoria?.nome || p.categoria))].length}</span><span className="material-symbols-outlined text-tertiary/20 text-4xl">category</span></div></div>
         <div className="p-6 bg-secondary text-on-secondary rounded-2xl shadow-xl shadow-secondary/20"><p className="text-xs uppercase tracking-widest text-on-secondary/70 font-bold mb-4">Valor Total</p><div className="flex items-end justify-between"><span className="text-2xl font-extrabold">R$ {totalValue.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span><span className="material-symbols-outlined text-on-secondary/30 text-4xl">payments</span></div></div>
       </div>
 
@@ -69,7 +79,7 @@ export default function EstoquePage() {
             {produtos.map((p) => (
               <tr key={p.id} className="hover:bg-surface-container-low transition-colors group">
                 <td className="px-8 py-6"><div className="flex items-center gap-4"><div className="w-12 h-12 rounded-2xl bg-primary/20 flex items-center justify-center"><span className="material-symbols-outlined text-on-surface-variant">inventory_2</span></div><div><p className="font-bold text-on-surface">{p.nome}</p></div></div></td>
-                <td className="px-8 py-6"><span className={`px-4 py-1.5 ${catColor(p.categoria)} rounded-full text-xs font-bold`}>{p.categoria}</span></td>
+                <td className="px-8 py-6"><span className={`px-4 py-1.5 ${catColor(p.categoria?.nome || p.categoria)} rounded-full text-xs font-bold`}>{p.categoria?.nome || p.categoria || '—'}</span></td>
                 <td className="px-8 py-6"><div className="flex items-center gap-2"><span className={`font-bold text-lg ${p.quantidade < 20 ? 'text-error' : 'text-on-surface'}`}>{p.quantidade}</span><span className="text-on-surface-variant text-xs font-medium">{p.unidadeMedida}</span></div></td>
                 <td className="px-8 py-6 font-medium text-on-surface">R$ {Number(p.custoUnitario).toFixed(2)}</td>
                 <td className="px-8 py-6"><div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity"><button onClick={() => handleEdit(p)} className="p-2 hover:bg-white rounded-full text-on-surface-variant"><span className="material-symbols-outlined">edit</span></button>
@@ -99,7 +109,7 @@ export default function EstoquePage() {
             <div className="flex-1 overflow-y-auto p-8">
               <form id="prod-form" className="space-y-6" onSubmit={handleSave}>
                 <div className="space-y-2"><label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-4">Nome</label><input className="w-full bg-surface-container-low border-none rounded-full py-3.5 px-6 focus:ring-2 focus:ring-primary" value={form.nome} onChange={e => setForm({...form, nome: e.target.value})} required /></div>
-                <div className="space-y-2"><label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-4">Categoria</label><select className="w-full bg-surface-container-low border-none rounded-full py-3.5 px-6 focus:ring-2 focus:ring-primary" value={form.categoria} onChange={e => setForm({...form, categoria: e.target.value})} required><option value="">Selecione...</option><option value="Alimento">Alimento</option><option value="Bebida">Bebida</option><option value="Descartável">Descartável</option><option value="Decoração">Decoração</option><option value="Equipamento">Equipamento</option></select></div>
+                <div className="space-y-2"><label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-4">Categoria</label><select className="w-full bg-surface-container-low border-none rounded-full py-3.5 px-6 focus:ring-2 focus:ring-primary" value={form.categoriaId} onChange={e => setForm({...form, categoriaId: e.target.value})} required><option value="">Selecione...</option>{categorias.map(cat => <option key={cat.id} value={cat.id}>{cat.nome}</option>)}</select></div>
                 <div className="grid grid-cols-3 gap-4">
                   <div className="space-y-2"><label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-4">Qtd</label><input type="number" className="w-full bg-surface-container-low border-none rounded-full py-3.5 px-6 focus:ring-2 focus:ring-primary" value={form.quantidade} onChange={e => setForm({...form, quantidade: +e.target.value})} /></div>
                   <div className="space-y-2"><label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-4">Un.</label><input className="w-full bg-surface-container-low border-none rounded-full py-3.5 px-6 focus:ring-2 focus:ring-primary" value={form.unidadeMedida} onChange={e => setForm({...form, unidadeMedida: e.target.value})} /></div>
