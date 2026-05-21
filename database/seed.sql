@@ -11,8 +11,8 @@ RESTART IDENTITY CASCADE;
 
 -- 0. USUARIOS
 INSERT INTO usuarios (usr_nome, usr_email, usr_senha, usr_role) VALUES
-('Gerente Souza',  'gerente@maisalegria.com',  '$2y$10$wWwMj.Q9Gq.i0v7Y.9c3.u.V4nB0q0t3eXZ.P1yI0aQ2hE8c3L9oK', 'gerente'),
-('Operador Lima',  'operador@maisalegria.com', '$2y$10$wWwMj.Q9Gq.i0v7Y.9c3.u.V4nB0q0t3eXZ.P1yI0aQ2hE8c3L9oK', 'operador');
+('Gerente',  'gerente@maisalegria.com',  '$2y$10$wWwMj.Q9Gq.i0v7Y.9c3.u.V4nB0q0t3eXZ.P1yI0aQ2hE8c3L9oK', 'gerente'),
+('Operador',  'operador@maisalegria.com', '$2y$10$wWwMj.Q9Gq.i0v7Y.9c3.u.V4nB0q0t3eXZ.P1yI0aQ2hE8c3L9oK', 'operador');
 
 -- L. LOCAIS
 INSERT INTO locais (loc_nome, loc_logradouro, loc_numero, loc_bairro, loc_cidade, loc_estado, loc_cep) VALUES
@@ -358,3 +358,4 @@ INSERT INTO catalogos (cat_titulo, cat_descricao, cat_preco_base, cat_ativo) VAL
 ('Catalogo 18', 'Descricao 18', 3013.00, true),
 ('Catalogo 19', 'Descricao 19', 2237.00, true),
 ('Catalogo 20', 'Descricao 20', 4363.00, true);
+
