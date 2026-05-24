@@ -13,6 +13,7 @@ import DocumentosPage from './pages/Documentos/DocumentosPage';
 import CatalogosPage from './pages/Catalogos/CatalogosPage';
 import FornecedoresPage from './pages/Fornecedores/FornecedoresPage';
 import UsuariosPage from './pages/Usuarios/UsuariosPage';
+import CadastrosPage from './pages/Cadastros/CadastrosPage';
 
 function ProtectedRoute({ children }) {
   const { isAuthenticated, loading } = useAuth();
@@ -71,6 +72,7 @@ function AppRoutes() {
         <Route path="orcamentos" element={<OrcamentosPage />} />
         <Route path="documentos" element={<DocumentosPage />} />
         <Route path="catalogos" element={<CatalogosPage />} />
+        <Route path="cadastros" element={<CadastrosPage />} />
         <Route path="usuarios" element={<UsuariosPage />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />

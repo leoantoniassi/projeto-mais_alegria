@@ -10,16 +10,19 @@ router.use(auth);
 // Funcoes
 router.get('/funcoes',              ctrl.listarFuncoes);
 router.post('/funcoes',             ctrl.criarFuncao);
+router.put('/funcoes/:id',          ctrl.atualizarFuncao);
 router.delete('/funcoes/:id',       ctrl.removerFuncao);
 
 // Categorias Fornecedor
 router.get('/categorias-fornecedor',         ctrl.listarCategoriasFornecedor);
 router.post('/categorias-fornecedor',        ctrl.criarCategoriaFornecedor);
+router.put('/categorias-fornecedor/:id',     ctrl.atualizarCategoriaFornecedor);
 router.delete('/categorias-fornecedor/:id',  ctrl.removerCategoriaFornecedor);
 
 // Categorias Produto
 router.get('/categorias-produto',            ctrl.listarCategoriasProduto);
 router.post('/categorias-produto',           ctrl.criarCategoriaProduto);
+router.put('/categorias-produto/:id',        ctrl.atualizarCategoriaProduto);
 router.delete('/categorias-produto/:id',     ctrl.removerCategoriaProduto);
 
 module.exports = router;
