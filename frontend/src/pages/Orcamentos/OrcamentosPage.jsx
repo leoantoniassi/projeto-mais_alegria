@@ -125,7 +125,7 @@ export default function OrcamentosPage() {
               onChange={(e) => setFiltroLocal(e.target.value)}
             >
               <option value="">Todos os locais</option>
-              {locais.map(loc => <option key={loc.id} value={loc.id}>{loc.nome}</option>)}
+              {locais.slice().sort((a, b) => a.nome.localeCompare(b.nome)).map(loc => <option key={loc.id} value={loc.id}>{loc.nome}</option>)}
             </select>
           </div>
 
@@ -217,14 +217,14 @@ export default function OrcamentosPage() {
             <div className="p-8 border-b border-outline-variant/30 flex justify-between"><div><h3 className="text-2xl font-headline font-extrabold">{editing ? 'Editar Orçamento' : 'Novo Orçamento'}</h3></div><button onClick={() => setShowPanel(false)} className="p-2 hover:bg-surface-container rounded-full"><span className="material-symbols-outlined">close</span></button></div>
             <div className="flex-1 overflow-y-auto p-8">
               <form id="orc-form" className="space-y-6" onSubmit={handleSave}>
-                <div className="space-y-2"><label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-4">Cliente</label><select className="w-full bg-surface-container-low border-none rounded-full py-3.5 px-6 focus:ring-2 focus:ring-primary" value={form.clienteId} onChange={e => setForm({ ...form, clienteId: e.target.value })} required><option value="">Selecione...</option>{clientes.map(c => <option key={c.id} value={c.id}>{c.nome}</option>)}</select></div>
+                <div className="space-y-2"><label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-4">Cliente</label><select className="w-full bg-surface-container-low border-none rounded-full py-3.5 px-6 focus:ring-2 focus:ring-primary" value={form.clienteId} onChange={e => setForm({ ...form, clienteId: e.target.value })} required><option value="">Selecione...</option>{clientes.slice().sort((a, b) => a.nome.localeCompare(b.nome)).map(c => <option key={c.id} value={c.id}>{c.nome}</option>)}</select></div>
 
                 {/* Seleção do Local */}
                 <div className="space-y-2">
                   <label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-4">Local</label>
                   <select className="w-full bg-surface-container-low border-none rounded-full py-3.5 px-6 focus:ring-2 focus:ring-primary" value={form.localId} onChange={e => setForm({ ...form, localId: e.target.value })} required>
                     <option value="">Selecione o local...</option>
-                    {locais.map(loc => <option key={loc.id} value={loc.id}>{loc.nome}</option>)}
+                    {locais.slice().sort((a, b) => a.nome.localeCompare(b.nome)).map(loc => <option key={loc.id} value={loc.id}>{loc.nome}</option>)}
                   </select>
                 </div>
 

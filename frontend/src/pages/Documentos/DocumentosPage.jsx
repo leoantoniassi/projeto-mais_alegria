@@ -288,7 +288,7 @@ export default function DocumentosPage() {
                     onChange={(e) => setForm({ ...form, clienteId: e.target.value })}
                   >
                     <option value="">— Nenhum cliente selecionado —</option>
-                    {clientes.map((c) => (
+                    {clientes.slice().sort((a, b) => a.nome.localeCompare(b.nome)).map((c) => (
                       <option key={c.id} value={c.id}>{c.nome}</option>
                     ))}
                   </select>
@@ -305,7 +305,7 @@ export default function DocumentosPage() {
                     onChange={(e) => setForm({ ...form, eventoId: e.target.value })}
                   >
                     <option value="">— Nenhum evento selecionado —</option>
-                    {eventos.map((ev) => (
+                    {eventos.slice().sort((a, b) => a.nome.localeCompare(b.nome)).map((ev) => (
                       <option key={ev.id} value={ev.id}>{ev.nome}</option>
                     ))}
                   </select>

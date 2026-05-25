@@ -206,7 +206,7 @@ export default function EventosPage() {
                 onChange={(e) => setFiltroLocal(e.target.value)}
               >
                 <option value="">Todos os locais</option>
-                {locais.map(loc => <option key={loc.id} value={loc.id}>{loc.nome}</option>)}
+                {locais.slice().sort((a, b) => a.nome.localeCompare(b.nome)).map(loc => <option key={loc.id} value={loc.id}>{loc.nome}</option>)}
               </select>
             </div>
           </div>
@@ -396,7 +396,7 @@ export default function EventosPage() {
                     <label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-4">Local</label>
                     <select className="w-full bg-surface-container-low border-none rounded-full py-3.5 px-6 focus:ring-2 focus:ring-primary" value={form.localId} onChange={e => setForm({ ...form, localId: e.target.value })} required>
                       <option value="">Selecione o local...</option>
-                      {locais.map(loc => <option key={loc.id} value={loc.id}>{loc.nome}</option>)}
+                      {locais.slice().sort((a, b) => a.nome.localeCompare(b.nome)).map(loc => <option key={loc.id} value={loc.id}>{loc.nome}</option>)}
                     </select>
                   </div>
                 </div>
@@ -405,7 +405,7 @@ export default function EventosPage() {
                     <label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-4">Cliente</label>
                     <select className="w-full bg-surface-container-low border-none rounded-full py-3.5 px-6 focus:ring-2 focus:ring-primary" value={form.clienteId} onChange={e => setForm({ ...form, clienteId: e.target.value })} required>
                       <option value="">Selecione...</option>
-                      {clientes.map(c => <option key={c.id} value={c.id}>{c.nome}</option>)}
+                      {clientes.slice().sort((a, b) => a.nome.localeCompare(b.nome)).map(c => <option key={c.id} value={c.id}>{c.nome}</option>)}
                     </select>
                   </div>
                   <div className="space-y-2">
@@ -425,7 +425,7 @@ export default function EventosPage() {
                     }
                   }}>
                     <option value="">Nenhum</option>
-                    {orcamentos.map(o => <option key={o.id} value={o.id}>R$ {o.valorTotal} - {o.status}</option>)}
+                    {orcamentos.slice().sort((a, b) => Number(a.valorTotal) - Number(b.valorTotal)).map(o => <option key={o.id} value={o.id}>R$ {o.valorTotal} - {o.status}</option>)}
                   </select>
                 </div>
                 <div className="grid grid-cols-4 gap-3">

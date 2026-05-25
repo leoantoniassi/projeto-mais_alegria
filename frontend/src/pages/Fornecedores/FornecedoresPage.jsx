@@ -133,7 +133,7 @@ export default function FornecedoresPage() {
               onChange={(e) => { setCategoriaFiltro(e.target.value); setPage(1); }}
             >
               <option value="">Todas as categorias</option>
-              {categorias.map((cat) => (
+              {categorias.slice().sort((a, b) => a.nome.localeCompare(b.nome)).map((cat) => (
                 <option key={cat.id} value={cat.id}>{cat.nome}</option>
               ))}
             </select>
@@ -254,7 +254,7 @@ export default function FornecedoresPage() {
                     required
                   >
                     <option value="" disabled>Selecione uma categoria...</option>
-                    {categorias.map((cat) => (
+                    {categorias.slice().sort((a, b) => a.nome.localeCompare(b.nome)).map((cat) => (
                       <option key={cat.id} value={cat.id}>{cat.nome}</option>
                     ))}
                   </select>

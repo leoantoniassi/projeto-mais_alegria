@@ -157,7 +157,7 @@ export default function FuncionariosPage() {
                 <div className="space-y-2"><label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-4">Função</label>
                   <select className="w-full bg-surface-container-low border-none rounded-full py-3.5 px-6 focus:ring-2 focus:ring-primary" value={form.funcaoId} onChange={e => setForm({...form, funcaoId: e.target.value})} required>
                     <option value="">Selecione...</option>
-                    {funcoes.map(fn => <option key={fn.id} value={fn.id}>{fn.nome}</option>)}
+                    {funcoes.slice().sort((a, b) => a.nome.localeCompare(b.nome)).map(fn => <option key={fn.id} value={fn.id}>{fn.nome}</option>)}
                   </select>
                 </div>
               </form>
