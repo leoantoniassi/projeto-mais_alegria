@@ -33,6 +33,18 @@ export default function EventosPage() {
     observacoes: "",
   });
 
+  // ─── Escala States ────────────────────────────────────────────
+  const [showEscalaModal, setShowEscalaModal] = useState(false);
+  const [showCriarEscalaModal, setShowCriarEscalaModal] = useState(false);
+  const [escalaAtual, setEscalaAtual] = useState([]);
+  const [loadingEscala, setLoadingEscala] = useState(false);
+  const [funcionariosDisponiveis, setFuncionariosDisponiveis] = useState([]);
+  const [loadingDisponiveis, setLoadingDisponiveis] = useState(false);
+  const [filtroFuncao, setFiltroFuncao] = useState("");
+  const [selecionados, setSelecionados] = useState([]);
+  const [salvandoEscala, setSalvandoEscala] = useState(false);
+  const [errosEscala, setErrosEscala] = useState([]);
+
   const fetchData = async () => {
     try {
       const params = { page, limit: 10 };
@@ -106,6 +118,96 @@ export default function EventosPage() {
     }
   };
 
+  // ─── Escala Handlers ───────────────────────────────────────────
+
+  const handleVerEscala = async (evt) => {
+    setEscalaAtual([]);
+    setLoadingEscala(true);
+    setShowEscalaModal(true);
+    try {
+      const { data: res } = await api.get(`/escala/evento/${evt.id}`);
+      setEscalaAtual(Array.isArray(res.data) ? res.data : []);
+    } catch {
+      setEscalaAtual([]);
+    } finally {
+      setLoadingEscala(false);
+    }
+  };
+
+  const handleRemoverDaEscala = async (escalaId) => {
+    if (!(await confirm("Remover este funcionário da escala?"))) return;
+    try {
+      await api.delete(`/escala/${escalaId}`);
+      // Atualiza a lista após remover
+      const { data: res } = await api.get(`/escala/evento/${selectedEvento.id}`);
+      setEscalaAtual(Array.isArray(res.data) ? res.data : []);
+    } catch (err) {
+      alert(err.response?.data?.message || "Erro ao remover da escala.");
+    }
+  };
+
+  const handleAbrirCriarEscala = async (evt) => {
+    setSelecionados([]);
+    setFiltroFuncao("");
+    setErrosEscala([]);
+    setFuncionariosDisponiveis([]);
+    setLoadingDisponiveis(true);
+    setShowCriarEscalaModal(true);
+    try {
+      const { data: res } = await api.get(`/escala/disponiveis/${evt.id}`);
+      setFuncionariosDisponiveis(Array.isArray(res.data) ? res.data : []);
+    } catch {
+      setFuncionariosDisponiveis([]);
+    } finally {
+      setLoadingDisponiveis(false);
+    }
+  };
+
+  const handleSalvarEscala = async () => {
+    if (selecionados.length === 0) {
+      alert("Selecione ao menos um funcionário.");
+      return;
+    }
+    setSalvandoEscala(true);
+    setErrosEscala([]);
+    try {
+      const { data: res } = await api.post("/escala/lote", {
+        eventoId: selectedEvento.id,
+        funcionarioIds: selecionados,
+      });
+      const errs = res.data?.erros || [];
+      setErrosEscala(errs);
+      if (errs.length === 0) {
+        setShowCriarEscalaModal(false);
+      }
+      // Atualiza lista de disponíveis após salvar
+      const { data: res2 } = await api.get(`/escala/disponiveis/${selectedEvento.id}`);
+      setFuncionariosDisponiveis(Array.isArray(res2.data) ? res2.data : []);
+      setSelecionados([]);
+    } catch (err) {
+      alert(err.response?.data?.message || "Erro ao salvar escala.");
+    } finally {
+      setSalvandoEscala(false);
+    }
+  };
+
+  const toggleSelecionado = (id) => {
+    setSelecionados(prev =>
+      prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
+    );
+  };
+
+  // Funções únicas para o filtro
+  const funcoesUnicas = [...new Map(
+    funcionariosDisponiveis
+      .filter(f => f.funcao)
+      .map(f => [f.funcao.id, f.funcao])
+  ).values()].sort((a, b) => a.nome.localeCompare(b.nome));
+
+  const funcionariosFiltrados = filtroFuncao
+    ? funcionariosDisponiveis.filter(f => f.funcao?.id === filtroFuncao)
+    : funcionariosDisponiveis;
+
   const statusBadge = (s) => {
     const m = {
       confirmado: "bg-secondary-container text-on-secondary-container",
@@ -119,7 +221,6 @@ export default function EventosPage() {
 
   const parseDate = (d) => {
     if (!d) return null;
-    // Para datas DATEONLY (ex: "2026-05-02"), evita deslocamento de fuso
     if (typeof d === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(d)) {
       const [year, month, day] = d.split('-');
       return new Date(year, month - 1, day);
@@ -234,7 +335,7 @@ export default function EventosPage() {
                 {eventos.map((evt) => (
                   <tr
                     key={evt.id}
-                    className="group hover:bg-surface-container-low transition-colors cursor-pointer"
+                    className={`group hover:bg-surface-container-low transition-colors cursor-pointer ${selectedEvento?.id === evt.id ? 'bg-primary/5 border-l-2 border-primary' : ''}`}
                     onClick={() => setSelectedEvento(evt)}
                   >
                     <td className="py-4 px-4 font-semibold text-sm">{evt.nome}</td>
@@ -316,60 +417,330 @@ export default function EventosPage() {
         </div>
 
         {/* Detail Sidebar */}
-        <div className="col-span-12 lg:col-span-4 space-y-6">
+        <div className="col-span-12 lg:col-span-4 space-y-4">
           {selectedEvento ? (
-            <div className="bg-tertiary text-on-tertiary p-6 rounded-2xl relative overflow-hidden shadow-xl">
-              <div className="relative z-10">
-                <h3 className="text-xl font-bold mb-2">Detalhes do Evento</h3>
-                <p className="text-sm opacity-80 mb-6">{selectedEvento.nome}</p>
-                <div className="space-y-4">
-                  <div className="flex justify-between text-sm border-b border-white/10 pb-2">
-                    <span>Local</span>
-                    <span className="font-bold capitalize">{selectedEvento.local?.nome || selectedEvento.local || "—"}</span>
-                  </div>
-                  <div className="flex justify-between text-sm border-b border-white/10 pb-2">
-                    <span>Data</span>
-                    <span className="font-bold">
-                      {formatDate(selectedEvento.dataEvento)} • {formatTime(selectedEvento.dataEvento)}
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-sm border-b border-white/10 pb-2">
-                    <span>Cliente</span>
-                    <span className="font-bold">{selectedEvento.cliente?.nome || selectedEvento.Cliente?.nome || "—"}</span>
-                  </div>
-                  <div className="flex justify-between text-sm border-b border-white/10 pb-2">
-                    <span>Status</span>
-                    <span className="font-bold uppercase">{selectedEvento.status}</span>
-                  </div>
-                  {selectedEvento.valorOrcamento > 0 && (
+            <>
+              <div className="bg-tertiary text-on-tertiary p-6 rounded-2xl relative overflow-hidden shadow-xl">
+                <div className="relative z-10">
+                  <h3 className="text-xl font-bold mb-2">Detalhes do Evento</h3>
+                  <p className="text-sm opacity-80 mb-6">{selectedEvento.nome}</p>
+                  <div className="space-y-4">
                     <div className="flex justify-between text-sm border-b border-white/10 pb-2">
-                      <span>Orçamento</span>
-                      <span className="font-bold text-primary">
-                        R$ {Number(selectedEvento.valorOrcamento).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                      <span>Local</span>
+                      <span className="font-bold capitalize">{selectedEvento.local?.nome || selectedEvento.local || "—"}</span>
+                    </div>
+                    <div className="flex justify-between text-sm border-b border-white/10 pb-2">
+                      <span>Data</span>
+                      <span className="font-bold">
+                        {formatDate(selectedEvento.dataEvento)} • {formatTime(selectedEvento.dataEvento)}
                       </span>
                     </div>
-                  )}
-                  <div className="flex justify-between text-sm">
-                    <span>Público</span>
-                    <span className="font-bold">
-                      {(selectedEvento.qtdAdultos || 0) + (selectedEvento.qtdCriancas || 0) + (selectedEvento.qtdBebes || 0)} pessoas
-                    </span>
+                    <div className="flex justify-between text-sm border-b border-white/10 pb-2">
+                      <span>Cliente</span>
+                      <span className="font-bold">{selectedEvento.cliente?.nome || selectedEvento.Cliente?.nome || "—"}</span>
+                    </div>
+                    <div className="flex justify-between text-sm border-b border-white/10 pb-2">
+                      <span>Status</span>
+                      <span className="font-bold uppercase">{selectedEvento.status}</span>
+                    </div>
+                    {selectedEvento.valorOrcamento > 0 && (
+                      <div className="flex justify-between text-sm border-b border-white/10 pb-2">
+                        <span>Orçamento</span>
+                        <span className="font-bold text-primary">
+                          R$ {Number(selectedEvento.valorOrcamento).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                        </span>
+                      </div>
+                    )}
+                    <div className="flex justify-between text-sm">
+                      <span>Público</span>
+                      <span className="font-bold">
+                        {(selectedEvento.qtdAdultos || 0) + (selectedEvento.qtdCriancas || 0) + (selectedEvento.qtdBebes || 0)} pessoas
+                      </span>
+                    </div>
                   </div>
+                  {selectedEvento.observacoes && (
+                    <p className="mt-4 text-sm opacity-80 italic">{selectedEvento.observacoes}</p>
+                  )}
                 </div>
-                {selectedEvento.observacoes && (
-                  <p className="mt-4 text-sm opacity-80 italic">{selectedEvento.observacoes}</p>
-                )}
+                <div className="absolute -right-10 -bottom-10 w-40 h-40 bg-white/5 rounded-full blur-3xl" />
               </div>
-              <div className="absolute -right-10 -bottom-10 w-40 h-40 bg-white/5 rounded-full blur-3xl" />
-            </div>
+
+              {/* ─── Botões de Escala ────────────────────────────── */}
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  onClick={() => handleVerEscala(selectedEvento)}
+                  className="flex items-center justify-center gap-2 px-4 py-3.5 bg-white border-2 border-tertiary text-tertiary rounded-2xl font-bold text-sm hover:bg-tertiary hover:text-on-tertiary transition-all shadow-sm group"
+                >
+                  <span className="material-symbols-outlined text-xl group-hover:scale-110 transition-transform">groups</span>
+                  Ver Escala
+                </button>
+                <button
+                  onClick={() => handleAbrirCriarEscala(selectedEvento)}
+                  className="flex items-center justify-center gap-2 px-4 py-3.5 bg-tertiary text-on-tertiary rounded-2xl font-bold text-sm hover:brightness-110 transition-all shadow-md shadow-tertiary/30 group"
+                >
+                  <span className="material-symbols-outlined text-xl group-hover:scale-110 transition-transform">person_add</span>
+                  Criar Escala
+                </button>
+              </div>
+            </>
           ) : (
             <div className="bg-surface-container-high rounded-2xl p-8 text-center">
               <span className="material-symbols-outlined text-5xl text-outline/30 mb-4">event</span>
-              <p className="text-sm text-on-surface-variant">Selecione um evento</p>
+              <p className="text-sm text-on-surface-variant">Selecione um evento para ver os detalhes</p>
             </div>
           )}
         </div>
       </div>
+
+      {/* ─── Modal: Ver Escala ─────────────────────────────────── */}
+      {showEscalaModal && (
+        <div
+          className="fixed inset-0 bg-on-surface/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 fade-in"
+          onClick={() => setShowEscalaModal(false)}
+        >
+          <div
+            className="bg-white rounded-3xl shadow-2xl w-full max-w-lg max-h-[80vh] flex flex-col overflow-hidden"
+            onClick={e => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between p-6 border-b border-outline-variant/20">
+              <div>
+                <h3 className="text-xl font-headline font-extrabold text-on-surface">Escala do Evento</h3>
+                <p className="text-sm text-on-surface-variant mt-0.5">{selectedEvento?.nome}</p>
+              </div>
+              <button
+                onClick={() => setShowEscalaModal(false)}
+                className="p-2 hover:bg-surface-container rounded-full transition-colors"
+              >
+                <span className="material-symbols-outlined">close</span>
+              </button>
+            </div>
+
+            {/* Content */}
+            <div className="flex-1 overflow-y-auto p-6">
+              {loadingEscala ? (
+                <div className="flex items-center justify-center py-12 text-on-surface-variant">
+                  <span className="material-symbols-outlined animate-spin mr-2">progress_activity</span>
+                  Carregando escala...
+                </div>
+              ) : escalaAtual.length === 0 ? (
+                <div className="text-center py-12">
+                  <span className="material-symbols-outlined text-5xl text-outline/30 block mb-3">group_off</span>
+                  <p className="text-on-surface-variant text-sm">Nenhum funcionário escalado ainda.</p>
+                  <button
+                    onClick={() => {
+                      setShowEscalaModal(false);
+                      handleAbrirCriarEscala(selectedEvento);
+                    }}
+                    className="mt-4 px-6 py-2 bg-tertiary text-on-tertiary rounded-full font-bold text-sm hover:brightness-110 transition-all"
+                  >
+                    Criar Escala Agora
+                  </button>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {escalaAtual.map(entry => (
+                    <div
+                      key={entry.id}
+                      className="flex items-center justify-between p-4 bg-surface-container-low rounded-2xl group hover:bg-tertiary/5 transition-colors"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-tertiary/10 text-tertiary flex items-center justify-center font-bold text-sm">
+                          {entry.funcionario?.nome?.slice(0, 2).toUpperCase() || "??"}
+                        </div>
+                        <div>
+                          <p className="font-bold text-on-surface text-sm">{entry.funcionario?.nome || "—"}</p>
+                          <p className="text-xs text-on-surface-variant">
+                            {entry.funcionario?.funcao?.nome || "Sem função"}
+                          </p>
+                        </div>
+                      </div>
+                      {user?.role === "gerente" && (
+                        <button
+                          onClick={() => handleRemoverDaEscala(entry.id)}
+                          className="p-1.5 text-outline hover:text-error rounded-full hover:bg-error/10 transition-colors opacity-0 group-hover:opacity-100"
+                          title="Remover da escala"
+                        >
+                          <span className="material-symbols-outlined text-lg">person_remove</span>
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Footer */}
+            <div className="p-6 border-t border-outline-variant/20 bg-surface-container-low/30 flex justify-between items-center">
+              <p className="text-xs text-on-surface-variant font-medium">
+                {escalaAtual.length} funcionário{escalaAtual.length !== 1 ? 's' : ''} escalado{escalaAtual.length !== 1 ? 's' : ''}
+              </p>
+              <button
+                onClick={() => {
+                  setShowEscalaModal(false);
+                  handleAbrirCriarEscala(selectedEvento);
+                }}
+                className="flex items-center gap-1.5 px-4 py-2 bg-tertiary text-on-tertiary rounded-full font-bold text-sm hover:brightness-110 transition-all"
+              >
+                <span className="material-symbols-outlined text-base">person_add</span>
+                Adicionar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ─── Modal: Criar Escala ───────────────────────────────── */}
+      {showCriarEscalaModal && (
+        <div
+          className="fixed inset-0 bg-on-surface/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 fade-in"
+          onClick={() => setShowCriarEscalaModal(false)}
+        >
+          <div
+            className="bg-white rounded-3xl shadow-2xl w-full max-w-xl max-h-[85vh] flex flex-col overflow-hidden"
+            onClick={e => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between p-6 border-b border-outline-variant/20">
+              <div>
+                <h3 className="text-xl font-headline font-extrabold text-on-surface">Criar Escala</h3>
+                <p className="text-sm text-on-surface-variant mt-0.5">{selectedEvento?.nome}</p>
+              </div>
+              <button
+                onClick={() => setShowCriarEscalaModal(false)}
+                className="p-2 hover:bg-surface-container rounded-full transition-colors"
+              >
+                <span className="material-symbols-outlined">close</span>
+              </button>
+            </div>
+
+            {/* Filtro por Função */}
+            <div className="px-6 pt-4 pb-2">
+              <label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant block mb-2">
+                Filtrar por Função
+              </label>
+              <select
+                className="w-full bg-surface-container-low border-none rounded-full py-2.5 px-5 focus:ring-2 focus:ring-tertiary text-sm font-medium outline-none"
+                value={filtroFuncao}
+                onChange={e => setFiltroFuncao(e.target.value)}
+              >
+                <option value="">Todas as funções</option>
+                {funcoesUnicas.map(f => (
+                  <option key={f.id} value={f.id}>{f.nome}</option>
+                ))}
+              </select>
+
+              {/* Contador */}
+              <div className="flex items-center justify-between mt-3">
+                <p className="text-xs text-on-surface-variant">
+                  {funcionariosFiltrados.length} funcionário{funcionariosFiltrados.length !== 1 ? 's' : ''} disponível{funcionariosFiltrados.length !== 1 ? 'eis' : ''}
+                </p>
+                {selecionados.length > 0 && (
+                  <p className="text-xs font-bold text-tertiary">
+                    {selecionados.length} selecionado{selecionados.length !== 1 ? 's' : ''}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {/* Lista de Funcionários */}
+            <div className="flex-1 overflow-y-auto px-6 py-2">
+              {loadingDisponiveis ? (
+                <div className="flex items-center justify-center py-12 text-on-surface-variant">
+                  <span className="material-symbols-outlined animate-spin mr-2">progress_activity</span>
+                  Buscando disponíveis...
+                </div>
+              ) : funcionariosFiltrados.length === 0 ? (
+                <div className="text-center py-12">
+                  <span className="material-symbols-outlined text-5xl text-outline/30 block mb-3">group_off</span>
+                  <p className="text-on-surface-variant text-sm">
+                    {filtroFuncao
+                      ? "Nenhum funcionário disponível com esta função neste dia."
+                      : "Todos os funcionários já estão ocupados neste dia."}
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {funcionariosFiltrados.map(func => {
+                    const isChecked = selecionados.includes(func.id);
+                    return (
+                      <label
+                        key={func.id}
+                        className={`flex items-center gap-3 p-3.5 rounded-2xl cursor-pointer transition-all select-none ${
+                          isChecked
+                            ? 'bg-tertiary/10 ring-2 ring-tertiary/30'
+                            : 'bg-surface-container-low hover:bg-surface-container'
+                        }`}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={isChecked}
+                          onChange={() => toggleSelecionado(func.id)}
+                          className="w-4 h-4 rounded accent-[#6600A1] shrink-0"
+                        />
+                        <div className="flex items-center gap-3 flex-1 min-w-0">
+                          <div className={`w-9 h-9 rounded-full flex items-center justify-center font-bold text-sm shrink-0 ${isChecked ? 'bg-tertiary text-on-tertiary' : 'bg-outline/10 text-on-surface-variant'}`}>
+                            {func.nome?.slice(0, 2).toUpperCase()}
+                          </div>
+                          <div className="min-w-0">
+                            <p className="font-semibold text-on-surface text-sm truncate">{func.nome}</p>
+                            <p className="text-xs text-on-surface-variant truncate">{func.funcao?.nome || 'Sem função'}</p>
+                          </div>
+                        </div>
+                        {isChecked && (
+                          <span className="material-symbols-outlined text-tertiary text-xl shrink-0">check_circle</span>
+                        )}
+                      </label>
+                    );
+                  })}
+                </div>
+              )}
+
+              {/* Erros */}
+              {errosEscala.length > 0 && (
+                <div className="mt-4 p-4 bg-error/10 rounded-2xl border border-error/20">
+                  <p className="text-sm font-bold text-error mb-2 flex items-center gap-1">
+                    <span className="material-symbols-outlined text-base">warning</span>
+                    Conflitos encontrados:
+                  </p>
+                  <ul className="space-y-1">
+                    {errosEscala.map((err, i) => (
+                      <li key={i} className="text-xs text-error/80">• {err}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+
+            {/* Footer */}
+            <div className="p-6 border-t border-outline-variant/20 bg-surface-container-low/30 flex gap-3">
+              <button
+                onClick={() => setShowCriarEscalaModal(false)}
+                className="flex-1 border-2 border-outline-variant text-on-surface-variant py-3 rounded-full font-bold text-sm hover:bg-surface-container transition-colors"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleSalvarEscala}
+                disabled={selecionados.length === 0 || salvandoEscala}
+                className="flex-[2] bg-tertiary text-on-tertiary py-3 rounded-full font-bold text-sm shadow-lg shadow-tertiary/30 hover:brightness-110 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              >
+                {salvandoEscala ? (
+                  <>
+                    <span className="material-symbols-outlined animate-spin text-base">progress_activity</span>
+                    Salvando...
+                  </>
+                ) : (
+                  <>
+                    <span className="material-symbols-outlined text-base">group_add</span>
+                    Adicionar {selecionados.length > 0 ? `(${selecionados.length})` : ''}
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Panel */}
       {showPanel && (

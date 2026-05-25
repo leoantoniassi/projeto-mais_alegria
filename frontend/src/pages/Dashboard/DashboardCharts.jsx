@@ -27,10 +27,10 @@ export default function DashboardCharts() {
   }
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
       
       {/* 1. Gráfico Temporal (Sazonalidade) */}
-      <div className="bg-white p-6 rounded-3xl editorial-shadow border border-outline-variant/10 w-full h-[350px]">
+      <div className="bg-white p-6 rounded-3xl editorial-shadow border border-outline-variant/10 h-[350px]">
         <h3 className="text-sm font-bold text-on-surface-variant uppercase tracking-widest mb-6">Sazonalidade Anual</h3>
         {data.timeSeries.length === 0 ? (
           <div className="flex h-full items-center justify-center text-on-surface-variant">Sem dados para exibir</div>
@@ -57,7 +57,7 @@ export default function DashboardCharts() {
       </div>
 
       {/* 2. Gráfico de Barras (Uso da Infraestrutura) */}
-      <div className="bg-white p-6 rounded-3xl editorial-shadow border border-outline-variant/10 w-full h-[350px]">
+      <div className="bg-white p-6 rounded-3xl editorial-shadow border border-outline-variant/10 h-[350px]">
         <h3 className="text-sm font-bold text-on-surface-variant uppercase tracking-widest mb-6">Uso da Infraestrutura</h3>
         {data.infra.length === 0 ? (
           <div className="flex h-full items-center justify-center text-on-surface-variant">Sem dados para exibir</div>
@@ -71,7 +71,7 @@ export default function DashboardCharts() {
                 formatter={(value) => [`${value} eventos`, 'Quantidade']}
                 contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
               />
-              <Bar dataKey="value" name="Quantidade" radius={[8, 8, 0, 0]}>
+              <Bar dataKey="value" name="Quantidade" radius={[8, 8, 0, 0]} maxBarSize={45}>
                 {data.infra.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
                 ))}
@@ -82,7 +82,7 @@ export default function DashboardCharts() {
       </div>
 
       {/* 3. Gráfico de Dispersão (Convidados x Custo) */}
-      <div className="bg-white p-6 rounded-3xl editorial-shadow border border-outline-variant/10 w-full h-[350px]">
+      <div className="bg-white p-6 rounded-3xl editorial-shadow border border-outline-variant/10 h-[350px] lg:col-span-2">
         <h3 className="text-sm font-bold text-on-surface-variant uppercase tracking-widest mb-6">Correlação: Convidados x Custo Total</h3>
         {data.scatter.length === 0 ? (
           <div className="flex flex-col h-full items-center justify-center text-on-surface-variant p-6 text-center">

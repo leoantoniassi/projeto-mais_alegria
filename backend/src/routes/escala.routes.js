@@ -8,8 +8,10 @@ const authorize = require('../middleware/roles');
 
 router.use(auth);
 
-router.post('/', controller.alocar);
+router.get('/disponiveis/:eventoId', controller.listarDisponiveis);
+router.get('/evento/:eventoId',      controller.listarPorEvento);
+router.post('/',                     controller.alocar);
+router.post('/lote',                 controller.alocarLote);
 router.delete('/:id', authorize('gerente'), controller.remover);
-router.get('/evento/:eventoId', controller.listarPorEvento);
 
 module.exports = router;

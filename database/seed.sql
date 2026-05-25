@@ -16,9 +16,9 @@ INSERT INTO usuarios (usr_nome, usr_email, usr_senha, usr_role) VALUES
 
 -- L. LOCAIS
 INSERT INTO locais (loc_nome, loc_logradouro, loc_numero, loc_bairro, loc_cidade, loc_estado, loc_cep) VALUES
-('Salão 1', 'Rua das Festas', '100', 'Centro', 'São Paulo', 'SP', '01310-100'),
-('Salão 2', 'Rua das Festas', '100', 'Centro', 'São Paulo', 'SP', '01310-100'),
-('Externo', 'Estrada das Flores', '450', 'Zona Rural', 'Mairiporã', 'SP', '07600-000');
+('Salão 1', 'Rua Treze de Maio', '749', 'Santo Antônio', 'Jaú', 'SP', '17202-180'),
+('Salão 2', 'Avenida Isaltino do Amaral Carvalho', 'S/N', 'Chácara Bela Vista', 'Jaú', 'SP', '17209-010'),
+('Externo', 'Local Externo', 'S/N', 'Zona Rural', 'Jaú', 'SP', '00000-000');
 
 -- F. FUNCOES
 INSERT INTO funcoes (fnc_nome, fnc_descricao) VALUES

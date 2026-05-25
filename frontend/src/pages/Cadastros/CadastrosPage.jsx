@@ -32,6 +32,15 @@ const TABLES = [
     description: 'Tipos de itens do estoque',
     placeholder: 'Ex: Alimento, Bebida, Descartável...',
   },
+  {
+    key: 'locais',
+    label: 'Locais',
+    icon: 'location_on',
+    color: 'primary',
+    endpoint: '/locais',
+    description: 'Espaços e salões de festas para realização de eventos',
+    placeholder: 'Ex: Salão de Festas Principal...',
+  },
 ];
 
 /* ─── Mapa de cores por tabela ──────────────────────────────── */
@@ -49,7 +58,18 @@ export default function CadastrosPage() {
   const [loading, setLoading] = useState({});
   const [showPanel, setShowPanel] = useState(false);
   const [editing, setEditing] = useState(null);
-  const [form, setForm] = useState({ nome: '', descricao: '' });
+  const [form, setForm] = useState({
+    nome: '',
+    descricao: '',
+    logradouro: '',
+    numero: '',
+    complemento: '',
+    bairro: '',
+    cidade: '',
+    estado: '',
+    cep: '',
+    observacoes: '',
+  });
   const [search, setSearch] = useState('');
 
   const activeTable = TABLES.find(t => t.key === activeTab);
@@ -61,7 +81,8 @@ export default function CadastrosPage() {
     if (!table) return;
     setLoading(prev => ({ ...prev, [tableKey]: true }));
     try {
-      const { data: res } = await api.get(table.endpoint);
+      const endpoint = tableKey === 'locais' ? `${table.endpoint}?limit=1000` : table.endpoint;
+      const { data: res } = await api.get(endpoint);
       const list = Array.isArray(res.data) ? res.data : [];
       setItems(prev => ({ ...prev, [tableKey]: list }));
     } catch {
@@ -80,14 +101,40 @@ export default function CadastrosPage() {
   const handleSave = async (e) => {
     e.preventDefault();
     try {
+      const payload = activeTab === 'locais' ? {
+        nome: form.nome,
+        logradouro: form.logradouro,
+        numero: form.numero,
+        complemento: form.complemento,
+        bairro: form.bairro,
+        cidade: form.cidade,
+        estado: form.estado,
+        cep: form.cep,
+        observacoes: form.observacoes,
+      } : {
+        nome: form.nome,
+        descricao: form.descricao,
+      };
+
       if (editing) {
-        await api.put(`${activeTable.endpoint}/${editing}`, form);
+        await api.put(`${activeTable.endpoint}/${editing}`, payload);
       } else {
-        await api.post(activeTable.endpoint, form);
+        await api.post(activeTable.endpoint, payload);
       }
       setShowPanel(false);
       setEditing(null);
-      setForm({ nome: '', descricao: '' });
+      setForm({
+        nome: '',
+        descricao: '',
+        logradouro: '',
+        numero: '',
+        complemento: '',
+        bairro: '',
+        cidade: '',
+        estado: '',
+        cep: '',
+        observacoes: '',
+      });
       fetchItems(activeTab);
     } catch (err) {
       alert(err.response?.data?.message || 'Erro ao salvar');
@@ -96,7 +143,33 @@ export default function CadastrosPage() {
 
   /* ─── Edit ────────────────────────────────────────────────── */
   const handleEdit = (item) => {
-    setForm({ nome: item.nome, descricao: item.descricao || '' });
+    if (activeTab === 'locais') {
+      setForm({
+        nome: item.nome || '',
+        logradouro: item.logradouro || '',
+        numero: item.numero || '',
+        complemento: item.complemento || '',
+        bairro: item.bairro || '',
+        cidade: item.cidade || '',
+        estado: item.estado || '',
+        cep: item.cep || '',
+        observacoes: item.observacoes || '',
+        descricao: '',
+      });
+    } else {
+      setForm({
+        nome: item.nome || '',
+        descricao: item.descricao || '',
+        logradouro: '',
+        numero: '',
+        complemento: '',
+        bairro: '',
+        cidade: '',
+        estado: '',
+        cep: '',
+        observacoes: '',
+      });
+    }
     setEditing(item.id);
     setShowPanel(true);
   };
@@ -113,15 +186,40 @@ export default function CadastrosPage() {
   };
 
   /* ─── Filter items by search ──────────────────────────────── */
-  const currentItems = (items[activeTab] || []).filter(item =>
-    item.nome?.toLowerCase().includes(search.toLowerCase()) ||
-    item.descricao?.toLowerCase().includes(search.toLowerCase())
-  );
+  const currentItems = (items[activeTab] || []).filter(item => {
+    const q = search.toLowerCase();
+    if (activeTab === 'locais') {
+      return (
+        item.nome?.toLowerCase().includes(q) ||
+        item.logradouro?.toLowerCase().includes(q) ||
+        item.bairro?.toLowerCase().includes(q) ||
+        item.cidade?.toLowerCase().includes(q) ||
+        item.estado?.toLowerCase().includes(q) ||
+        item.cep?.toLowerCase().includes(q) ||
+        item.observacoes?.toLowerCase().includes(q)
+      );
+    }
+    return (
+      item.nome?.toLowerCase().includes(q) ||
+      item.descricao?.toLowerCase().includes(q)
+    );
+  });
 
   /* ─── Open new panel ──────────────────────────────────────── */
   const openNew = () => {
     setEditing(null);
-    setForm({ nome: '', descricao: '' });
+    setForm({
+      nome: '',
+      descricao: '',
+      logradouro: '',
+      numero: '',
+      complemento: '',
+      bairro: '',
+      cidade: '',
+      estado: '',
+      cep: '',
+      observacoes: '',
+    });
     setShowPanel(true);
   };
 
@@ -205,14 +303,21 @@ export default function CadastrosPage() {
                 <thead>
                   <tr className="bg-surface-container-low/50">
                     <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-on-surface-variant">Nome</th>
-                    <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-on-surface-variant">Descrição</th>
+                    {activeTab === 'locais' ? (
+                      <>
+                        <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-on-surface-variant">Endereço</th>
+                        <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-on-surface-variant">Observações</th>
+                      </>
+                    ) : (
+                      <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-on-surface-variant">Descrição</th>
+                    )}
                     <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-on-surface-variant text-right">Ações</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-surface-container-high">
                   {loading[activeTab] && (
                     <tr>
-                      <td colSpan={3} className="px-6 py-12 text-center text-on-surface-variant">
+                      <td colSpan={activeTab === 'locais' ? 4 : 3} className="px-6 py-12 text-center text-on-surface-variant">
                         <span className="material-symbols-outlined animate-spin mr-2">progress_activity</span>
                         Carregando...
                       </td>
@@ -220,7 +325,7 @@ export default function CadastrosPage() {
                   )}
                   {!loading[activeTab] && currentItems.length === 0 && (
                     <tr>
-                      <td colSpan={3} className="px-6 py-12 text-center text-on-surface-variant">
+                      <td colSpan={activeTab === 'locais' ? 4 : 3} className="px-6 py-12 text-center text-on-surface-variant">
                         <div className="flex flex-col items-center gap-3">
                           <span className={`material-symbols-outlined text-4xl ${colors.textDark} opacity-40`}>{activeTable.icon}</span>
                           <p>Nenhum registro encontrado.</p>
@@ -244,9 +349,23 @@ export default function CadastrosPage() {
                           </div>
                         </div>
                       </td>
-                      <td className="px-6 py-5">
-                        <p className="text-sm text-on-surface-variant">{item.descricao || '—'}</p>
-                      </td>
+                      {activeTab === 'locais' ? (
+                        <>
+                          <td className="px-6 py-5">
+                            <p className="text-sm text-on-surface font-medium">
+                              {item.logradouro}, {item.numero}{item.complemento ? ` - ${item.complemento}` : ''}
+                            </p>
+                            <p className="text-xs text-on-surface-variant">{item.bairro} - {item.cidade}/{item.estado} - CEP: {item.cep}</p>
+                          </td>
+                          <td className="px-6 py-5">
+                            <p className="text-sm text-on-surface-variant truncate max-w-xs">{item.observacoes || '—'}</p>
+                          </td>
+                        </>
+                      ) : (
+                        <td className="px-6 py-5">
+                          <p className="text-sm text-on-surface-variant">{item.descricao || '—'}</p>
+                        </td>
+                      )}
                       <td className="px-6 py-5 text-right">
                         <div className="flex justify-end gap-1">
                           <button
@@ -296,26 +415,171 @@ export default function CadastrosPage() {
             </div>
             <div className="flex-1 overflow-y-auto p-8">
               <form id="cadastro-form" className="space-y-6" onSubmit={handleSave}>
-                <div className="space-y-2">
-                  <label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-4">Nome *</label>
-                  <input
-                    className="w-full bg-surface-container-low border-none rounded-full py-3.5 px-6 focus:ring-2 focus:ring-primary"
-                    value={form.nome}
-                    onChange={e => setForm({ ...form, nome: e.target.value })}
-                    placeholder={activeTable.placeholder}
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-4">Descrição</label>
-                  <textarea
-                    className="w-full bg-surface-container-low border-none rounded-2xl py-3.5 px-6 focus:ring-2 focus:ring-primary resize-none min-h-[120px]"
-                    value={form.descricao}
-                    onChange={e => setForm({ ...form, descricao: e.target.value })}
-                    placeholder="Descrição opcional..."
-                    rows={4}
-                  />
-                </div>
+                {activeTab === 'locais' ? (
+                  <>
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-4">Nome do Local *</label>
+                      <input
+                        className="w-full bg-surface-container-low border-none rounded-full py-3.5 px-6 focus:ring-2 focus:ring-primary"
+                        value={form.nome}
+                        onChange={e => setForm({ ...form, nome: e.target.value })}
+                        placeholder="Ex: Salão Imperial, Chácara Primavera..."
+                        required
+                      />
+                    </div>
+                    
+                    <div className="grid grid-cols-3 gap-4">
+                      <div className="col-span-2 space-y-2">
+                        <label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-4">CEP *</label>
+                        <input
+                          className="w-full bg-surface-container-low border-none rounded-full py-3.5 px-6 focus:ring-2 focus:ring-primary"
+                          value={form.cep}
+                          onChange={e => {
+                            let val = e.target.value.replace(/\D/g, '');
+                            if (val.length > 8) val = val.slice(0, 8);
+                            if (val.length > 5) {
+                              val = `${val.slice(0, 5)}-${val.slice(5)}`;
+                            }
+                            setForm({ ...form, cep: val });
+                          }}
+                          placeholder="00000-000"
+                          required
+                        />
+                      </div>
+                      
+                      <div className="col-span-1 flex items-end">
+                        <button
+                          type="button"
+                          onClick={async () => {
+                            const rawCep = form.cep.replace(/\D/g, '');
+                            if (rawCep.length === 8) {
+                              try {
+                                const response = await fetch(`https://viacep.com.br/ws/${rawCep}/json/`);
+                                const data = await response.json();
+                                if (!data.erro) {
+                                  setForm(prev => ({
+                                    ...prev,
+                                    logradouro: data.logradouro || '',
+                                    bairro: data.bairro || '',
+                                    cidade: data.localidade || '',
+                                    estado: data.uf || '',
+                                  }));
+                                }
+                              } catch (e) {
+                                console.error(e);
+                              }
+                            }
+                          }}
+                          className="w-full bg-primary/10 hover:bg-primary/20 text-primary py-3.5 rounded-full font-bold text-xs transition-colors"
+                        >
+                          Buscar CEP
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-3 gap-4">
+                      <div className="col-span-2 space-y-2">
+                        <label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-4">Logradouro *</label>
+                        <input
+                          className="w-full bg-surface-container-low border-none rounded-full py-3.5 px-6 focus:ring-2 focus:ring-primary"
+                          value={form.logradouro}
+                          onChange={e => setForm({ ...form, logradouro: e.target.value })}
+                          placeholder="Rua, Avenida..."
+                          required
+                        />
+                      </div>
+                      <div className="col-span-1 space-y-2">
+                        <label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-4">Número *</label>
+                        <input
+                          className="w-full bg-surface-container-low border-none rounded-full py-3.5 px-6 focus:ring-2 focus:ring-primary"
+                          value={form.numero}
+                          onChange={e => setForm({ ...form, numero: e.target.value })}
+                          placeholder="123"
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-4">Complemento</label>
+                      <input
+                        className="w-full bg-surface-container-low border-none rounded-full py-3.5 px-6 focus:ring-2 focus:ring-primary"
+                        value={form.complemento || ''}
+                        onChange={e => setForm({ ...form, complemento: e.target.value })}
+                        placeholder="Apto, Bloco, Sala..."
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-4">Bairro *</label>
+                        <input
+                          className="w-full bg-surface-container-low border-none rounded-full py-3.5 px-6 focus:ring-2 focus:ring-primary"
+                          value={form.bairro}
+                          onChange={e => setForm({ ...form, bairro: e.target.value })}
+                          placeholder="Bairro"
+                          required
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-4">Cidade *</label>
+                        <input
+                          className="w-full bg-surface-container-low border-none rounded-full py-3.5 px-6 focus:ring-2 focus:ring-primary"
+                          value={form.cidade}
+                          onChange={e => setForm({ ...form, cidade: e.target.value })}
+                          placeholder="Cidade"
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-4">Estado (UF) *</label>
+                      <input
+                        className="w-full bg-surface-container-low border-none rounded-full py-3.5 px-6 focus:ring-2 focus:ring-primary"
+                        value={form.estado}
+                        onChange={e => setForm({ ...form, estado: e.target.value.toUpperCase().slice(0, 2) })}
+                        placeholder="SP"
+                        maxLength={2}
+                        required
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-4">Observações</label>
+                      <textarea
+                        className="w-full bg-surface-container-low border-none rounded-2xl py-3.5 px-6 focus:ring-2 focus:ring-primary resize-none min-h-[100px]"
+                        value={form.observacoes || ''}
+                        onChange={e => setForm({ ...form, observacoes: e.target.value })}
+                        placeholder="Instruções de acesso, capacidade, contato no local..."
+                        rows={3}
+                      />
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-4">Nome *</label>
+                      <input
+                        className="w-full bg-surface-container-low border-none rounded-full py-3.5 px-6 focus:ring-2 focus:ring-primary"
+                        value={form.nome}
+                        onChange={e => setForm({ ...form, nome: e.target.value })}
+                        placeholder={activeTable.placeholder}
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-4">Descrição</label>
+                      <textarea
+                        className="w-full bg-surface-container-low border-none rounded-2xl py-3.5 px-6 focus:ring-2 focus:ring-primary resize-none min-h-[120px]"
+                        value={form.descricao}
+                        onChange={e => setForm({ ...form, descricao: e.target.value })}
+                        placeholder="Descrição opcional..."
+                        rows={4}
+                      />
+                    </div>
+                  </>
+                )}
               </form>
             </div>
             <div className="p-8 bg-surface-container-low flex gap-4">

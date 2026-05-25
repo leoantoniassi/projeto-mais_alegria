@@ -46,11 +46,16 @@ Para o desenvolvimento deste projeto, serão utilizadas as seguintes tecnologias
 ### • Requisitos Funcionais
 
 - _RF1:_ O sistema deve permitir o CRUD (Criação, Leitura, Atualização e Exclusão) de Clientes, registrando Nome, E-mail, RG/CPF e Número de telefone.
-- _RF2:_ O sistema deve possuir uma função/botão de atalho para enviar mensagens diretamente para o WhatsApp do cliente cadastrado.
+- _RF2:_ O sistema deve possuir uma função/botão de atalho para enviar mensagens diretamente para o WhatsApp do cliente cadastrado, funcionário cadastrado ou cliente associado a um evento.
 - _RF3:_ O sistema deve permitir o CRUD de Funcionários, com campos para categorização por funções (ex: recreadores, cozinheiros, garçons, etc.).
-- _RF4:_ O sistema deve possuir um módulo de upload e gerenciamento de documentos para adicionar e consultar arquivos, como contratos assinados pelos clientes.
-- _RF5:_ O sistema deve permitir o CRUD de Eventos, registrando data, local, funcionários alocados e informações gerais.
+- _RF4:_ O sistema deve possuir um módulo de gerenciamento de documentos que suporte upload físico e registros de links/URLs externas (como PDFs, imagens).
+- _RF5:_ O sistema deve permitir o CRUD de Eventos, registrando data, local, funcionários alocados e informações gerais. Os status dos eventos devem seguir um ciclo de vida (`pendente`, `confirmado`, `concluido`, `cancelado`), com transição automática para `concluido` após a data do evento passar.
 - _RF6:_ O sistema deve permitir o CRUD de Orçamentos, registrando valor total, data de validade, status (pendente, aprovado, reprovado) e informações gerais.
+- _RF7:_ O sistema deve permitir o CRUD de Locais de Eventos, com busca automática de endereço via CEP utilizando a API ViaCEP.
+- _RF8:_ O sistema deve permitir o CRUD de Fornecedores, com categorização e botão de atalho rápido para contato via WhatsApp.
+- _RF9:_ O sistema deve permitir o CRUD de Catálogos de Serviços/Buffet, registrando título, descrição, preço base e link externo.
+- _RF10:_ O sistema deve possuir controle de usuários do sistema, permitindo o gerenciamento de contas administrativas divididas nos perfis de `gerente` e `operador`.
+- _RF11:_ O sistema deve possuir um Dashboard Analítico com métricas rápidas (total de clientes, funcionários, próximos eventos e orçamentos pendentes) e três gráficos integrados (Sazonalidade de eventos, Uso da infraestrutura por local e Dispersão de convidados vs. custo).
 
 ### • Requisitos Não Funcionais
 
@@ -68,12 +73,17 @@ Para o desenvolvimento deste projeto, serão utilizadas as seguintes tecnologias
 ### Casos de Uso de Alto Nível
 
 - **Gerenciar Clientes:** Permite cadastrar, visualizar, editar e remover clientes do sistema.
-- **Contatar via WhatsApp:** Ação rápida para abrir o chat do WhatsApp utilizando o número registrado no cadastro do cliente.
-- **Gerenciar Funcionários:** Registra novos colaboradores e os categoriza por suas respectivas funções (recreador, cozinheiro, garçom, etc.).
-- **Gerenciar Documentos:** Permite o upload, visualização e exclusão de arquivos, vinculando contratos aos clientes ou eventos específicos.
-- **Gerenciar Estoque:** Registra as entradas, saídas e controle de inventário de produtos e insumos (alimentos, descartáveis, etc.), garantindo o controle com base na quantidade, unidade de medida e custos.
-- **Gerenciar Orçamentos:** Permite criar, editar, enviar e acompanhar o status de orçamentos (ex: pendente, aprovado, reprovado) para potenciais eventos.
-- **Gerenciar Eventos:** Cria novos eventos (geralmente a partir de orçamentos aprovados), definindo data, local e associando o cliente responsável e a equipe de funcionários alocada.
+- **Contatar via WhatsApp:** Ação rápida para abrir o chat do WhatsApp utilizando o número registrado no cadastro de clientes, funcionários ou eventos.
+- **Gerenciar Funcionários:** Registra novos colaboradores e os categoriza por suas respectivas funções.
+- **Gerenciar Documentos:** Permite o upload físico, armazenamento de URLs externas e gerenciamento de arquivos de contratos vinculados a clientes ou eventos.
+- **Gerenciar Estoque:** Registra as entradas, saídas e controle de inventário de produtos e insumos, garantindo o controle com base na quantidade, unidade de medida e custos.
+- **Gerenciar Orçamentos:** Permite criar, editar, enviar e acompanhar o status de orçamentos para potenciais eventos.
+- **Gerenciar Eventos:** Cria e gerencia eventos, definindo data, local, convidados e associando o cliente responsável e a equipe alocada na escala.
+- **Gerenciar Locais:** Permite o cadastro e controle de locais com autocompletar de endereços via CEP.
+- **Gerenciar Fornecedores:** Controle de fornecedores com atalhos de contato rápido e categorização.
+- **Gerenciar Catálogos:** Gerenciamento dos serviços e buffets ofertados pela empresa.
+- **Gerenciar Usuários:** Permite que gerentes gerenciem as credenciais e permissões dos operadores e gerentes do sistema.
+- **Visualizar Dashboard:** Apresentação gráfica e visual de sazonalidade, distribuição de eventos e estatísticas operacionais na página inicial.
 
 ---
 
@@ -81,7 +91,7 @@ Para o desenvolvimento deste projeto, serão utilizadas as seguintes tecnologias
 
 O banco de dados do projeto será estruturado utilizando um **Banco de Dados Relacional** PostgreSQL , garantindo a integridade referencial dos dados e permitindo o cruzamento de informações entre clientes, eventos, funcionários, financeiro e suprimentos de forma robusta.
 
-> **Usuários:** Armazena os usuários do sistema com controle de acesso por níveis (admin, gerente, operador).
+> **Usuários:** Armazena os usuários do sistema com controle de acesso por níveis (`gerente` e `operador`).
 
 > **Clientes:** Armazena os dados pessoais e de contato (Nome, E-mail, RG/CPF, Telefone).
 
@@ -91,9 +101,15 @@ O banco de dados do projeto será estruturado utilizando um **Banco de Dados Rel
 
 > **Orçamentos:** Registra as propostas financeiras geradas para os clientes, contendo valor total, data de validade, status (pendente, aprovado, reprovado) e uma chave estrangeira que o vincula ao Cliente.
 
-> **Eventos:** Registra os detalhes dos eventos, possuindo chave estrangeira que o vincula a um Cliente e, opcionalmente, ao Orçamento de origem. Também consolida a quantidade detalhada de convidados (adultos, crianças e bebês) e o status do evento.
+> **Eventos:** Registra os detalhes dos eventos, possuindo chave estrangeira que o vincula a um Cliente, a um Local e, opcionalmente, ao Orçamento de origem. Também consolida a quantidade detalhada de convidados (adultos, crianças e bebês) e o status do evento.
 
-> **Documentos:** Armazena o caminho/URL do arquivo (ex: .pdf, .jpg, .png), referenciando a qual Cliente ou Evento o documento pertence.
+> **Documentos:** Armazena o caminho ou URL externa do arquivo (ex: .pdf, .jpg, .png), referenciando a qual Cliente ou Evento o documento pertence.
+
+> **Locais:** Armazena os locais de eventos e seus respectivos endereços (logradouro, número, complemento, bairro, cidade, estado, CEP) e observações adicionais.
+
+> **Fornecedores:** Armazena os dados de fornecedores associados a categorias específicas, com suporte a contato por WhatsApp.
+
+> **Catalogos:** Armazena os pacotes de serviços e opções de buffet disponíveis para apresentação.
 
 > **Escala:** Tabela intermediária (N:M) para registrar quais funcionários estão alocados em quais eventos.
 
@@ -134,17 +150,16 @@ O modelo físico segue a estrutura relacional padrão, utilizando tabelas interl
 ### RN1: Cadastro Único
 
 - Não será permitido o cadastro de dois clientes com o mesmo RG/CPF ou e-mail.
-
 - Não será permitido o cadastro de dois funcionários com o mesmo e-mail.
 
 ### RN2: Alocação em Eventos
 
-- Um funcionário não pode ser alocado em dois eventos que ocorram exatamente na mesma data e horário conflitante.
+- Um funcionário não pode ser alocado em dois eventos que ocorram no mesmo dia (das 00h00 às 23h59).
 
 ### RN3: Gestão de Documentos
 
-- Apenas usuários com permissão administrativa podem excluir contratos já assinados e anexados ao sistema.
-- O sistema deve aceitar formatos padronizados para documentos (ex: `.pdf`, `.jpg`, `.png`).
+- Apenas usuários com perfil de "Gerente" podem excluir contratos já assinados e anexados ao sistema.
+- O sistema deve aceitar formatos padronizados para documentos (ex: `.pdf`, `.jpg`, `.png`) ou referências via URLs externas.
 
 ### RN4: Controle de Público
 
@@ -186,7 +201,7 @@ O projeto é altamente viável, pois resolve dores reais de gestão de eventos u
 
 ### RN1: Acesso e Autenticação
 
-- O sistema deve possuir níveis de acesso. Apenas usuários com perfil de "Administrador" ou "Gerente" podem aprovar orçamentos, excluir clientes ou apagar documentos.
+- O sistema deve possuir níveis de acesso. Apenas usuários com perfil de "Gerente" podem gerenciar outros usuários, aprovar orçamentos, excluir clientes ou apagar documentos.
 
 ### RN2: Fluxo de Orçamentos e Eventos
 
@@ -194,12 +209,12 @@ O projeto é altamente viável, pois resolve dores reais de gestão de eventos u
 
 ### RN3: Alocação de Funcionários
 
-- O sistema deve impedir a alocação de um mesmo funcionário em dois eventos distintos que ocorram no mesmo dia e horário.
-- A busca por funcionários na hora de montar a equipe do evento deve permitir filtros por função (ex: buscar apenas "Cozinheiros").
+- O sistema deve impedir a alocação de um mesmo funcionário em dois eventos distintos que ocorram no mesmo dia.
+- O modal de criação de escala na visualização de detalhes do evento permite filtrar colaboradores por função operacional e exibe em formato checkbox somente os funcionários que estão disponíveis (que não estão escalados em nenhum outro evento naquele mesmo dia).
 
 ### RN4: Gestão de Contratos (Documentos)
 
-- Todo evento deve estar atrelado a um contrato digitalizado. O sistema deve aceitar extensões seguras e comuns, como `.pdf`, `.png` e `.jpg`.
+- Todo evento deve estar atrelado a um contrato digitalizado ou link de acesso. O sistema deve aceitar extensões seguras e comuns, como `.pdf`, `.png` e `.jpg`.
 
 ---
 
