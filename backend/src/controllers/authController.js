@@ -81,8 +81,9 @@ async function login(req, res, next) {
       });
     }
 
-    // Verifica senha
-    const senhaValida = await bcrypt.compare(senha, usuario.senha);
+    // Verifica senha (converte hash $2y$ para $2a$ para garantir compatibilidade com o bcryptjs)
+    const hashCompativel = usuario.senha.replace(/^\$2y\$/, '$2a$');
+    const senhaValida = await bcrypt.compare(senha, hashCompativel);
     if (!senhaValida) {
       return res.status(401).json({
         success: false,

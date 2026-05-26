@@ -13,8 +13,8 @@ RESTART IDENTITY CASCADE;
 
 -- 0. USUARIOS
 INSERT INTO usuarios (usr_nome, usr_email, usr_senha, usr_role) VALUES
-('Gerente',  'gerente@maisalegria.com',  '$2y$10$wWwMj.Q9Gq.i0v7Y.9c3.u.V4nB0q0t3eXZ.P1yI0aQ2hE8c3L9oK', 'gerente'),
-('Operador',  'operador@maisalegria.com', '$2y$10$wWwMj.Q9Gq.i0v7Y.9c3.u.V4nB0q0t3eXZ.P1yI0aQ2hE8c3L9oK', 'operador');
+('Gerente',  'gerente@maisalegria.com',  '$2a$10$Nq.Tgkmz8Dz4/s9KWP.NDOSD33LH4pGBrGsnd5R3F/kqoymkRpyoa', 'gerente'),
+('Operador',  'operador@maisalegria.com', '$2a$10$Nq.Tgkmz8Dz4/s9KWP.NDOSD33LH4pGBrGsnd5R3F/kqoymkRpyoa', 'operador');
 
 -- L. LOCAIS
 INSERT INTO locais (loc_nome, loc_logradouro, loc_numero, loc_bairro, loc_cidade, loc_estado, loc_cep) VALUES
