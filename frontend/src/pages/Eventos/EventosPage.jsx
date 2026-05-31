@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import api from "../../services/api";
 import { useAuth } from "../../contexts/AuthContext";
 import { useConfirm } from "../../contexts/ConfirmContext";
+import Toast from "../../components/Toast";
 
 export default function EventosPage() {
   const { user } = useAuth();
@@ -44,6 +45,7 @@ export default function EventosPage() {
   const [selecionados, setSelecionados] = useState([]);
   const [salvandoEscala, setSalvandoEscala] = useState(false);
   const [errosEscala, setErrosEscala] = useState([]);
+  const [toast, setToast] = useState(null);
 
   const fetchData = async () => {
     try {
@@ -115,6 +117,17 @@ export default function EventosPage() {
       window.open(res.data?.link || res.url, '_blank');
     } catch (err) {
       alert('Erro ao abrir o WhatsApp');
+    }
+  };
+
+  const handleCancel = async (id) => {
+    if (!(await confirm('Tem certeza que deseja cancelar este evento?', { title: 'Cancelar Evento', isDanger: true }))) return;
+    try {
+      await api.patch(`/eventos/${id}/status`, { status: 'cancelado' });
+      setToast({ message: 'Evento cancelado com sucesso!', type: 'success' });
+      fetchData();
+    } catch (err) {
+      alert(err.response?.data?.error || 'Erro ao cancelar evento');
     }
   };
 
@@ -317,9 +330,9 @@ export default function EventosPage() {
               <thead>
                 <tr className="text-on-surface-variant text-xs uppercase tracking-widest font-bold">
                   <th className="pb-4 px-4">Evento</th>
-                  <th className="pb-4 px-4">Data & Hora</th>
-                  <th className="pb-4 px-4">Local</th>
-                  <th className="pb-4 px-4">Cliente</th>
+                  <th className="pb-4 px-4 hidden sm:table-cell">Data & Hora</th>
+                  <th className="pb-4 px-4 hidden md:table-cell">Local</th>
+                  <th className="pb-4 px-4 hidden sm:table-cell">Cliente</th>
                   <th className="pb-4 px-4">Status</th>
                   <th className="pb-4 px-4 text-right">Ações</th>
                 </tr>
@@ -339,14 +352,14 @@ export default function EventosPage() {
                     onClick={() => setSelectedEvento(evt)}
                   >
                     <td className="py-4 px-4 font-semibold text-sm">{evt.nome}</td>
-                    <td className="py-4 px-4 text-sm">
+                    <td className="py-4 px-4 text-sm hidden sm:table-cell">
                       {formatDate(evt.dataEvento)}{" "}
                       <span className="text-outline block text-[11px]">
                         {formatTime(evt.dataEvento)}
                       </span>
                     </td>
-                    <td className="py-4 px-4 text-sm capitalize">{evt.local?.nome || evt.local || "—"}</td>
-                    <td className="py-4 px-4 text-sm">{evt.cliente?.nome || evt.Cliente?.nome || "—"}</td>
+                    <td className="py-4 px-4 text-sm capitalize hidden md:table-cell">{evt.local?.nome || evt.local || "—"}</td>
+                    <td className="py-4 px-4 text-sm hidden sm:table-cell">{evt.cliente?.nome || evt.Cliente?.nome || "—"}</td>
                     <td className="py-4 px-4">
                       <span className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium ${statusBadge(evt.status)}`}>
                         {evt.status}
@@ -364,6 +377,18 @@ export default function EventosPage() {
                         >
                           <span className="material-symbols-outlined text-sm filled">chat</span>
                         </button>
+                        {evt.status !== 'cancelado' && evt.status !== 'concluido' && (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleCancel(evt.id);
+                            }}
+                            className="p-1.5 text-error hover:bg-error/10 rounded-full"
+                            title="Cancelar"
+                          >
+                            <span className="material-symbols-outlined text-lg">block</span>
+                          </button>
+                        )}
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
@@ -830,6 +855,7 @@ export default function EventosPage() {
           </div>
         </div>
       )}
+      {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
     </div>
   );
 }

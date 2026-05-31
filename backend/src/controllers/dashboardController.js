@@ -17,6 +17,7 @@ async function stats(req, res, next) {
       orcamentosAprovados,
       eventosConfirmados,
       eventosPendentes,
+      eventosProximos30Dias,
     ] = await Promise.all([
       Cliente.count(),
       Funcionario.count(),
@@ -27,6 +28,14 @@ async function stats(req, res, next) {
       Orcamento.count({ where: { status: 'aprovado' } }),
       Evento.count({ where: { status: 'confirmado' } }),
       Evento.count({ where: { status: 'pendente' } }),
+      Evento.count({
+        where: {
+          dataEvento: {
+            [Op.gte]: new Date(),
+            [Op.lte]: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+          },
+        },
+      }),
     ]);
 
     return res.json({
@@ -41,6 +50,7 @@ async function stats(req, res, next) {
         orcamentosAprovados,
         eventosConfirmados,
         eventosPendentes,
+        eventosProximos30Dias,
       },
     });
   } catch (error) {
@@ -58,6 +68,7 @@ async function proximosEventos(req, res, next) {
       },
       include: [
         { model: Cliente, as: 'cliente', attributes: ['id', 'nome', 'telefone'] },
+        { model: Local, as: 'local', attributes: ['id', 'nome'] },
       ],
       order: [['dataEvento', 'ASC']],
       limit: 5,

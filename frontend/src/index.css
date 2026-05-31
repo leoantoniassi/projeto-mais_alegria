@@ -86,3 +86,12 @@ h1, h2, h3, .font-headline {
 .fade-in {
   animation: fadeIn 0.2s ease-out;
 }
+
+@keyframes slideInDown {
+  from { transform: translateY(-1rem); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.slide-in-down {
+  animation: slideInDown 0.3s ease-out;
+}

@@ -16,18 +16,22 @@ const { gerarLinkWhatsApp } = require('../utils/whatsapp');
 // GET /api/orcamentos
 async function listar(req, res, next) {
   try {
-    const { page = 1, limit = 20, status, localId } = req.query;
+    const { page = 1, limit = 20, status, localId, incluirReprovados } = req.query;
     const offset = (page - 1) * limit;
 
+    let scope = 'defaultScope';
     const where = {};
-    if (status) {
+    if (incluirReprovados === 'true') {
+      scope = 'comDeletados';
+      where.status = 'reprovado';
+    } else if (status) {
       where.status = status;
     }
     if (localId) {
       where.localId = localId;
     }
 
-    const { count, rows } = await Orcamento.findAndCountAll({
+    const { count, rows } = await Orcamento.scope(scope).findAndCountAll({
       where,
       include: [
         {

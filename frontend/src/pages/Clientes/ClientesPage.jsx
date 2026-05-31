@@ -3,6 +3,7 @@ import api from '../../services/api';
 import { useAuth } from '../../contexts/AuthContext';
 import { useConfirm } from '../../contexts/ConfirmContext';
 import { validarCpfCnpj } from '../../utils/validators';
+import { formatCpfCnpj } from '../../utils/formatters';
 
 export default function ClientesPage() {
   const { user } = useAuth();
@@ -179,7 +180,7 @@ export default function ClientesPage() {
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-sm text-on-surface-variant font-mono">{c.rgCpf}</td>
+                    <td className="px-6 py-4 text-sm text-on-surface-variant font-mono">{formatCpfCnpj(c.rgCpf)}</td>
                     <td className="px-6 py-4 text-sm text-on-surface-variant">{c.telefone}</td>
                     <td className="px-6 py-4 text-right">
                       <div className="flex justify-end gap-2">
@@ -250,7 +251,7 @@ export default function ClientesPage() {
                 </div>
                 <div className="space-y-2">
                   <label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-4">CPF/CNPJ</label>
-                  <input className="w-full bg-surface-container-low border-none rounded-full py-3.5 px-6 focus:bg-white focus:ring-2 focus:ring-primary transition-all" placeholder="000.000.000-00" value={form.rgCpf} onChange={(e) => setForm({ ...form, rgCpf: e.target.value })} required />
+                  <input className="w-full bg-surface-container-low border-none rounded-full py-3.5 px-6 focus:bg-white focus:ring-2 focus:ring-primary transition-all" placeholder="000.000.000-00" value={form.rgCpf} onChange={(e) => { const raw = e.target.value; const digits = raw.replace(/\D/g, ''); if (digits.length > 14) return; setForm({ ...form, rgCpf: formatCpfCnpj(digits) }); }} required />
                 </div>
               </form>
             </div>

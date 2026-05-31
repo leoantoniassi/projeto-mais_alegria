@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import api from '../../services/api';
 import { useAuth } from '../../contexts/AuthContext';
 import { useConfirm } from '../../contexts/ConfirmContext';
-
+import { validarCpfCnpj } from '../../utils/validators';
+import { formatCpfCnpj } from '../../utils/formatters';
 
 export default function FornecedoresPage() {
   const { user } = useAuth();
@@ -41,6 +42,10 @@ export default function FornecedoresPage() {
 
   const handleSave = async (e) => {
     e.preventDefault();
+    if (!validarCpfCnpj(form.cnpj)) {
+      alert('CNPJ inválido!');
+      return;
+    }
     try {
       if (editing) {
         await api.put(`/fornecedores/${editing}`, form);
@@ -170,7 +175,7 @@ export default function FornecedoresPage() {
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-sm text-on-surface-variant font-mono">{f.cnpj}</td>
+                    <td className="px-6 py-4 text-sm text-on-surface-variant font-mono">{formatCpfCnpj(f.cnpj)}</td>
                     <td className="px-6 py-4 text-sm text-on-surface-variant">{f.telefone}</td>
                     <td className="px-6 py-4">
                       <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold ${categoriaBadgeColor(f.categoria?.nome)}`}>
@@ -243,7 +248,7 @@ export default function FornecedoresPage() {
                 </div>
                 <div className="space-y-2">
                   <label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-4">CNPJ</label>
-                  <input className="w-full bg-surface-container-low border-none rounded-full py-3.5 px-6 focus:bg-white focus:ring-2 focus:ring-primary transition-all" placeholder="00.000.000/0001-00" value={form.cnpj} onChange={(e) => setForm({ ...form, cnpj: e.target.value })} required />
+                  <input className="w-full bg-surface-container-low border-none rounded-full py-3.5 px-6 focus:bg-white focus:ring-2 focus:ring-primary transition-all" placeholder="00.000.000/0001-00" value={form.cnpj} onChange={(e) => { const raw = e.target.value; const digits = raw.replace(/\D/g, ''); if (digits.length > 14) return; setForm({ ...form, cnpj: formatCpfCnpj(digits) }); }} required />
                 </div>
                 <div className="space-y-2">
                   <label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-4">Categoria</label>

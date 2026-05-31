@@ -4,7 +4,7 @@ import api from '../../services/api';
 import DashboardCharts from './DashboardCharts';
 
 export default function DashboardPage() {
-  const [stats, setStats] = useState({ clientes: 0, funcionarios: 0, eventos: 0, orcamentosPendentes: 0 });
+  const [stats, setStats] = useState({ clientes: 0, funcionarios: 0, eventos: 0, eventosProximos30Dias: 0, orcamentosPendentes: 0 });
   const [proximosEventos, setProximosEventos] = useState([]);
   const navigate = useNavigate();
 
@@ -15,6 +15,7 @@ export default function DashboardPage() {
         clientes: d.totalClientes || 0,
         funcionarios: d.totalFuncionarios || 0,
         eventos: d.totalEventos || 0,
+        eventosProximos30Dias: d.eventosProximos30Dias || 0,
         orcamentosPendentes: d.orcamentosPendentes || 0,
       });
     }).catch(() => {});
@@ -74,7 +75,7 @@ export default function DashboardPage() {
           <div className="absolute -right-4 -top-4 w-24 h-24 bg-primary/10 rounded-full group-hover:scale-110 transition-transform" />
           <p className="text-[11px] font-bold text-on-surface-variant uppercase tracking-widest mb-4">Próximos Eventos</p>
           <div className="flex items-baseline gap-2">
-            <span className="text-4xl font-headline font-extrabold text-tertiary">{stats.eventos || 0}</span>
+            <span className="text-4xl font-headline font-extrabold text-tertiary">{stats.eventosProximos30Dias || 0}</span>
           </div>
           <p className="text-xs text-outline mt-2">Próximos 30 dias</p>
         </div>
@@ -141,12 +142,12 @@ export default function DashboardPage() {
                       </div>
                       <div>
                         <p className="text-sm font-bold text-on-surface">{evt.nome}</p>
-                        <p className="text-[11px] text-on-surface-variant">{evt.local}</p>
+                        <p className="text-[11px] text-on-surface-variant">{evt.local?.nome || '—'}</p>
                       </div>
                     </div>
                   </td>
                   <td className="px-8 py-5 text-sm text-on-surface-variant">
-                    {evt.Cliente?.nome || '—'}
+                    {evt.cliente?.nome || '—'}
                   </td>
                   <td className="px-8 py-5">
                     <p className="text-sm text-on-surface font-medium">{formatDate(evt.dataEvento)}</p>

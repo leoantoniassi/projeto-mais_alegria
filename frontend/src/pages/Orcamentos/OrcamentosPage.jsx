@@ -3,6 +3,7 @@ import api from '../../services/api';
 import { useAuth } from '../../contexts/AuthContext';
 import { useConfirm } from '../../contexts/ConfirmContext';
 import { formatCurrency } from '../../utils/formatters';
+import Toast from '../../components/Toast';
 
 export default function OrcamentosPage() {
   const { user } = useAuth();
@@ -15,8 +16,9 @@ export default function OrcamentosPage() {
   const [editing, setEditing] = useState(null);
   const [selected, setSelected] = useState(null);
   const [locais, setLocais] = useState([]);
-  // 1. Adicionado filtro e local no form
   const [filtroLocal, setFiltroLocal] = useState('');
+  const [mostrarReprovados, setMostrarReprovados] = useState(false);
+  const [toast, setToast] = useState(null);
   const [form, setForm] = useState({ clienteId: '', valorTotal: 0, dataValidade: '', observacoes: '', localId: '', produtos: [] });
 
   useEffect(() => {
@@ -28,9 +30,9 @@ export default function OrcamentosPage() {
 
   const fetchData = async () => {
     try {
-      // 2. Parâmetro local adicionado à requisição
       const params = { page, limit: 10 };
       if (filtroLocal) params.localId = filtroLocal;
+      if (mostrarReprovados) params.incluirReprovados = 'true';
 
       const { data: res } = await api.get('/orcamentos', { params });
       const items = Array.isArray(res.data) ? res.data : [];
@@ -39,8 +41,7 @@ export default function OrcamentosPage() {
     } catch { }
   };
 
-  // 3. Atualiza os dados sempre que o page ou o filtroLocal mudarem
-  useEffect(() => { fetchData(); }, [page, filtroLocal]);
+  useEffect(() => { fetchData(); }, [page, filtroLocal, mostrarReprovados]);
 
   useEffect(() => { api.get('/clientes').then(r => { const items = Array.isArray(r.data.data) ? r.data.data : []; setClientes(items); }).catch(() => { }); }, []);
 
@@ -63,6 +64,7 @@ export default function OrcamentosPage() {
     if (!(await confirm('Você tem certeza que deseja confirmar este orçamento? Ele será convertido em um evento automaticamente.', { title: 'Confirmar Orçamento', isDanger: false }))) return;
     try {
       await api.post(`/orcamentos/${id}/confirmar`);
+      setToast({ message: 'Orçamento aprovado e convertido em evento!', type: 'success' });
       fetchData();
     } catch (err) {
       alert(err.response?.data?.error || 'Erro ao confirmar orçamento');
@@ -73,6 +75,7 @@ export default function OrcamentosPage() {
     if (!(await confirm('Você tem certeza que deseja rejeitar este orçamento? Ele será marcado como reprovado e removido.', { title: 'Rejeitar Orçamento', isDanger: true }))) return;
     try {
       await api.post(`/orcamentos/${id}/rejeitar`);
+      setToast({ message: 'Orçamento reprovado com sucesso!', type: 'success' });
       fetchData();
     } catch (err) {
       alert(err.response?.data?.error || 'Erro ao rejeitar orçamento');
@@ -116,17 +119,28 @@ export default function OrcamentosPage() {
         {/* Table */}
         <div className="col-span-12 lg:col-span-8 bg-white p-6 rounded-2xl shadow-sm border border-outline-variant/30">
 
-          {/* Header e Filtro de Local */}
+          {/* Header e Filtros */}
           <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-6">
             <h3 className="text-xl font-bold font-headline">Listagem</h3>
-            <select
-              className="bg-surface-container-low border-none rounded-full py-2 px-4 focus:ring-2 focus:ring-primary text-sm font-medium outline-none"
-              value={filtroLocal}
-              onChange={(e) => setFiltroLocal(e.target.value)}
-            >
-              <option value="">Todos os locais</option>
-              {locais.slice().sort((a, b) => a.nome.localeCompare(b.nome)).map(loc => <option key={loc.id} value={loc.id}>{loc.nome}</option>)}
-            </select>
+            <div className="flex items-center gap-3">
+              <label className="flex items-center gap-2 cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  checked={mostrarReprovados}
+                  onChange={(e) => { setMostrarReprovados(e.target.checked); setPage(1); }}
+                  className="w-4 h-4 rounded accent-error"
+                />
+                <span className="text-sm font-medium text-on-surface-variant">Reprovados</span>
+              </label>
+              <select
+                className="bg-surface-container-low border-none rounded-full py-2 px-4 focus:ring-2 focus:ring-primary text-sm font-medium outline-none"
+                value={filtroLocal}
+                onChange={(e) => setFiltroLocal(e.target.value)}
+              >
+                <option value="">Todos os locais</option>
+                {locais.slice().sort((a, b) => a.nome.localeCompare(b.nome)).map(loc => <option key={loc.id} value={loc.id}>{loc.nome}</option>)}
+              </select>
+            </div>
           </div>
 
           <div className="overflow-x-auto">
@@ -134,8 +148,8 @@ export default function OrcamentosPage() {
               <thead>
                 <tr className="text-on-surface-variant text-xs uppercase tracking-widest font-bold">
                   <th className="pb-4 px-4">Cliente</th>
-                  <th className="pb-4 px-4">Local</th>
-                  <th className="pb-4 px-4">Validade</th>
+                  <th className="pb-4 px-4 hidden sm:table-cell">Local</th>
+                  <th className="pb-4 px-4 hidden md:table-cell">Validade</th>
                   <th className="pb-4 px-4">Valor Total</th>
                   <th className="pb-4 px-4">Status</th>
                   <th className="pb-4 px-4 text-right">Ações</th>
@@ -146,8 +160,8 @@ export default function OrcamentosPage() {
                 {orcamentos.map((o) => (
                   <tr key={o.id} className="group hover:bg-surface-container-low transition-colors cursor-pointer" onClick={() => setSelected(o)}>
                     <td className="py-4 px-4 font-semibold text-sm">{o.cliente?.nome || o.Cliente?.nome || '—'}</td>
-                    <td className="py-4 px-4 text-sm capitalize">{o.local?.nome || o.local || '—'}</td>
-                    <td className="py-4 px-4 text-sm opacity-80">{formatDate(o.dataValidade)}</td>
+                    <td className="py-4 px-4 text-sm capitalize hidden sm:table-cell">{o.local?.nome || o.local || '—'}</td>
+                    <td className="py-4 px-4 text-sm opacity-80 hidden md:table-cell">{formatDate(o.dataValidade)}</td>
                     <td className="py-4 px-4 font-bold text-sm">{formatCurrency(o.valorTotal)}</td>
                     <td className="py-4 px-4"><span className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium ${statusBadge(o.status)}`}>{o.status}</span></td>
                     <td className="py-4 px-4 text-right">
@@ -243,6 +257,7 @@ export default function OrcamentosPage() {
           </div>
         </div>
       )}
+      {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
     </div>
   );
 }
