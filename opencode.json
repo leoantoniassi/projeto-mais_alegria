@@ -1,0 +1,32 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "instructions": ["AGENTS.md"],
+  "command": {
+    "feature": {
+      "description": "Inicia desenvolvimento de uma nova feature seguindo o workflow: desenvolvimento -> revisão -> segurança -> testes",
+      "template": "Desenvolva a seguinte feature seguindo rigorosamente o workflow definido no AGENTS.md (engenheiro-desenvolvimento -> revisor-codigo -> especialista-seguranca -> engenheiro-testes): {{input}}"
+    }
+  },
+  "agent": {
+    "engenheiro-desenvolvimento": {
+      "description": "Engenheiro de Software Sênior focado em escrever código funcional e de alta qualidade.",
+      "mode": "subagent",
+      "permission": { "edit": "allow", "bash": "allow" }
+    },
+    "revisor-codigo": {
+      "description": "Arquiteto de Software e Revisor de Código Sênior focado em analisar, criticar e refatorar códigos existentes.",
+      "mode": "subagent",
+      "permission": { "edit": "allow", "bash": "ask" }
+    },
+    "especialista-seguranca": {
+      "description": "Engenheiro de Segurança de Aplicações focado em auditar código e mitigar vulnerabilidades.",
+      "mode": "subagent",
+      "permission": { "edit": "allow", "bash": "ask" }
+    },
+    "engenheiro-testes": {
+      "description": "Engenheiro de Qualidade e Especialista em Testes Automatizados focado em criar testes robustos.",
+      "mode": "subagent",
+      "permission": { "edit": "allow", "bash": "allow" }
+    }
+  }
+}

@@ -166,28 +166,57 @@ export default function OrcamentosPage() {
                     <td className="py-4 px-4"><span className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium ${statusBadge(o.status)}`}>{o.status}</span></td>
                     <td className="py-4 px-4 text-right">
                       <div className="flex justify-end gap-1">
-                        <button onClick={(e) => { e.stopPropagation(); handleWhatsApp(o.id); }} className="w-8 h-8 rounded-full bg-secondary text-on-secondary flex items-center justify-center hover:scale-110 transition-all shadow-md shadow-secondary/20 mr-1" title="WhatsApp">
+                        <button
+                          onClick={(e) => { e.stopPropagation(); handleWhatsApp(o.id); }}
+                          className="w-8 h-8 rounded-full bg-secondary text-on-secondary flex items-center justify-center hover:scale-110 transition-all shadow-md shadow-secondary/20 mr-1"
+                          title="WhatsApp"
+                        >
                           <span className="material-symbols-outlined text-sm filled">chat</span>
                         </button>
-                        {o.status === 'pendente' && <><button onClick={e => { e.stopPropagation(); handleConfirm(o.id); }} className="p-1.5 text-secondary hover:bg-secondary/10 rounded-full" title="Aprovar e Confirmar"><span className="material-symbols-outlined text-lg">check</span></button><button onClick={e => { e.stopPropagation(); handleReject(o.id); }} className="p-1.5 text-error hover:bg-error/10 rounded-full" title="Rejeitar"><span className="material-symbols-outlined text-lg">close</span></button></>}
                         {user?.role !== 'operador' && (
                           <>
-                            <button onClick={e => { 
-                              e.stopPropagation(); 
-                              setEditing(o.id); 
-                              setForm({
-                                clienteId: o.clienteId || o.cliente?.id || o.Cliente?.id || '',
-                                valorTotal: o.valorTotal || 0,
-                                dataValidade: o.dataValidade ? new Date(new Date(o.dataValidade).getTime() - (new Date().getTimezoneOffset() * 60000)).toISOString().slice(0, 10) : '',
-                                observacoes: o.observacoes || '',
-                                localId: o.localId || o.local?.id || '',
-                                produtos: []
-                              });
-                              setShowPanel(true);
-                            }} className="p-1.5 text-on-surface-variant hover:text-primary rounded-full transition-colors" title="Editar">
+                            {o.status === 'pendente' && (
+                              <>
+                                <button
+                                  onClick={e => { e.stopPropagation(); handleConfirm(o.id); }}
+                                  className="p-1.5 text-secondary hover:bg-secondary/10 rounded-full"
+                                  title="Aprovar e Confirmar"
+                                >
+                                  <span className="material-symbols-outlined text-lg">check</span>
+                                </button>
+                                <button
+                                  onClick={e => { e.stopPropagation(); handleReject(o.id); }}
+                                  className="p-1.5 text-error hover:bg-error/10 rounded-full"
+                                  title="Rejeitar"
+                                >
+                                  <span className="material-symbols-outlined text-lg">close</span>
+                                </button>
+                              </>
+                            )}
+                            <button
+                              onClick={e => {
+                                e.stopPropagation();
+                                setEditing(o.id);
+                                setForm({
+                                  clienteId: o.clienteId || o.cliente?.id || o.Cliente?.id || '',
+                                  valorTotal: o.valorTotal || 0,
+                                  dataValidade: o.dataValidade ? new Date(new Date(o.dataValidade).getTime() - (new Date().getTimezoneOffset() * 60000)).toISOString().slice(0, 10) : '',
+                                  observacoes: o.observacoes || '',
+                                  localId: o.localId || o.local?.id || '',
+                                  produtos: []
+                                });
+                                setShowPanel(true);
+                              }}
+                              className="p-1.5 text-on-surface-variant hover:text-primary rounded-full transition-colors"
+                              title="Editar"
+                            >
                               <span className="material-symbols-outlined text-lg">edit</span>
                             </button>
-                            <button onClick={e => { e.stopPropagation(); handleDelete(o.id); }} className="p-1.5 text-on-surface-variant hover:text-error rounded-full">
+                            <button
+                              onClick={e => { e.stopPropagation(); handleDelete(o.id); }}
+                              className="p-1.5 text-on-surface-variant hover:text-error rounded-full"
+                              title="Excluir"
+                            >
                               <span className="material-symbols-outlined text-lg">delete</span>
                             </button>
                           </>
