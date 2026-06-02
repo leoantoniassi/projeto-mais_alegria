@@ -86,10 +86,10 @@ async function criar(req, res, next) {
     const produto = await Produto.create({
       nome,
       categoriaId,
-      quantidade:     quantidade     ?? 0,
-      estoqueMinimo:  estoqueMinimo  ?? 0,
+      quantidade:     Number(quantidade)     || 0,
+      estoqueMinimo:  Number(estoqueMinimo)  || 0,
       unidadeMedida,
-      custoUnitario:  custoUnitario  ?? 0,
+      custoUnitario:  Number(custoUnitario)  || 0,
     });
 
     const produtoCompleto = await Produto.findByPk(produto.id, {
@@ -129,10 +129,10 @@ async function atualizar(req, res, next) {
     await produto.update({
       nome:          nome          || produto.nome,
       categoriaId:   categoriaId   || produto.categoriaId,
-      quantidade:    quantidade    !== undefined ? quantidade    : produto.quantidade,
-      estoqueMinimo: estoqueMinimo !== undefined ? estoqueMinimo : produto.estoqueMinimo,
+      quantidade:    quantidade    !== undefined ? Number(quantidade)    : produto.quantidade,
+      estoqueMinimo: estoqueMinimo !== undefined ? Number(estoqueMinimo) : produto.estoqueMinimo,
       unidadeMedida: unidadeMedida || produto.unidadeMedida,
-      custoUnitario: custoUnitario !== undefined ? custoUnitario : produto.custoUnitario,
+      custoUnitario: custoUnitario !== undefined ? Number(custoUnitario) : produto.custoUnitario,
       atualizadoEm: new Date(),
     });
 

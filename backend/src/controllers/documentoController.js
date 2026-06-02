@@ -1,19 +1,8 @@
-// ============================================================
-// Controller: Documentos (sem upload — caminho/link manual)
-// ============================================================
-const path = require('path');
 const { Documento, Cliente, Evento } = require('../models');
+const documentoService = require('../services/documentoService');
+const { arquivoExiste, sanitizarCaminhoLocal } = require('../utils/fileUtils');
+const { success, fail } = require('../utils/response');
 
-// Detecta o tipo pelo caminho/URL do arquivo
-function detectarTipo(caminho) {
-  if (!caminho) return 'pdf';
-  const ext = path.extname(caminho).replace('.', '').toLowerCase();
-  if (ext === 'jpg' || ext === 'jpeg') return 'jpg';
-  if (ext === 'png') return 'png';
-  return 'pdf'; // padrão para .pdf, .docx, etc.
-}
-
-// GET /api/documentos
 async function listar(req, res, next) {
   try {
     const { clienteId, eventoId } = req.query;
@@ -31,89 +20,71 @@ async function listar(req, res, next) {
       order: [['criadoEm', 'DESC']],
     });
 
-    return res.json({ success: true, data: documentos });
+    return success(res, documentos);
   } catch (error) {
     return next(error);
   }
 }
 
-// POST /api/documentos
 async function criar(req, res, next) {
   try {
-    const { nomeArquivo, caminhoUrl, clienteId, eventoId } = req.body;
+    const erro = documentoService.validarCriacao(req.body);
+    if (erro) return fail(res, erro, 400);
 
-    if (!nomeArquivo) {
-      return res.status(400).json({ success: false, message: 'O nome do documento é obrigatório.' });
-    }
-    if (!caminhoUrl) {
-      return res.status(400).json({ success: false, message: 'A localização do arquivo é obrigatória.' });
-    }
+    const payload = documentoService.montarPayloadCriacao(req.body);
+    const documento = await Documento.create(payload);
 
-    const tipoArquivo = detectarTipo(caminhoUrl);
-
-    const documento = await Documento.create({
-      nomeArquivo,
-      caminhoUrl,
-      tipoArquivo,
-      clienteId: clienteId || null,
-      eventoId: eventoId || null,
-    });
-
-    return res.status(201).json({
-      success: true,
-      message: 'Documento cadastrado com sucesso!',
-      data: documento,
-    });
+    return success(res, documento, 'Documento cadastrado com sucesso!', 201);
   } catch (error) {
     return next(error);
   }
 }
 
-// PUT /api/documentos/:id
 async function atualizar(req, res, next) {
   try {
-    const documento = await Documento.findByPk(req.params.id);
-    if (!documento) {
-      return res.status(404).json({ success: false, message: 'Documento não encontrado.' });
-    }
+    const documento = await documentoService.findDocumentoOrFail(req.params.id);
+    const payload = documentoService.montarPayloadAtualizacao(req.body);
+    await documento.update(payload);
 
-    const { nomeArquivo, caminhoUrl, clienteId, eventoId } = req.body;
-
-    const novoTipo = caminhoUrl ? detectarTipo(caminhoUrl) : documento.tipoArquivo;
-
-    await documento.update({
-      nomeArquivo: nomeArquivo || documento.nomeArquivo,
-      caminhoUrl: caminhoUrl || documento.caminhoUrl,
-      tipoArquivo: novoTipo,
-      clienteId: clienteId !== undefined ? (clienteId || null) : documento.clienteId,
-      eventoId: eventoId !== undefined ? (eventoId || null) : documento.eventoId,
-      atualizadoEm: new Date(),
-    });
-
-    return res.json({
-      success: true,
-      message: 'Documento atualizado com sucesso!',
-      data: documento,
-    });
+    return success(res, documento, 'Documento atualizado com sucesso!');
   } catch (error) {
     return next(error);
   }
 }
 
-// DELETE /api/documentos/:id (soft delete)
 async function remover(req, res, next) {
   try {
-    const documento = await Documento.findByPk(req.params.id);
-    if (!documento) {
-      return res.status(404).json({ success: false, message: 'Documento não encontrado.' });
-    }
-
+    const documento = await documentoService.findDocumentoOrFail(req.params.id);
     await documento.update({ deletadoEm: new Date() });
 
-    return res.json({ success: true, message: 'Documento removido com sucesso!' });
+    return success(res, null, 'Documento removido com sucesso!');
   } catch (error) {
     return next(error);
   }
 }
 
-module.exports = { listar, criar, atualizar, remover };
+async function abrirArquivo(req, res, next) {
+  try {
+    const documento = await documentoService.findDocumentoOrFail(req.params.id);
+    const { caminho, isExterno } = documentoService.infoArquivo(documento);
+
+    if (isExterno) {
+      return fail(res, 'Este documento não possui um arquivo local.', 400);
+    }
+
+    const caminhoSeguro = await sanitizarCaminhoLocal(caminho);
+    if (!caminhoSeguro) {
+      return fail(res, 'Caminho de arquivo inválido ou extensão não permitida.', 400);
+    }
+
+    if (!(await arquivoExiste(caminhoSeguro))) {
+      return fail(res, 'Arquivo não encontrado no diretório de documentos.', 404);
+    }
+
+    return res.sendFile(caminhoSeguro);
+  } catch (error) {
+    return next(error);
+  }
+}
+
+module.exports = { listar, criar, atualizar, remover, abrirArquivo };

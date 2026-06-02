@@ -43,6 +43,8 @@ services:
     volumes:
       - backend_uploads:/app/uploads
       - ./database:/database:ro
+      - ./docs:/app/docs
+      - C:\Users:/Users
     depends_on:
       db:
         condition: service_healthy

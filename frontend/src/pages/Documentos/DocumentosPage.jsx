@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import api from '../../services/api';
 import { useAuth } from '../../contexts/AuthContext';
 import { useConfirm } from '../../contexts/ConfirmContext';
@@ -18,8 +18,7 @@ export default function DocumentosPage() {
     clienteId: '',
     eventoId: '',
   });
-
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       const [docsRes, clientesRes, eventosRes] = await Promise.all([
         api.get('/documentos'),
@@ -30,9 +29,9 @@ export default function DocumentosPage() {
       setClientes(Array.isArray(clientesRes.data.data) ? clientesRes.data.data : (clientesRes.data.rows || []));
       setEventos(Array.isArray(eventosRes.data.data) ? eventosRes.data.data : (eventosRes.data.rows || []));
     } catch {}
-  };
+  }, []);
 
-  useEffect(() => { fetchData(); }, []);
+  useEffect(() => { fetchData(); }, [fetchData]);
 
   const openNew = () => {
     setEditing(null);
@@ -85,12 +84,19 @@ export default function DocumentosPage() {
     }
   };
 
-  const handleAbrir = (caminhoUrl) => {
-    if (!caminhoUrl) return;
-    if (caminhoUrl.startsWith('http')) {
-      window.open(caminhoUrl, '_blank');
+  const handleAbrir = async (doc) => {
+    if (!doc?.caminhoUrl) return;
+    if (/^https?:\/\//i.test(doc.caminhoUrl)) {
+      const win = window.open(doc.caminhoUrl, '_blank', 'noopener,noreferrer');
+      if (win) win.opener = null;
     } else {
-      alert(`Localização local: ${caminhoUrl}\n\nAbra este arquivo diretamente no seu computador.`);
+      try {
+        const response = await api.get(`/documentos/${doc.id}/arquivo`, { responseType: 'blob' });
+        const blobUrl = window.URL.createObjectURL(response.data);
+        window.open(blobUrl, '_blank');
+      } catch {
+        alert('Erro ao abrir o arquivo. Verifique se o caminho está acessível pelo servidor.');
+      }
     }
   };
 
@@ -103,7 +109,6 @@ export default function DocumentosPage() {
 
   return (
     <div>
-      {/* Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10 px-2">
         <div>
           <h2 className="text-4xl font-extrabold text-on-surface tracking-tight mb-2 font-headline">Documentos</h2>
@@ -118,7 +123,6 @@ export default function DocumentosPage() {
         </button>
       </div>
 
-      {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8 px-2">
         <div className="bg-white p-6 rounded-xl border border-outline-variant/10 editorial-shadow">
           <p className="text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-1">Total de Documentos</p>
@@ -134,13 +138,12 @@ export default function DocumentosPage() {
         </div>
       </div>
 
-      {/* Cards Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 px-2">
         {docs.length === 0 && (
           <div className="col-span-full text-center py-16 text-on-surface-variant">
             <span className="material-symbols-outlined text-6xl text-outline/30 block mb-4">folder_off</span>
             <p className="font-medium">Nenhum documento cadastrado.</p>
-            <p className="text-sm mt-1">Clique em "Novo Documento" para começar.</p>
+            <p className="text-sm mt-1">Clique em &quot;Novo Documento&quot; para começar.</p>
           </div>
         )}
         {docs.map((doc) => {
@@ -148,7 +151,6 @@ export default function DocumentosPage() {
           const isUrl = doc.caminhoUrl?.startsWith('http');
           return (
             <div key={doc.id} className="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-outline-variant/10">
-              {/* Card Top */}
               <div className={`${fi.bg} p-6 flex items-center justify-center aspect-[3/2] relative`}>
                 <span className={`material-symbols-outlined text-6xl ${fi.color}`}>{fi.icon}</span>
                 <div className="absolute top-3 right-3">
@@ -158,7 +160,6 @@ export default function DocumentosPage() {
                 </div>
               </div>
 
-              {/* Card Body */}
               <div className="p-5">
                 <h3 className="font-bold text-on-surface truncate mb-2">{doc.nomeArquivo}</h3>
 
@@ -183,7 +184,7 @@ export default function DocumentosPage() {
                 <div className="flex items-center justify-between pt-3 border-t border-outline-variant/10">
                   <div className="flex gap-1">
                     <button
-                      onClick={() => handleAbrir(doc.caminhoUrl)}
+                      onClick={() => handleAbrir(doc)}
                       className="p-2 hover:bg-primary/10 rounded-full text-tertiary transition-colors"
                       title={isUrl ? 'Abrir link' : 'Ver localização'}
                     >
@@ -213,7 +214,6 @@ export default function DocumentosPage() {
         })}
       </div>
 
-      {/* Slide-over Panel */}
       {showPanel && (
         <div
           className="fixed inset-0 bg-on-surface/40 backdrop-blur-md z-50 flex justify-end fade-in"
@@ -223,7 +223,6 @@ export default function DocumentosPage() {
             className="w-full max-w-lg bg-white h-full shadow-2xl flex flex-col slide-in-right rounded-l-3xl"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Panel Header */}
             <div className="p-8 border-b border-outline-variant/30 flex justify-between items-start">
               <div>
                 <h3 className="text-2xl font-headline font-extrabold text-on-surface">
@@ -241,11 +240,9 @@ export default function DocumentosPage() {
               </button>
             </div>
 
-            {/* Panel Body */}
             <div className="flex-1 overflow-y-auto p-8">
               <form id="doc-form" className="space-y-6" onSubmit={handleSave}>
 
-                {/* Nome do Documento */}
                 <div className="space-y-2">
                   <label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-4">
                     Nome do Documento *
@@ -259,7 +256,6 @@ export default function DocumentosPage() {
                   />
                 </div>
 
-                {/* Localização */}
                 <div className="space-y-2">
                   <label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-4">
                     Localização do Arquivo *
@@ -277,7 +273,6 @@ export default function DocumentosPage() {
                   </p>
                 </div>
 
-                {/* Cliente */}
                 <div className="space-y-2">
                   <label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-4">
                     Cliente
@@ -294,7 +289,6 @@ export default function DocumentosPage() {
                   </select>
                 </div>
 
-                {/* Evento */}
                 <div className="space-y-2">
                   <label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-4">
                     Evento (opcional)
@@ -314,7 +308,6 @@ export default function DocumentosPage() {
               </form>
             </div>
 
-            {/* Panel Footer */}
             <div className="p-8 bg-surface-container-low flex gap-4 rounded-tl-3xl">
               <button
                 onClick={() => setShowPanel(false)}

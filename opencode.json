@@ -3,8 +3,8 @@
   "instructions": ["AGENTS.md"],
   "command": {
     "feature": {
-      "description": "Inicia desenvolvimento de uma nova feature seguindo o workflow: desenvolvimento -> revisão -> segurança -> testes",
-      "template": "Desenvolva a seguinte feature seguindo rigorosamente o workflow definido no AGENTS.md (engenheiro-desenvolvimento -> revisor-codigo -> especialista-seguranca -> engenheiro-testes): {{input}}"
+      "description": "Inicia desenvolvimento seguindo o workflow obrigatório: desenvolvimento -> revisão -> segurança -> testes",
+      "template": "Execute a seguinte solicitação seguindo rigorosamente o workflow definido no AGENTS.md (engenheiro-desenvolvimento -> revisor-codigo -> especialista-seguranca -> engenheiro-testes): {{input}}"
     }
   },
   "agent": {
