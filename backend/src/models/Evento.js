@@ -37,6 +37,11 @@ const Evento = sequelize.define('Evento', {
     allowNull: false,
     field: 'evt_data_evento',
   },
+  horarioTermino: {
+    type: DataTypes.DATE,
+    allowNull: false,
+    field: 'evt_horario_termino',
+  },
   status: {
     type: DataTypes.STRING(30),
     allowNull: false,

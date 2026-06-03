@@ -99,4 +99,23 @@ describe('EventosPage — warning de capacidade excedida', () => {
       expect(screen.queryByText('Capacidade excedida!')).not.toBeInTheDocument();
     });
   });
+
+  test('deve exibir campo "Horário de Término" no formulário de Novo Evento', async () => {
+    const user = userEvent.setup();
+    render(<EventosPage />);
+    await abrirFormulario(user);
+
+    expect(screen.getByText('Horário de Término')).toBeInTheDocument();
+  });
+
+  test('campo "Horário de Término" deve ser required', async () => {
+    const user = userEvent.setup();
+    render(<EventosPage />);
+    await abrirFormulario(user);
+
+    const inputs = document.querySelectorAll('#evt-form input[type="datetime-local"]');
+    expect(inputs.length).toBe(2);
+    // O segundo input datetime-local é o Horário de Término
+    expect(inputs[1]).toHaveAttribute('required');
+  });
 });

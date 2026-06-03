@@ -17,27 +17,27 @@ INSERT INTO usuarios (usr_nome, usr_email, usr_senha, usr_role) VALUES
 ('Operador',  'operador@maisalegria.com', '$2a$10$Nq.Tgkmz8Dz4/s9KWP.NDOSD33LH4pGBrGsnd5R3F/kqoymkRpyoa', 'operador');
 
 -- L. LOCAIS
-INSERT INTO locais (loc_nome, loc_logradouro, loc_numero, loc_bairro, loc_cidade, loc_estado, loc_cep) VALUES
-('Local 1', 'Rua 1', '100', 'Bairro 1', 'Cidade 1', 'SP', '00000-001'),
-('Local 2', 'Rua 2', '200', 'Bairro 2', 'Cidade 2', 'SP', '00000-002'),
-('Local 3', 'Rua 3', '300', 'Bairro 3', 'Cidade 3', 'SP', '00000-003'),
-('Local 4', 'Rua 4', '400', 'Bairro 4', 'Cidade 4', 'SP', '00000-004'),
-('Local 5', 'Rua 5', '500', 'Bairro 5', 'Cidade 5', 'SP', '00000-005'),
-('Local 6', 'Rua 6', '600', 'Bairro 6', 'Cidade 6', 'SP', '00000-006'),
-('Local 7', 'Rua 7', '700', 'Bairro 7', 'Cidade 7', 'SP', '00000-007'),
-('Local 8', 'Rua 8', '800', 'Bairro 8', 'Cidade 8', 'SP', '00000-008'),
-('Local 9', 'Rua 9', '900', 'Bairro 9', 'Cidade 9', 'SP', '00000-009'),
-('Local 10', 'Rua 10', '1000', 'Bairro 10', 'Cidade 10', 'SP', '00000-010'),
-('Local 11', 'Rua 11', '1100', 'Bairro 11', 'Cidade 11', 'SP', '00000-011'),
-('Local 12', 'Rua 12', '1200', 'Bairro 12', 'Cidade 12', 'SP', '00000-012'),
-('Local 13', 'Rua 13', '1300', 'Bairro 13', 'Cidade 13', 'SP', '00000-013'),
-('Local 14', 'Rua 14', '1400', 'Bairro 14', 'Cidade 14', 'SP', '00000-014'),
-('Local 15', 'Rua 15', '1500', 'Bairro 15', 'Cidade 15', 'SP', '00000-015'),
-('Local 16', 'Rua 16', '1600', 'Bairro 16', 'Cidade 16', 'SP', '00000-016'),
-('Local 17', 'Rua 17', '1700', 'Bairro 17', 'Cidade 17', 'SP', '00000-017'),
-('Local 18', 'Rua 18', '1800', 'Bairro 18', 'Cidade 18', 'SP', '00000-018'),
-('Local 19', 'Rua 19', '1900', 'Bairro 19', 'Cidade 19', 'SP', '00000-019'),
-('Local 20', 'Rua 20', '2000', 'Bairro 20', 'Cidade 20', 'SP', '00000-020');
+INSERT INTO locais (loc_nome, loc_logradouro, loc_numero, loc_bairro, loc_cidade, loc_estado, loc_cep, loc_capacidade_maxima) VALUES
+('Local 1', 'Rua 1', '100', 'Bairro 1', 'Cidade 1', 'SP', '00000-001', 150),
+('Local 2', 'Rua 2', '200', 'Bairro 2', 'Cidade 2', 'SP', '00000-002', 250),
+('Local 3', 'Rua 3', '300', 'Bairro 3', 'Cidade 3', 'SP', '00000-003', NULL),
+('Local 4', 'Rua 4', '400', 'Bairro 4', 'Cidade 4', 'SP', '00000-004', NULL),
+('Local 5', 'Rua 5', '500', 'Bairro 5', 'Cidade 5', 'SP', '00000-005', NULL),
+('Local 6', 'Rua 6', '600', 'Bairro 6', 'Cidade 6', 'SP', '00000-006', NULL),
+('Local 7', 'Rua 7', '700', 'Bairro 7', 'Cidade 7', 'SP', '00000-007', NULL),
+('Local 8', 'Rua 8', '800', 'Bairro 8', 'Cidade 8', 'SP', '00000-008', NULL),
+('Local 9', 'Rua 9', '900', 'Bairro 9', 'Cidade 9', 'SP', '00000-009', NULL),
+('Local 10', 'Rua 10', '1000', 'Bairro 10', 'Cidade 10', 'SP', '00000-010', NULL),
+('Local 11', 'Rua 11', '1100', 'Bairro 11', 'Cidade 11', 'SP', '00000-011', NULL),
+('Local 12', 'Rua 12', '1200', 'Bairro 12', 'Cidade 12', 'SP', '00000-012', NULL),
+('Local 13', 'Rua 13', '1300', 'Bairro 13', 'Cidade 13', 'SP', '00000-013', NULL),
+('Local 14', 'Rua 14', '1400', 'Bairro 14', 'Cidade 14', 'SP', '00000-014', NULL),
+('Local 15', 'Rua 15', '1500', 'Bairro 15', 'Cidade 15', 'SP', '00000-015', NULL),
+('Local 16', 'Rua 16', '1600', 'Bairro 16', 'Cidade 16', 'SP', '00000-016', NULL),
+('Local 17', 'Rua 17', '1700', 'Bairro 17', 'Cidade 17', 'SP', '00000-017', NULL),
+('Local 18', 'Rua 18', '1800', 'Bairro 18', 'Cidade 18', 'SP', '00000-018', NULL),
+('Local 19', 'Rua 19', '1900', 'Bairro 19', 'Cidade 19', 'SP', '00000-019', NULL),
+('Local 20', 'Rua 20', '2000', 'Bairro 20', 'Cidade 20', 'SP', '00000-020', NULL);
 
 -- F. FUNCOES
 INSERT INTO funcoes (fnc_nome, fnc_descricao) VALUES
@@ -224,27 +224,27 @@ INSERT INTO orcamentos (orc_cli_id, orc_loc_id, orc_valor_total, orc_data_valida
 ((SELECT cli_id FROM clientes WHERE cli_nome = 'Cliente 20'), (SELECT loc_id FROM locais WHERE loc_nome = 'Local 20'), 8430.00, '2026-05-15', 'pendente', 'Obs do orcamento 20');
 
 -- 6. EVENTOS (Corrigidos para letras minúsculas conforme exigido pelo CHECK)
-INSERT INTO eventos (evt_cli_id, evt_orc_id, evt_loc_id, evt_nome, evt_data_evento, evt_status, evt_qtd_pessoas, evt_qtd_adultos, evt_qtd_criancas, evt_qtd_bebes, evt_observacoes) VALUES
-((SELECT cli_id FROM clientes WHERE cli_nome = 'Cliente 1'), (SELECT orc_id FROM orcamentos WHERE orc_observacoes = 'Obs do orcamento 1'), (SELECT loc_id FROM locais WHERE loc_nome = 'Local 1'), 'Evento 1', '2026-05-17 14:00:00', 'confirmado', 100, 80, 20, 0, 'Obs Evento 1'),
-((SELECT cli_id FROM clientes WHERE cli_nome = 'Cliente 2'), (SELECT orc_id FROM orcamentos WHERE orc_observacoes = 'Obs do orcamento 2'), (SELECT loc_id FROM locais WHERE loc_nome = 'Local 2'), 'Evento 2', '2026-12-14 14:00:00', 'concluido', 100, 80, 20, 0, 'Obs Evento 2'),
-((SELECT cli_id FROM clientes WHERE cli_nome = 'Cliente 3'), (SELECT orc_id FROM orcamentos WHERE orc_observacoes = 'Obs do orcamento 3'), (SELECT loc_id FROM locais WHERE loc_nome = 'Local 3'), 'Evento 3', '2026-01-27 14:00:00', 'confirmado', 100, 80, 20, 0, 'Obs Evento 3'),
-((SELECT cli_id FROM clientes WHERE cli_nome = 'Cliente 4'), (SELECT orc_id FROM orcamentos WHERE orc_observacoes = 'Obs do orcamento 4'), (SELECT loc_id FROM locais WHERE loc_nome = 'Local 4'), 'Evento 4', '2026-01-27 14:00:00', 'confirmado', 100, 80, 20, 0, 'Obs Evento 4'),
-((SELECT cli_id FROM clientes WHERE cli_nome = 'Cliente 5'), (SELECT orc_id FROM orcamentos WHERE orc_observacoes = 'Obs do orcamento 5'), (SELECT loc_id FROM locais WHERE loc_nome = 'Local 5'), 'Evento 5', '2026-05-06 14:00:00', 'confirmado', 100, 80, 20, 0, 'Obs Evento 5'),
-((SELECT cli_id FROM clientes WHERE cli_nome = 'Cliente 6'), (SELECT orc_id FROM orcamentos WHERE orc_observacoes = 'Obs do orcamento 6'), (SELECT loc_id FROM locais WHERE loc_nome = 'Local 6'), 'Evento 6', '2026-07-28 14:00:00', 'confirmado', 100, 80, 20, 0, 'Obs Evento 6'),
-((SELECT cli_id FROM clientes WHERE cli_nome = 'Cliente 7'), (SELECT orc_id FROM orcamentos WHERE orc_observacoes = 'Obs do orcamento 7'), (SELECT loc_id FROM locais WHERE loc_nome = 'Local 7'), 'Evento 7', '2026-04-16 14:00:00', 'cancelado', 100, 80, 20, 0, 'Obs Evento 7'),
-((SELECT cli_id FROM clientes WHERE cli_nome = 'Cliente 8'), (SELECT orc_id FROM orcamentos WHERE orc_observacoes = 'Obs do orcamento 8'), (SELECT loc_id FROM locais WHERE loc_nome = 'Local 8'), 'Evento 8', '2026-05-17 14:00:00', 'confirmado', 100, 80, 20, 0, 'Obs Evento 8'),
-((SELECT cli_id FROM clientes WHERE cli_nome = 'Cliente 9'), (SELECT orc_id FROM orcamentos WHERE orc_observacoes = 'Obs do orcamento 9'), (SELECT loc_id FROM locais WHERE loc_nome = 'Local 9'), 'Evento 9', '2026-10-15 14:00:00', 'confirmado', 100, 80, 20, 0, 'Obs Evento 9'),
-((SELECT cli_id FROM clientes WHERE cli_nome = 'Cliente 10'), (SELECT orc_id FROM orcamentos WHERE orc_observacoes = 'Obs do orcamento 10'), (SELECT loc_id FROM locais WHERE loc_nome = 'Local 10'), 'Evento 10', '2026-10-06 14:00:00', 'concluido', 100, 80, 20, 0, 'Obs Evento 10'),
-((SELECT cli_id FROM clientes WHERE cli_nome = 'Cliente 11'), (SELECT orc_id FROM orcamentos WHERE orc_observacoes = 'Obs do orcamento 11'), (SELECT loc_id FROM locais WHERE loc_nome = 'Local 11'), 'Evento 11', '2026-03-01 14:00:00', 'pendente', 100, 80, 20, 0, 'Obs Evento 11'),
-((SELECT cli_id FROM clientes WHERE cli_nome = 'Cliente 12'), (SELECT orc_id FROM orcamentos WHERE orc_observacoes = 'Obs do orcamento 12'), (SELECT loc_id FROM locais WHERE loc_nome = 'Local 12'), 'Evento 12', '2026-07-16 14:00:00', 'pendente', 100, 80, 20, 0, 'Obs Evento 12'),
-((SELECT cli_id FROM clientes WHERE cli_nome = 'Cliente 13'), (SELECT orc_id FROM orcamentos WHERE orc_observacoes = 'Obs do orcamento 13'), (SELECT loc_id FROM locais WHERE loc_nome = 'Local 13'), 'Evento 13', '2026-08-20 14:00:00', 'pendente', 100, 80, 20, 0, 'Obs Evento 13'),
-((SELECT cli_id FROM clientes WHERE cli_nome = 'Cliente 14'), (SELECT orc_id FROM orcamentos WHERE orc_observacoes = 'Obs do orcamento 14'), (SELECT loc_id FROM locais WHERE loc_nome = 'Local 14'), 'Evento 14', '2026-12-21 14:00:00', 'cancelado', 100, 80, 20, 0, 'Obs Evento 14'),
-((SELECT cli_id FROM clientes WHERE cli_nome = 'Cliente 15'), (SELECT orc_id FROM orcamentos WHERE orc_observacoes = 'Obs do orcamento 15'), (SELECT loc_id FROM locais WHERE loc_nome = 'Local 15'), 'Evento 15', '2026-05-22 14:00:00', 'cancelado', 100, 80, 20, 0, 'Obs Evento 15'),
-((SELECT cli_id FROM clientes WHERE cli_nome = 'Cliente 16'), (SELECT orc_id FROM orcamentos WHERE orc_observacoes = 'Obs do orcamento 16'), (SELECT loc_id FROM locais WHERE loc_nome = 'Local 16'), 'Evento 16', '2026-06-01 14:00:00', 'cancelado', 100, 80, 20, 0, 'Obs Evento 16'),
-((SELECT cli_id FROM clientes WHERE cli_nome = 'Cliente 17'), (SELECT orc_id FROM orcamentos WHERE orc_observacoes = 'Obs do orcamento 17'), (SELECT loc_id FROM locais WHERE loc_nome = 'Local 17'), 'Evento 17', '2026-09-10 14:00:00', 'cancelado', 100, 80, 20, 0, 'Obs Evento 17'),
-((SELECT cli_id FROM clientes WHERE cli_nome = 'Cliente 18'), (SELECT orc_id FROM orcamentos WHERE orc_observacoes = 'Obs do orcamento 18'), (SELECT loc_id FROM locais WHERE loc_nome = 'Local 18'), 'Evento 18', '2026-01-10 14:00:00', 'pendente', 100, 80, 20, 0, 'Obs Evento 18'),
-((SELECT cli_id FROM clientes WHERE cli_nome = 'Cliente 19'), (SELECT orc_id FROM orcamentos WHERE orc_observacoes = 'Obs do orcamento 19'), (SELECT loc_id FROM locais WHERE loc_nome = 'Local 19'), 'Evento 19', '2026-10-08 14:00:00', 'pendente', 100, 80, 20, 0, 'Obs Evento 19'),
-((SELECT cli_id FROM clientes WHERE cli_nome = 'Cliente 20'), (SELECT orc_id FROM orcamentos WHERE orc_observacoes = 'Obs do orcamento 20'), (SELECT loc_id FROM locais WHERE loc_nome = 'Local 20'), 'Evento 20', '2026-05-22 14:00:00', 'concluido', 100, 80, 20, 0, 'Obs Evento 20');
+INSERT INTO eventos (evt_cli_id, evt_orc_id, evt_loc_id, evt_nome, evt_data_evento, evt_horario_termino, evt_status, evt_qtd_pessoas, evt_qtd_adultos, evt_qtd_criancas, evt_qtd_bebes, evt_observacoes) VALUES
+((SELECT cli_id FROM clientes WHERE cli_nome = 'Cliente 1'), (SELECT orc_id FROM orcamentos WHERE orc_observacoes = 'Obs do orcamento 1'), (SELECT loc_id FROM locais WHERE loc_nome = 'Local 1'), 'Evento 1', '2026-05-17 14:00:00', '2026-05-17 18:00:00', 'confirmado', 100, 80, 20, 0, 'Obs Evento 1'),
+((SELECT cli_id FROM clientes WHERE cli_nome = 'Cliente 2'), (SELECT orc_id FROM orcamentos WHERE orc_observacoes = 'Obs do orcamento 2'), (SELECT loc_id FROM locais WHERE loc_nome = 'Local 2'), 'Evento 2', '2026-12-14 14:00:00', '2026-12-14 18:00:00', 'concluido', 100, 80, 20, 0, 'Obs Evento 2'),
+((SELECT cli_id FROM clientes WHERE cli_nome = 'Cliente 3'), (SELECT orc_id FROM orcamentos WHERE orc_observacoes = 'Obs do orcamento 3'), (SELECT loc_id FROM locais WHERE loc_nome = 'Local 3'), 'Evento 3', '2026-01-27 14:00:00', '2026-01-27 18:00:00', 'confirmado', 100, 80, 20, 0, 'Obs Evento 3'),
+((SELECT cli_id FROM clientes WHERE cli_nome = 'Cliente 4'), (SELECT orc_id FROM orcamentos WHERE orc_observacoes = 'Obs do orcamento 4'), (SELECT loc_id FROM locais WHERE loc_nome = 'Local 4'), 'Evento 4', '2026-01-27 14:00:00', '2026-01-27 18:00:00', 'confirmado', 100, 80, 20, 0, 'Obs Evento 4'),
+((SELECT cli_id FROM clientes WHERE cli_nome = 'Cliente 5'), (SELECT orc_id FROM orcamentos WHERE orc_observacoes = 'Obs do orcamento 5'), (SELECT loc_id FROM locais WHERE loc_nome = 'Local 5'), 'Evento 5', '2026-05-06 14:00:00', '2026-05-06 18:00:00', 'confirmado', 100, 80, 20, 0, 'Obs Evento 5'),
+((SELECT cli_id FROM clientes WHERE cli_nome = 'Cliente 6'), (SELECT orc_id FROM orcamentos WHERE orc_observacoes = 'Obs do orcamento 6'), (SELECT loc_id FROM locais WHERE loc_nome = 'Local 6'), 'Evento 6', '2026-07-28 14:00:00', '2026-07-28 18:00:00', 'confirmado', 100, 80, 20, 0, 'Obs Evento 6'),
+((SELECT cli_id FROM clientes WHERE cli_nome = 'Cliente 7'), (SELECT orc_id FROM orcamentos WHERE orc_observacoes = 'Obs do orcamento 7'), (SELECT loc_id FROM locais WHERE loc_nome = 'Local 7'), 'Evento 7', '2026-04-16 14:00:00', '2026-04-16 18:00:00', 'cancelado', 100, 80, 20, 0, 'Obs Evento 7'),
+((SELECT cli_id FROM clientes WHERE cli_nome = 'Cliente 8'), (SELECT orc_id FROM orcamentos WHERE orc_observacoes = 'Obs do orcamento 8'), (SELECT loc_id FROM locais WHERE loc_nome = 'Local 8'), 'Evento 8', '2026-05-17 14:00:00', '2026-05-17 18:00:00', 'confirmado', 100, 80, 20, 0, 'Obs Evento 8'),
+((SELECT cli_id FROM clientes WHERE cli_nome = 'Cliente 9'), (SELECT orc_id FROM orcamentos WHERE orc_observacoes = 'Obs do orcamento 9'), (SELECT loc_id FROM locais WHERE loc_nome = 'Local 9'), 'Evento 9', '2026-10-15 14:00:00', '2026-10-15 18:00:00', 'confirmado', 100, 80, 20, 0, 'Obs Evento 9'),
+((SELECT cli_id FROM clientes WHERE cli_nome = 'Cliente 10'), (SELECT orc_id FROM orcamentos WHERE orc_observacoes = 'Obs do orcamento 10'), (SELECT loc_id FROM locais WHERE loc_nome = 'Local 10'), 'Evento 10', '2026-10-06 14:00:00', '2026-10-06 18:00:00', 'concluido', 100, 80, 20, 0, 'Obs Evento 10'),
+((SELECT cli_id FROM clientes WHERE cli_nome = 'Cliente 11'), (SELECT orc_id FROM orcamentos WHERE orc_observacoes = 'Obs do orcamento 11'), (SELECT loc_id FROM locais WHERE loc_nome = 'Local 11'), 'Evento 11', '2026-03-01 14:00:00', '2026-03-01 18:00:00', 'pendente', 100, 80, 20, 0, 'Obs Evento 11'),
+((SELECT cli_id FROM clientes WHERE cli_nome = 'Cliente 12'), (SELECT orc_id FROM orcamentos WHERE orc_observacoes = 'Obs do orcamento 12'), (SELECT loc_id FROM locais WHERE loc_nome = 'Local 12'), 'Evento 12', '2026-07-16 14:00:00', '2026-07-16 18:00:00', 'pendente', 100, 80, 20, 0, 'Obs Evento 12'),
+((SELECT cli_id FROM clientes WHERE cli_nome = 'Cliente 13'), (SELECT orc_id FROM orcamentos WHERE orc_observacoes = 'Obs do orcamento 13'), (SELECT loc_id FROM locais WHERE loc_nome = 'Local 13'), 'Evento 13', '2026-08-20 14:00:00', '2026-08-20 18:00:00', 'pendente', 100, 80, 20, 0, 'Obs Evento 13'),
+((SELECT cli_id FROM clientes WHERE cli_nome = 'Cliente 14'), (SELECT orc_id FROM orcamentos WHERE orc_observacoes = 'Obs do orcamento 14'), (SELECT loc_id FROM locais WHERE loc_nome = 'Local 14'), 'Evento 14', '2026-12-21 14:00:00', '2026-12-21 18:00:00', 'cancelado', 100, 80, 20, 0, 'Obs Evento 14'),
+((SELECT cli_id FROM clientes WHERE cli_nome = 'Cliente 15'), (SELECT orc_id FROM orcamentos WHERE orc_observacoes = 'Obs do orcamento 15'), (SELECT loc_id FROM locais WHERE loc_nome = 'Local 15'), 'Evento 15', '2026-05-22 14:00:00', '2026-05-22 18:00:00', 'cancelado', 100, 80, 20, 0, 'Obs Evento 15'),
+((SELECT cli_id FROM clientes WHERE cli_nome = 'Cliente 16'), (SELECT orc_id FROM orcamentos WHERE orc_observacoes = 'Obs do orcamento 16'), (SELECT loc_id FROM locais WHERE loc_nome = 'Local 16'), 'Evento 16', '2026-06-01 14:00:00', '2026-06-01 18:00:00', 'cancelado', 100, 80, 20, 0, 'Obs Evento 16'),
+((SELECT cli_id FROM clientes WHERE cli_nome = 'Cliente 17'), (SELECT orc_id FROM orcamentos WHERE orc_observacoes = 'Obs do orcamento 17'), (SELECT loc_id FROM locais WHERE loc_nome = 'Local 17'), 'Evento 17', '2026-09-10 14:00:00', '2026-09-10 18:00:00', 'cancelado', 100, 80, 20, 0, 'Obs Evento 17'),
+((SELECT cli_id FROM clientes WHERE cli_nome = 'Cliente 18'), (SELECT orc_id FROM orcamentos WHERE orc_observacoes = 'Obs do orcamento 18'), (SELECT loc_id FROM locais WHERE loc_nome = 'Local 18'), 'Evento 18', '2026-01-10 14:00:00', '2026-01-10 18:00:00', 'pendente', 100, 80, 20, 0, 'Obs Evento 18'),
+((SELECT cli_id FROM clientes WHERE cli_nome = 'Cliente 19'), (SELECT orc_id FROM orcamentos WHERE orc_observacoes = 'Obs do orcamento 19'), (SELECT loc_id FROM locais WHERE loc_nome = 'Local 19'), 'Evento 19', '2026-10-08 14:00:00', '2026-10-08 18:00:00', 'pendente', 100, 80, 20, 0, 'Obs Evento 19'),
+((SELECT cli_id FROM clientes WHERE cli_nome = 'Cliente 20'), (SELECT orc_id FROM orcamentos WHERE orc_observacoes = 'Obs do orcamento 20'), (SELECT loc_id FROM locais WHERE loc_nome = 'Local 20'), 'Evento 20', '2026-05-22 14:00:00', '2026-05-22 18:00:00', 'concluido', 100, 80, 20, 0, 'Obs Evento 20');
 
 -- 7. DOCUMENTOS
 INSERT INTO documentos (doc_cli_id, doc_evt_id, doc_nome_arquivo, doc_caminho_url, doc_tipo_arquivo) VALUES

@@ -4,6 +4,54 @@
 const { Op } = require('sequelize');
 const { Escala, Evento, Funcionario, Funcao } = require('../models');
 
+const CONFLITO_GAP_MS = 2 * 60 * 60 * 1000; // 2 horas em ms
+const MAX_ALOCACAO_LOTE = 100; // Limite de funcionários por lote para evitar DoS
+
+function garantirNumeroValido(valor, nome) {
+  if (typeof valor !== 'number' || Number.isNaN(valor)) {
+    throw new Error(`${nome} inválido(a): não é um número válido.`);
+  }
+  return valor;
+}
+
+function calcularLimitesDia(data) {
+  const dataEvento = new Date(data);
+  if (Number.isNaN(dataEvento.getTime())) {
+    throw new Error('Data do evento inválida.');
+  }
+  const inicioDia = new Date(dataEvento);
+  inicioDia.setHours(0, 0, 0, 0);
+  const fimDia = new Date(dataEvento);
+  fimDia.setHours(23, 59, 59, 999);
+  return { inicioDia, fimDia };
+}
+
+function temConflito(inicioA, fimA, inicioB, fimB) {
+  return fimB + CONFLITO_GAP_MS > inicioA && fimA + CONFLITO_GAP_MS > inicioB;
+}
+
+function mensagemConflito(funcionarioNome, eventoNome) {
+  return `"${funcionarioNome}" já está alocado no evento "${eventoNome}" neste horário (gap mínimo de 2h não respeitado).`;
+}
+
+function buscarEscalasMesmoDia(funcionarioId, eventoId, inicioDia, fimDia) {
+  return Escala.findAll({
+    where: {
+      funcionarioId,
+      eventoId: { [Op.ne]: eventoId },
+    },
+    include: [{
+      model: Evento,
+      as: 'evento',
+      where: {
+        dataEvento: { [Op.between]: [inicioDia, fimDia] },
+        deletadoEm: null,
+      },
+      required: true,
+    }],
+  });
+}
+
 // POST /api/escala
 async function alocar(req, res, next) {
   try {
@@ -34,34 +82,22 @@ async function alocar(req, res, next) {
       });
     }
 
-    // RN2: Verifica conflito de horário — funcionário já alocado em evento no mesmo dia
-    const dataEvento = new Date(evento.dataEvento);
-    const inicioDia = new Date(dataEvento);
-    inicioDia.setHours(0, 0, 0, 0);
-    const fimDia = new Date(dataEvento);
-    fimDia.setHours(23, 59, 59, 999);
+    // Verifica conflito de horário com gap mínimo de 2h
+    const { inicioDia, fimDia } = calcularLimitesDia(evento.dataEvento);
+    const inicioA = garantirNumeroValido(new Date(evento.dataEvento).getTime(), 'Data de início do evento');
+    const fimA = garantirNumeroValido(new Date(evento.horarioTermino).getTime(), 'Horário de término do evento');
 
-    const conflito = await Escala.findOne({
-      where: {
-        funcionarioId,
-        eventoId: { [Op.ne]: eventoId },
-      },
-      include: [{
-        model: Evento,
-        as: 'evento',
-        where: {
-          dataEvento: {
-            [Op.between]: [inicioDia, fimDia],
-          },
-        },
-      }],
-    });
+    const escalasMesmoDia = await buscarEscalasMesmoDia(funcionarioId, eventoId, inicioDia, fimDia);
 
-    if (conflito) {
-      return res.status(409).json({
-        success: false,
-        message: `O funcionário "${funcionario.nome}" já está alocado em outro evento nesta data (${dataEvento.toLocaleDateString('pt-BR')}).`,
-      });
+    for (const escala of escalasMesmoDia) {
+      const inicioB = garantirNumeroValido(new Date(escala.evento.dataEvento).getTime(), 'Data de início do evento conflitante');
+      const fimB = garantirNumeroValido(new Date(escala.evento.horarioTermino).getTime(), 'Horário de término do evento conflitante');
+      if (temConflito(inicioA, fimA, inicioB, fimB)) {
+        return res.status(409).json({
+          success: false,
+          message: mensagemConflito(funcionario.nome, escala.evento.nome),
+        });
+      }
     }
 
     // Verifica se já está alocado neste evento
@@ -81,7 +117,7 @@ async function alocar(req, res, next) {
     // Retorna com dados completos
     const escalaCriada = await Escala.findByPk(escala.id, {
       include: [
-        { model: Evento, as: 'evento', attributes: ['id', 'nome', 'dataEvento'] },
+        { model: Evento, as: 'evento', attributes: ['id', 'nome', 'dataEvento', 'horarioTermino'] },
         { model: Funcionario, as: 'funcionario', attributes: ['id', 'nome', 'funcao'] },
       ],
     });
@@ -140,7 +176,7 @@ async function listarPorEvento(req, res, next) {
 }
 
 // GET /api/escala/disponiveis/:eventoId
-// Retorna funcionários que NÃO estão escalados em nenhum evento no mesmo dia
+// Retorna funcionários disponíveis para o evento respeitando gap mínimo de 2h
 async function listarDisponiveis(req, res, next) {
   try {
     const evento = await Evento.findByPk(req.params.eventoId);
@@ -148,11 +184,9 @@ async function listarDisponiveis(req, res, next) {
       return res.status(404).json({ success: false, message: 'Evento não encontrado.' });
     }
 
-    const dataEvento = new Date(evento.dataEvento);
-    const inicioDia = new Date(dataEvento);
-    inicioDia.setHours(0, 0, 0, 0);
-    const fimDia = new Date(dataEvento);
-    fimDia.setHours(23, 59, 59, 999);
+    const { inicioDia, fimDia } = calcularLimitesDia(evento.dataEvento);
+    const inicioA = garantirNumeroValido(new Date(evento.dataEvento).getTime(), 'Data de início do evento');
+    const fimA = garantirNumeroValido(new Date(evento.horarioTermino).getTime(), 'Horário de término do evento');
 
     // IDs dos funcionários já escalados neste evento
     const jaEscalados = await Escala.findAll({
@@ -161,23 +195,35 @@ async function listarDisponiveis(req, res, next) {
     });
     const idsJaEscalados = jaEscalados.map(e => e.funcionarioId);
 
-    // IDs dos funcionários ocupados em outro evento no mesmo dia
-    const ocupados = await Escala.findAll({
+    // Todas as escalas de outros eventos no mesmo dia
+    const escalasOutrosEventos = await Escala.findAll({
       where: {
         eventoId: { [Op.ne]: req.params.eventoId },
       },
       include: [{
         model: Evento,
         as: 'evento',
-        where: { dataEvento: { [Op.between]: [inicioDia, fimDia] } },
-        attributes: [],
+        where: {
+          dataEvento: { [Op.between]: [inicioDia, fimDia] },
+          deletadoEm: null,
+        },
+        required: true,
       }],
-      attributes: ['funcionarioId'],
+      attributes: ['funcionarioId', 'eventoId'],
     });
-    const idsOcupados = ocupados.map(e => e.funcionarioId);
 
-    // Todos os IDs indisponíveis (já escalados neste evento OU ocupados em outro)
-    const idsIndisponiveis = [...new Set([...idsJaEscalados, ...idsOcupados])];
+    // IDs dos funcionários que têm conflito real (gap < 2h)
+    const idsComConflito = new Set();
+    for (const escala of escalasOutrosEventos) {
+      const inicioB = garantirNumeroValido(new Date(escala.evento.dataEvento).getTime(), 'Data de início do evento conflitante');
+      const fimB = garantirNumeroValido(new Date(escala.evento.horarioTermino).getTime(), 'Horário de término do evento conflitante');
+      if (temConflito(inicioA, fimA, inicioB, fimB)) {
+        idsComConflito.add(escala.funcionarioId);
+      }
+    }
+
+    // Todos os IDs indisponíveis (já escalados neste evento OU com conflito em outro)
+    const idsIndisponiveis = [...new Set([...idsJaEscalados, ...idsComConflito])];
 
     const where = idsIndisponiveis.length > 0
       ? { id: { [Op.notIn]: idsIndisponiveis } }
@@ -204,14 +250,21 @@ async function alocarLote(req, res, next) {
       return res.status(400).json({ success: false, message: 'eventoId e funcionarioIds[] são obrigatórios.' });
     }
 
+    if (funcionarioIds.length > MAX_ALOCACAO_LOTE) {
+      return res.status(400).json({
+        success: false,
+        message: `Número máximo de ${MAX_ALOCACAO_LOTE} funcionários por lote excedido.`,
+      });
+    }
+
     const evento = await Evento.findByPk(eventoId);
     if (!evento) {
       return res.status(404).json({ success: false, message: 'Evento não encontrado.' });
     }
 
-    const dataEvento = new Date(evento.dataEvento);
-    const inicioDia = new Date(dataEvento); inicioDia.setHours(0, 0, 0, 0);
-    const fimDia = new Date(dataEvento);   fimDia.setHours(23, 59, 59, 999);
+    const { inicioDia, fimDia } = calcularLimitesDia(evento.dataEvento);
+    const inicioA = garantirNumeroValido(new Date(evento.dataEvento).getTime(), 'Data de início do evento');
+    const fimA = garantirNumeroValido(new Date(evento.horarioTermino).getTime(), 'Horário de término do evento');
 
     const erros = [];
     const criados = [];
@@ -220,11 +273,19 @@ async function alocarLote(req, res, next) {
       const funcionario = await Funcionario.findByPk(funcionarioId);
       if (!funcionario) { erros.push(`Funcionário ${funcionarioId} não encontrado.`); continue; }
 
-      const conflito = await Escala.findOne({
-        where: { funcionarioId, eventoId: { [Op.ne]: eventoId } },
-        include: [{ model: Evento, as: 'evento', where: { dataEvento: { [Op.between]: [inicioDia, fimDia] } } }],
-      });
-      if (conflito) { erros.push(`"${funcionario.nome}" já está escalado nesta data.`); continue; }
+      const escalasMesmoDia = await buscarEscalasMesmoDia(funcionarioId, eventoId, inicioDia, fimDia);
+
+      let conflito = false;
+      for (const escala of escalasMesmoDia) {
+        const inicioB = garantirNumeroValido(new Date(escala.evento.dataEvento).getTime(), 'Data de início do evento conflitante');
+        const fimB = garantirNumeroValido(new Date(escala.evento.horarioTermino).getTime(), 'Horário de término do evento conflitante');
+        if (temConflito(inicioA, fimA, inicioB, fimB)) {
+          erros.push(mensagemConflito(funcionario.nome, escala.evento.nome));
+          conflito = true;
+          break;
+        }
+      }
+      if (conflito) continue;
 
       const jaAlocado = await Escala.findOne({ where: { eventoId, funcionarioId } });
       if (jaAlocado) { erros.push(`"${funcionario.nome}" já está nesta escala.`); continue; }

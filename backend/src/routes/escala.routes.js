@@ -10,8 +10,8 @@ router.use(auth);
 
 router.get('/disponiveis/:eventoId', controller.listarDisponiveis);
 router.get('/evento/:eventoId',      controller.listarPorEvento);
-router.post('/',                     controller.alocar);
-router.post('/lote',                 controller.alocarLote);
-router.delete('/:id', authorize('gerente'), controller.remover);
+router.post('/',                     authorize('gerente'), controller.alocar);
+router.post('/lote',                 authorize('gerente'), controller.alocarLote);
+router.delete('/:id',                authorize('gerente'), controller.remover);
 
 module.exports = router;

@@ -24,6 +24,7 @@ export default function EventosPage() {
   const [form, setForm] = useState({
     nome: "",
     dataEvento: "",
+    horarioTermino: "",
     localId: "",
     clienteId: "",
     orcamentoId: "",
@@ -101,9 +102,14 @@ export default function EventosPage() {
   const handleSave = async (e) => {
     e.preventDefault();
     try {
+      const payload = {
+        ...form,
+        dataEvento: form.dataEvento ? new Date(form.dataEvento).toISOString() : "",
+        horarioTermino: form.horarioTermino ? new Date(form.horarioTermino).toISOString() : "",
+      };
       const { data: res } = editing
-        ? await api.put(`/eventos/${editing}`, form)
-        : await api.post("/eventos", form);
+        ? await api.put(`/eventos/${editing}`, payload)
+        : await api.post("/eventos", payload);
       if (res.warning) setToast({ message: res.warning, type: 'warning' });
       setShowPanel(false);
       setEditing(null);
@@ -131,6 +137,17 @@ export default function EventosPage() {
       fetchData();
     } catch (err) {
       alert(err.response?.data?.message || 'Erro ao cancelar evento');
+    }
+  };
+
+  const handleWhatsApp = async (id) => {
+    try {
+      const { data: res } = await api.get(`/eventos/${id}/whatsapp`);
+      if (res.data?.link) {
+        window.open(res.data.link, '_blank');
+      }
+    } catch (err) {
+      alert(err.response?.data?.message || 'Erro ao gerar link do WhatsApp');
     }
   };
 
@@ -281,6 +298,7 @@ export default function EventosPage() {
             setForm({
               nome: "",
               dataEvento: "",
+              horarioTermino: "",
               localId: "",
               clienteId: "",
               orcamentoId: "",
@@ -406,6 +424,14 @@ export default function EventosPage() {
                                     .toISOString()
                                     .slice(0, 16)
                                 : "",
+                              horarioTermino: evt.horarioTermino
+                                ? new Date(
+                                    new Date(evt.horarioTermino).getTime() -
+                                      new Date().getTimezoneOffset() * 60000,
+                                  )
+                                    .toISOString()
+                                    .slice(0, 16)
+                                : "",
                               localId: evt.localId || evt.local?.id || "",
                               clienteId: evt.clienteId || "",
                               orcamentoId: evt.orcamentoId || "",
@@ -460,7 +486,7 @@ export default function EventosPage() {
                     <div className="flex justify-between text-sm border-b border-white/10 pb-2">
                       <span>Data</span>
                       <span className="font-bold">
-                        {formatDate(selectedEvento.dataEvento)} • {formatTime(selectedEvento.dataEvento)}
+                        {formatDate(selectedEvento.dataEvento)} • {formatTime(selectedEvento.dataEvento)} — {formatTime(selectedEvento.horarioTermino)}
                       </span>
                     </div>
                     <div className="flex justify-between text-sm border-b border-white/10 pb-2">
@@ -796,13 +822,15 @@ export default function EventosPage() {
                   <label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-4">Nome do Evento</label>
                   <input className="w-full bg-surface-container-low border-none rounded-full py-3.5 px-6 focus:ring-2 focus:ring-primary" value={form.nome} onChange={e => setForm({ ...form, nome: e.target.value })} required />
                 </div>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-3 gap-4">
                   <div className="space-y-2">
                     <label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-4">Data e Hora</label>
                     <input type="datetime-local" className="w-full bg-surface-container-low border-none rounded-full py-3.5 px-6 focus:ring-2 focus:ring-primary" value={form.dataEvento} onChange={e => setForm({ ...form, dataEvento: e.target.value })} required />
                   </div>
-
-                  {/* Seleção de Local */}
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-4">Horário de Término</label>
+                    <input type="datetime-local" className="w-full bg-surface-container-low border-none rounded-full py-3.5 px-6 focus:ring-2 focus:ring-primary" value={form.horarioTermino} onChange={e => setForm({ ...form, horarioTermino: e.target.value })} required />
+                  </div>
                   <div className="space-y-2">
                     <label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-4">Local</label>
                     <select className="w-full bg-surface-container-low border-none rounded-full py-3.5 px-6 focus:ring-2 focus:ring-primary" value={form.localId} onChange={e => setForm({ ...form, localId: e.target.value })} required>

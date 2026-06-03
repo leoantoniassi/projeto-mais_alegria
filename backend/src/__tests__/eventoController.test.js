@@ -45,6 +45,7 @@ describe('EventoController — verificação de capacidade', () => {
     clienteId: 'cli-1',
     nome: 'Evento Teste',
     dataEvento: '2026-12-31',
+    horarioTermino: '2026-12-31T23:59:59.000Z',
   };
 
   describe('POST /api/eventos', () => {
@@ -101,6 +102,45 @@ describe('EventoController — verificação de capacidade', () => {
       expect(res.status).toBe(201);
       expect(res.body.warning).toBeNull();
     });
+
+    test('deve criar evento com horarioTermino válido', async () => {
+      Cliente.findByPk.mockResolvedValue(mockCliente);
+      Evento.create.mockResolvedValue({ ...mockEvento, horarioTermino: '2026-12-31T23:59:59.000Z' });
+
+      const res = await request(app)
+        .post('/api/eventos')
+        .send({ ...eventoPayload, horarioTermino: '2026-12-31T23:59:59.000Z', qtdPessoas: 50 });
+
+      expect(res.status).toBe(201);
+      expect(res.body.success).toBe(true);
+    });
+
+    test('deve retornar 400 se horarioTermino não for informado', async () => {
+      const res = await request(app)
+        .post('/api/eventos')
+        .send({ clienteId: 'cli-1', nome: 'Evento Teste', dataEvento: '2026-12-31', qtdPessoas: 50 });
+
+      expect(res.status).toBe(400);
+      expect(res.body.message).toContain('horário de término');
+    });
+
+    test('deve retornar 400 se horarioTermino for anterior a dataEvento', async () => {
+      const res = await request(app)
+        .post('/api/eventos')
+        .send({ ...eventoPayload, horarioTermino: '2026-12-30T10:00:00.000Z', qtdPessoas: 50 });
+
+      expect(res.status).toBe(400);
+      expect(res.body.message).toContain('deve ser maior');
+    });
+
+    test('deve retornar 400 se horarioTermino for inválido (string não-datável)', async () => {
+      const res = await request(app)
+        .post('/api/eventos')
+        .send({ ...eventoPayload, horarioTermino: 'invalido', qtdPessoas: 50 });
+
+      expect(res.status).toBe(400);
+      expect(res.body.message).toContain('data válida');
+    });
   });
 
   describe('PUT /api/eventos/:id', () => {
@@ -139,6 +179,28 @@ describe('EventoController — verificação de capacidade', () => {
 
       expect(res.status).toBe(200);
       expect(res.body.warning).toBeUndefined();
+    });
+
+    test('deve atualizar evento com horarioTermino válido', async () => {
+      Evento.findByPk.mockResolvedValue({ ...mockEvento, update: jest.fn().mockResolvedValue(true) });
+
+      const res = await request(app)
+        .put('/api/eventos/evt-1')
+        .send({ horarioTermino: '2026-12-31T23:59:59.000Z' });
+
+      expect(res.status).toBe(200);
+      expect(res.body.success).toBe(true);
+    });
+
+    test('deve retornar 400 se horarioTermino for inválido no PUT', async () => {
+      Evento.findByPk.mockResolvedValue({ ...mockEvento, update: jest.fn().mockResolvedValue(true) });
+
+      const res = await request(app)
+        .put('/api/eventos/evt-1')
+        .send({ horarioTermino: 'invalido' });
+
+      expect(res.status).toBe(400);
+      expect(res.body.message).toContain('data válida');
     });
   });
 });

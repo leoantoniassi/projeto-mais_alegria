@@ -28,6 +28,31 @@ function gerarWarningCapacidade(local, qtdPessoas) {
   return null;
 }
 
+function validarHorarioTermino(horarioTermino, dataEvento) {
+  const horario = new Date(horarioTermino);
+  const data = new Date(dataEvento);
+  if (Number.isNaN(horario.getTime())) {
+    return 'Horário de término fornecido não é uma data válida.';
+  }
+  if (Number.isNaN(data.getTime())) {
+    return 'Data do evento fornecida não é uma data válida.';
+  }
+  if (horario <= data) {
+    return 'O horário de término deve ser maior que a data/hora de início do evento.';
+  }
+  return null;
+}
+
+function coalesce(valor, padrao) {
+  return valor !== undefined ? valor : padrao;
+}
+
+async function buscarValorOrcamento(orcamentoId) {
+  if (!orcamentoId) return null;
+  const orcamento = await Orcamento.findByPk(orcamentoId);
+  return orcamento ? Number(orcamento.valorTotal) : null;
+}
+
 // GET /api/eventos
 async function listar(req, res, next) {
   try {
@@ -135,6 +160,7 @@ async function criar(req, res, next) {
       localId,
       nome,
       dataEvento,
+      horarioTermino,
       status,
       qtdPessoas,
       qtdAdultos,
@@ -145,11 +171,19 @@ async function criar(req, res, next) {
 
     let { orcamento: orcamentoValor } = req.body;
 
-    if (!clienteId || !nome || !dataEvento) {
+    if (!clienteId || !nome || !dataEvento || !horarioTermino) {
       return res.status(400).json({
         success: false,
-        message: "Cliente, nome e data do evento são obrigatórios.",
+        message: "Cliente, nome, data do evento e horário de término são obrigatórios.",
       });
+    }
+
+    if (typeof horarioTermino !== 'string' && typeof horarioTermino !== 'number' && !(horarioTermino instanceof Date)) {
+      return res.status(400).json({ success: false, message: 'Horário de término deve ser uma data válida.' });
+    }
+    const erroTermino = validarHorarioTermino(horarioTermino, dataEvento);
+    if (erroTermino) {
+      return res.status(400).json({ success: false, message: erroTermino });
     }
 
     if (qtdPessoas === undefined || qtdPessoas === null || qtdPessoas < 0) {
@@ -188,10 +222,8 @@ async function criar(req, res, next) {
     }
 
     if (orcamentoId) {
-      const orcObj = await Orcamento.findByPk(orcamentoId);
-      if (orcObj) {
-        orcamentoValor = Number(orcObj.valorTotal);
-      }
+      const valorDb = await buscarValorOrcamento(orcamentoId);
+      if (valorDb !== null) orcamentoValor = valorDb;
     }
 
     // RN Canvas 2: Evento confirmado requer orçamento aprovado
@@ -217,6 +249,7 @@ async function criar(req, res, next) {
       localId:     localId     || null,
       nome,
       dataEvento,
+      horarioTermino,
       status: status || "pendente",
       qtdPessoas,
       qtdAdultos,
@@ -254,6 +287,7 @@ async function atualizar(req, res, next) {
       localId,
       nome,
       dataEvento,
+      horarioTermino,
       qtdPessoas,
       qtdAdultos,
       qtdCriancas,
@@ -264,6 +298,17 @@ async function atualizar(req, res, next) {
     let { orcamento: orcamentoValor } = req.body;
 
     let warning;
+
+    if (horarioTermino !== undefined) {
+      if (typeof horarioTermino !== 'string' && typeof horarioTermino !== 'number' && !(horarioTermino instanceof Date)) {
+        return res.status(400).json({ success: false, message: 'Horário de término deve ser uma data válida.' });
+      }
+      const dataRef = dataEvento || evento.dataEvento;
+      const erroTermino = validarHorarioTermino(horarioTermino, dataRef);
+      if (erroTermino) {
+        return res.status(400).json({ success: false, message: erroTermino });
+      }
+    }
 
     if (localId !== undefined && localId !== null) {
       const localExiste = await Local.findByPk(localId);
@@ -276,27 +321,26 @@ async function atualizar(req, res, next) {
 
     const novoOrcamentoId = orcamentoId ? orcamentoId : orcamentoId === "" ? null : evento.orcamentoId;
     if (orcamentoId && orcamentoId !== evento.orcamentoId) {
-      const orcObj = await Orcamento.findByPk(orcamentoId);
-      if (orcObj) {
-        orcamentoValor = Number(orcObj.valorTotal);
-      }
+      const valorDb = await buscarValorOrcamento(orcamentoId);
+      if (valorDb !== null) orcamentoValor = valorDb;
     }
 
     const novaPessoas = qtdPessoas !== undefined ? qtdPessoas : evento.qtdPessoas;
 
     await evento.update({
-      clienteId:     clienteId     || evento.clienteId,
-      orcamentoId:   novoOrcamentoId,
-      localId:       localId       !== undefined ? localId       : evento.localId,
-      nome:          nome          || evento.nome,
-      dataEvento:    dataEvento    || evento.dataEvento,
-      qtdPessoas:    qtdPessoas    !== undefined ? qtdPessoas    : evento.qtdPessoas,
-      qtdAdultos:    qtdAdultos    !== undefined ? qtdAdultos    : evento.qtdAdultos,
-      qtdCriancas:   qtdCriancas   !== undefined ? qtdCriancas   : evento.qtdCriancas,
-      qtdBebes:      qtdBebes      !== undefined ? qtdBebes      : evento.qtdBebes,
-      valorOrcamento: orcamentoValor !== undefined ? orcamentoValor : evento.valorOrcamento,
-      observacoes:   observacoes   !== undefined ? observacoes   : evento.observacoes,
-      atualizadoEm: new Date(),
+      clienteId:      coalesce(clienteId, evento.clienteId),
+      orcamentoId:    novoOrcamentoId,
+      localId:        coalesce(localId, evento.localId),
+      nome:           coalesce(nome, evento.nome),
+      dataEvento:     coalesce(dataEvento, evento.dataEvento),
+      horarioTermino: coalesce(horarioTermino, evento.horarioTermino),
+      qtdPessoas:     coalesce(qtdPessoas, evento.qtdPessoas),
+      qtdAdultos:     coalesce(qtdAdultos, evento.qtdAdultos),
+      qtdCriancas:    coalesce(qtdCriancas, evento.qtdCriancas),
+      qtdBebes:       coalesce(qtdBebes, evento.qtdBebes),
+      valorOrcamento: coalesce(orcamentoValor, evento.valorOrcamento),
+      observacoes:    coalesce(observacoes, evento.observacoes),
+      atualizadoEm:   new Date(),
     });
 
     return res.json({

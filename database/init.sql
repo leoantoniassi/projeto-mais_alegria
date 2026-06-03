@@ -249,6 +249,7 @@ CREATE TABLE eventos (
     evt_loc_id          UUID,
     evt_nome            VARCHAR(150)  NOT NULL,
     evt_data_evento     TIMESTAMP     NOT NULL,
+    evt_horario_termino TIMESTAMP     NOT NULL,
     evt_status          VARCHAR(20)   NOT NULL DEFAULT 'pendente',
     evt_qtd_pessoas     INTEGER       NOT NULL DEFAULT 0,
     evt_qtd_adultos     INTEGER       NOT NULL DEFAULT 0,
@@ -273,10 +274,14 @@ CREATE TABLE eventos (
         ON UPDATE CASCADE ON DELETE SET NULL,
 
     CONSTRAINT ck_eventos_status
-        CHECK (evt_status IN ('pendente', 'confirmado', 'cancelado', 'concluido'))
+        CHECK (evt_status IN ('pendente', 'confirmado', 'cancelado', 'concluido')),
+
+    CONSTRAINT ck_eventos_horario_termino
+        CHECK (evt_horario_termino > evt_data_evento)
 );
 
 COMMENT ON COLUMN eventos.evt_loc_id IS 'FK para o local do evento. Nullable — pode não ter local definido ainda.';
+COMMENT ON COLUMN eventos.evt_horario_termino IS 'Horário de término do evento. Deve ser maior que evt_data_evento para garantir consistência temporal.';
 
 -- ============================================================
 -- 7. DOCUMENTOS
