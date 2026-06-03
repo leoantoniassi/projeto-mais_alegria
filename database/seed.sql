@@ -15,10 +15,10 @@ INSERT INTO usuarios (usr_nome, usr_email, usr_senha, usr_role) VALUES
 ('Operador',  'operador@maisalegria.com', '$2a$10$Nq.Tgkmz8Dz4/s9KWP.NDOSD33LH4pGBrGsnd5R3F/kqoymkRpyoa', 'operador');
 
 -- L. LOCAIS
-INSERT INTO locais (loc_nome, loc_logradouro, loc_numero, loc_bairro, loc_cidade, loc_estado, loc_cep) VALUES
-('Salão 1', 'Rua Treze de Maio', '749', 'Santo Antônio', 'Jaú', 'SP', '17202-180'),
-('Salão 2', 'Avenida Isaltino do Amaral Carvalho', 'S/N', 'Chácara Bela Vista', 'Jaú', 'SP', '17209-010'),
-('Externo', 'Local Externo', 'S/N', 'Zona Rural', 'Jaú', 'SP', '00000-000');
+INSERT INTO locais (loc_nome, loc_logradouro, loc_numero, loc_bairro, loc_cidade, loc_estado, loc_cep, loc_capacidade_maxima) VALUES
+('Salão 1', 'Rua Treze de Maio', '749', 'Santo Antônio', 'Jaú', 'SP', '17202-180', 150),
+('Salão 2', 'Avenida Isaltino do Amaral Carvalho', 'S/N', 'Chácara Bela Vista', 'Jaú', 'SP', '17209-010', 250),
+('Externo', 'Local Externo', 'S/N', 'Zona Rural', 'Jaú', 'SP', '00000-000', NULL);
 
 -- F. FUNCOES
 INSERT INTO funcoes (fnc_nome, fnc_descricao) VALUES

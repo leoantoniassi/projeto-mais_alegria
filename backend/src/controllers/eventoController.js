@@ -17,6 +17,17 @@ const {
 } = require("../models");
 const { gerarLinkWhatsApp } = require('../utils/whatsapp');
 
+// ─── Funções auxiliares (DRY) ──────────────────────────────────
+
+function gerarWarningCapacidade(local, qtdPessoas) {
+  if (!local || !local.capacidadeMaxima || qtdPessoas === undefined || qtdPessoas === null) return null;
+  if (typeof qtdPessoas !== 'number' || Number.isNaN(qtdPessoas) || qtdPessoas < 0) return null;
+  if (qtdPessoas > local.capacidadeMaxima) {
+    return `A quantidade de convidados (${qtdPessoas}) excede a capacidade máxima do local "${local.nome}" (${local.capacidadeMaxima} pessoas).`;
+  }
+  return null;
+}
+
 // GET /api/eventos
 async function listar(req, res, next) {
   try {
@@ -51,7 +62,7 @@ async function listar(req, res, next) {
       where,
       include: [
         { model: Cliente, as: "cliente", attributes: ["id", "nome"] },
-        { model: Local,   as: "local",   attributes: ["id", "nome", "cidade", "estado"] },
+        { model: Local,   as: "local",   attributes: ["id", "nome", "cidade", "estado", "capacidadeMaxima"] },
       ],
       limit: parseInt(limit),
       offset: parseInt(offset),
@@ -141,6 +152,23 @@ async function criar(req, res, next) {
       });
     }
 
+    if (qtdPessoas === undefined || qtdPessoas === null || qtdPessoas < 0) {
+      return res.status(400).json({
+        success: false,
+        message: "O campo Total de Pessoas é obrigatório e deve ser um número não negativo.",
+      });
+    }
+
+    const camposNumericos = { qtdPessoas, qtdAdultos, qtdCriancas, qtdBebes };
+    for (const [chave, valor] of Object.entries(camposNumericos)) {
+      if (valor !== undefined && valor !== null && (typeof valor !== 'number' || Number.isNaN(valor) || valor < 0)) {
+        return res.status(400).json({
+          success: false,
+          message: `O campo ${chave} deve ser um número não negativo.`,
+        });
+      }
+    }
+
     const cliente = await Cliente.findByPk(clienteId);
     if (!cliente) {
       return res.status(404).json({
@@ -149,11 +177,14 @@ async function criar(req, res, next) {
       });
     }
 
+    let warning;
+
     if (localId) {
       const localExiste = await Local.findByPk(localId);
       if (!localExiste) {
         return res.status(404).json({ success: false, message: "Local não encontrado." });
       }
+      warning = gerarWarningCapacidade(localExiste, qtdPessoas);
     }
 
     if (orcamentoId) {
@@ -180,16 +211,6 @@ async function criar(req, res, next) {
       }
     }
 
-    // RN4: Controle de público > 50 pessoas
-    if (qtdPessoas && qtdPessoas > 50) {
-      if (!qtdAdultos && !qtdCriancas && !qtdBebes) {
-        return res.status(400).json({
-          success: false,
-          message: "Para eventos com mais de 50 pessoas, é obrigatório informar a quantidade de adultos, crianças e bebês.",
-        });
-      }
-    }
-
     const evento = await Evento.create({
       clienteId,
       orcamentoId: orcamentoId || null,
@@ -209,6 +230,7 @@ async function criar(req, res, next) {
       success: true,
       message: "Evento criado com sucesso!",
       data: evento,
+      warning,
     });
   } catch (error) {
     return next(error);
@@ -241,11 +263,15 @@ async function atualizar(req, res, next) {
 
     let { orcamento: orcamentoValor } = req.body;
 
+    let warning;
+
     if (localId !== undefined && localId !== null) {
       const localExiste = await Local.findByPk(localId);
       if (!localExiste) {
         return res.status(404).json({ success: false, message: "Local não encontrado." });
       }
+      const novaQtd = qtdPessoas !== undefined ? qtdPessoas : evento.qtdPessoas;
+      warning = gerarWarningCapacidade(localExiste, novaQtd);
     }
 
     const novoOrcamentoId = orcamentoId ? orcamentoId : orcamentoId === "" ? null : evento.orcamentoId;
@@ -256,19 +282,7 @@ async function atualizar(req, res, next) {
       }
     }
 
-    // RN4: Controle de público > 50
     const novaPessoas = qtdPessoas !== undefined ? qtdPessoas : evento.qtdPessoas;
-    if (novaPessoas && novaPessoas > 50) {
-      const novoAdultos  = qtdAdultos  !== undefined ? qtdAdultos  : evento.qtdAdultos;
-      const novoCriancas = qtdCriancas !== undefined ? qtdCriancas : evento.qtdCriancas;
-      const novoBebes    = qtdBebes    !== undefined ? qtdBebes    : evento.qtdBebes;
-      if (!novoAdultos && !novoCriancas && !novoBebes) {
-        return res.status(400).json({
-          success: false,
-          message: "Para eventos com mais de 50 pessoas, é obrigatório informar a quantidade de adultos, crianças e bebês.",
-        });
-      }
-    }
 
     await evento.update({
       clienteId:     clienteId     || evento.clienteId,
@@ -289,6 +303,7 @@ async function atualizar(req, res, next) {
       success: true,
       message: "Evento atualizado com sucesso!",
       data: evento,
+      warning,
     });
   } catch (error) {
     return next(error);

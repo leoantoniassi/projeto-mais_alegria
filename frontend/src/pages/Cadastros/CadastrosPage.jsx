@@ -69,6 +69,7 @@ export default function CadastrosPage() {
     estado: '',
     cep: '',
     observacoes: '',
+    capacidadeMaxima: '',
   });
   const [search, setSearch] = useState('');
 
@@ -111,6 +112,7 @@ export default function CadastrosPage() {
         estado: form.estado,
         cep: form.cep,
         observacoes: form.observacoes,
+        capacidadeMaxima: form.capacidadeMaxima !== '' ? Number(form.capacidadeMaxima) : null,
       } : {
         nome: form.nome,
         descricao: form.descricao,
@@ -134,6 +136,7 @@ export default function CadastrosPage() {
         estado: '',
         cep: '',
         observacoes: '',
+        capacidadeMaxima: '',
       });
       fetchItems(activeTab);
     } catch (err) {
@@ -154,6 +157,7 @@ export default function CadastrosPage() {
         estado: item.estado || '',
         cep: item.cep || '',
         observacoes: item.observacoes || '',
+        capacidadeMaxima: item.capacidadeMaxima || '',
         descricao: '',
       });
     } else {
@@ -219,6 +223,7 @@ export default function CadastrosPage() {
       estado: '',
       cep: '',
       observacoes: '',
+      capacidadeMaxima: '',
     });
     setShowPanel(true);
   };
@@ -306,6 +311,7 @@ export default function CadastrosPage() {
                     {activeTab === 'locais' ? (
                       <>
                         <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-on-surface-variant">Endereço</th>
+                        <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-on-surface-variant">Capacidade</th>
                         <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-on-surface-variant">Observações</th>
                       </>
                     ) : (
@@ -317,7 +323,7 @@ export default function CadastrosPage() {
                 <tbody className="divide-y divide-surface-container-high">
                   {loading[activeTab] && (
                     <tr>
-                      <td colSpan={activeTab === 'locais' ? 4 : 3} className="px-6 py-12 text-center text-on-surface-variant">
+                      <td colSpan={activeTab === 'locais' ? 5 : 3} className="px-6 py-12 text-center text-on-surface-variant">
                         <span className="material-symbols-outlined animate-spin mr-2">progress_activity</span>
                         Carregando...
                       </td>
@@ -325,7 +331,7 @@ export default function CadastrosPage() {
                   )}
                   {!loading[activeTab] && currentItems.length === 0 && (
                     <tr>
-                      <td colSpan={activeTab === 'locais' ? 4 : 3} className="px-6 py-12 text-center text-on-surface-variant">
+                      <td colSpan={activeTab === 'locais' ? 5 : 3} className="px-6 py-12 text-center text-on-surface-variant">
                         <div className="flex flex-col items-center gap-3">
                           <span className={`material-symbols-outlined text-4xl ${colors.textDark} opacity-40`}>{activeTable.icon}</span>
                           <p>Nenhum registro encontrado.</p>
@@ -356,6 +362,9 @@ export default function CadastrosPage() {
                               {item.logradouro}, {item.numero}{item.complemento ? ` - ${item.complemento}` : ''}
                             </p>
                             <p className="text-xs text-on-surface-variant">{item.bairro} - {item.cidade}/{item.estado} - CEP: {item.cep}</p>
+                          </td>
+                          <td className="px-6 py-5">
+                            <p className="text-sm text-on-surface font-medium">{item.capacidadeMaxima ? `${item.capacidadeMaxima} pessoas` : '—'}</p>
                           </td>
                           <td className="px-6 py-5">
                             <p className="text-sm text-on-surface-variant truncate max-w-xs">{item.observacoes || '—'}</p>
@@ -546,12 +555,24 @@ export default function CadastrosPage() {
                     </div>
 
                     <div className="space-y-2">
+                      <label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-4">Capacidade Máxima</label>
+                      <input
+                        type="number"
+                        className="w-full bg-surface-container-low border-none rounded-full py-3.5 px-6 focus:ring-2 focus:ring-primary"
+                        value={form.capacidadeMaxima || ''}
+                        onChange={e => setForm({ ...form, capacidadeMaxima: e.target.value === '' ? '' : Number(e.target.value) })}
+                        placeholder="Ex: 150 pessoas"
+                        min={0}
+                      />
+                    </div>
+
+                    <div className="space-y-2">
                       <label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-4">Observações</label>
                       <textarea
                         className="w-full bg-surface-container-low border-none rounded-2xl py-3.5 px-6 focus:ring-2 focus:ring-primary resize-none min-h-[100px]"
                         value={form.observacoes || ''}
                         onChange={e => setForm({ ...form, observacoes: e.target.value })}
-                        placeholder="Instruções de acesso, capacidade, contato no local..."
+                        placeholder="Instruções de acesso, contato no local..."
                         rows={3}
                       />
                     </div>

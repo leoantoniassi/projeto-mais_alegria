@@ -111,7 +111,7 @@ export default function DashboardCharts() {
                   return null;
                 }}
               />
-              <Scatter name="Festas" data={data.scatter} fill="#FEDC57" fillOpacity={0.8} />
+              <Scatter name="Festas" data={data.scatter} fill="#4F46E5" fillOpacity={0.8} />
             </ScatterChart>
           </ResponsiveContainer>
         )}

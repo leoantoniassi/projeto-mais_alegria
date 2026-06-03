@@ -16,6 +16,7 @@ export default function EventosPage() {
   const [showPanel, setShowPanel] = useState(false);
   const [editing, setEditing] = useState(null);
   const [selectedEvento, setSelectedEvento] = useState(null);
+  const [capacidadeLocal, setCapacidadeLocal] = useState(null);
 
   // Filtros
   const [filtroLocal, setFiltroLocal] = useState("");
@@ -88,16 +89,27 @@ export default function EventosPage() {
       .catch(() => {});
   }, []);
 
+  useEffect(() => {
+    if (form.localId && locais.length > 0) {
+      const local = locais.find(l => l.id === form.localId);
+      setCapacidadeLocal(local?.capacidadeMaxima || null);
+    } else {
+      setCapacidadeLocal(null);
+    }
+  }, [form.localId, locais]);
+
   const handleSave = async (e) => {
     e.preventDefault();
     try {
-      if (editing) await api.put(`/eventos/${editing}`, form);
-      else await api.post("/eventos", form);
+      const { data: res } = editing
+        ? await api.put(`/eventos/${editing}`, form)
+        : await api.post("/eventos", form);
+      if (res.warning) setToast({ message: res.warning, type: 'warning' });
       setShowPanel(false);
       setEditing(null);
       fetchData();
     } catch (err) {
-      alert(err.response?.data?.error || "Erro");
+      alert(err.response?.data?.message || "Erro");
     }
   };
 
@@ -107,16 +119,7 @@ export default function EventosPage() {
       await api.delete(`/eventos/${id}`);
       fetchData();
     } catch (err) {
-      alert(err.response?.data?.error || "Erro");
-    }
-  };
-
-  const handleWhatsApp = async (id) => {
-    try {
-      const { data: res } = await api.get(`/eventos/${id}/whatsapp`);
-      window.open(res.data?.link || res.url, '_blank');
-    } catch (err) {
-      alert('Erro ao abrir o WhatsApp');
+      alert(err.response?.data?.message || "Erro");
     }
   };
 
@@ -127,7 +130,7 @@ export default function EventosPage() {
       setToast({ message: 'Evento cancelado com sucesso!', type: 'success' });
       fetchData();
     } catch (err) {
-      alert(err.response?.data?.error || 'Erro ao cancelar evento');
+      alert(err.response?.data?.message || 'Erro ao cancelar evento');
     }
   };
 
@@ -479,9 +482,21 @@ export default function EventosPage() {
                     <div className="flex justify-between text-sm">
                       <span>Público</span>
                       <span className="font-bold">
-                        {(selectedEvento.qtdAdultos || 0) + (selectedEvento.qtdCriancas || 0) + (selectedEvento.qtdBebes || 0)} pessoas
+                        {selectedEvento.qtdPessoas || 0} pessoas
                       </span>
                     </div>
+                    {selectedEvento.local?.capacidadeMaxima && (
+                      <div className="flex justify-between text-sm border-b border-white/10 pb-2">
+                        <span>Capacidade do Local</span>
+                        <span className="font-bold">{selectedEvento.local.capacidadeMaxima} pessoas</span>
+                      </div>
+                    )}
+                    {selectedEvento.local?.capacidadeMaxima && (selectedEvento.qtdPessoas || 0) > selectedEvento.local.capacidadeMaxima && (
+                      <div className="flex items-center gap-2 text-sm bg-error/20 text-error px-3 py-2 rounded-xl mt-2">
+                        <span className="material-symbols-outlined text-base">warning</span>
+                        <span>Capacidade excedida!</span>
+                      </div>
+                    )}
                   </div>
                   {selectedEvento.observacoes && (
                     <p className="mt-4 text-sm opacity-80 italic">{selectedEvento.observacoes}</p>
@@ -827,19 +842,30 @@ export default function EventosPage() {
                 <div className="grid grid-cols-4 gap-3">
                   <div className="space-y-2">
                     <label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-2">Total</label>
-                    <input type="number" className="w-full bg-surface-container-low border-none rounded-full py-3 px-4 focus:ring-2 focus:ring-primary text-center" placeholder="0" value={form.qtdPessoas || ""} onChange={e => setForm({ ...form, qtdPessoas: e.target.value ? Number(e.target.value) : 0 })} />
+                    <input type="number" className="w-full bg-surface-container-low border-none rounded-full py-3 px-4 focus:ring-2 focus:ring-primary text-center" placeholder="0" value={form.qtdPessoas || ""} onChange={e => setForm({ ...form, qtdPessoas: e.target.value === '' ? 0 : Number(e.target.value) })} required />
                   </div>
+                  {capacidadeLocal && form.qtdPessoas > 0 && form.qtdPessoas > capacidadeLocal && (
+                    <div className="col-span-4 p-3 bg-error/10 border border-error/20 rounded-2xl flex items-start gap-2">
+                      <span className="material-symbols-outlined text-error text-base mt-0.5">warning</span>
+                      <div>
+                        <p className="text-sm font-bold text-error">Capacidade excedida!</p>
+                        <p className="text-xs text-error/80">
+                          O total de convidados ({form.qtdPessoas}) ultrapassa a capacidade máxima do local ({capacidadeLocal} pessoas).
+                        </p>
+                      </div>
+                    </div>
+                  )}
                   <div className="space-y-2">
                     <label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-2">Adultos</label>
-                    <input type="number" className="w-full bg-surface-container-low border-none rounded-full py-3 px-4 focus:ring-2 focus:ring-primary text-center" placeholder="0" value={form.qtdAdultos || ""} onChange={e => setForm({ ...form, qtdAdultos: e.target.value ? Number(e.target.value) : 0 })} />
+                    <input type="number" className="w-full bg-surface-container-low border-none rounded-full py-3 px-4 focus:ring-2 focus:ring-primary text-center" placeholder="0" value={form.qtdAdultos || ""} onChange={e => setForm({ ...form, qtdAdultos: e.target.value === '' ? 0 : Number(e.target.value) })} />
                   </div>
                   <div className="space-y-2">
                     <label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-2">Crianças</label>
-                    <input type="number" className="w-full bg-surface-container-low border-none rounded-full py-3 px-4 focus:ring-2 focus:ring-primary text-center" placeholder="0" value={form.qtdCriancas || ""} onChange={e => setForm({ ...form, qtdCriancas: e.target.value ? Number(e.target.value) : 0 })} />
+                    <input type="number" className="w-full bg-surface-container-low border-none rounded-full py-3 px-4 focus:ring-2 focus:ring-primary text-center" placeholder="0" value={form.qtdCriancas || ""} onChange={e => setForm({ ...form, qtdCriancas: e.target.value === '' ? 0 : Number(e.target.value) })} />
                   </div>
                   <div className="space-y-2">
                     <label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-2">Bebês</label>
-                    <input type="number" className="w-full bg-surface-container-low border-none rounded-full py-3 px-4 focus:ring-2 focus:ring-primary text-center" placeholder="0" value={form.qtdBebes || ""} onChange={e => setForm({ ...form, qtdBebes: e.target.value ? Number(e.target.value) : 0 })} />
+                    <input type="number" className="w-full bg-surface-container-low border-none rounded-full py-3 px-4 focus:ring-2 focus:ring-primary text-center" placeholder="0" value={form.qtdBebes || ""} onChange={e => setForm({ ...form, qtdBebes: e.target.value === '' ? 0 : Number(e.target.value) })} />
                   </div>
                 </div>
                 <div className="space-y-2">

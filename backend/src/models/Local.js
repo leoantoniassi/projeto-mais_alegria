@@ -56,6 +56,15 @@ const Local = sequelize.define('Local', {
     allowNull: true,
     field: 'loc_observacoes',
   },
+  capacidadeMaxima: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+    field: 'loc_capacidade_maxima',
+    validate: {
+      isInt: { msg: 'Capacidade máxima deve ser um número inteiro.' },
+      min: { args: [0], msg: 'Capacidade máxima não pode ser negativa.' },
+    },
+  },
   criadoEm: {
     type: DataTypes.DATE,
     allowNull: false,

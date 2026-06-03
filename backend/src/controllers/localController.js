@@ -60,7 +60,7 @@ async function buscarPorId(req, res, next) {
 // POST /api/locais
 async function criar(req, res, next) {
   try {
-    const { nome, logradouro, numero, complemento, bairro, cidade, estado, cep, observacoes } = req.body;
+    const { nome, logradouro, numero, complemento, bairro, cidade, estado, cep, observacoes, capacidadeMaxima } = req.body;
 
     if (!nome || !logradouro || !numero || !bairro || !cidade || !estado || !cep) {
       return res.status(400).json({
@@ -69,7 +69,14 @@ async function criar(req, res, next) {
       });
     }
 
-    const local = await Local.create({ nome, logradouro, numero, complemento, bairro, cidade, estado, cep, observacoes });
+    if (capacidadeMaxima !== undefined && capacidadeMaxima !== null && (!Number.isInteger(capacidadeMaxima) || capacidadeMaxima < 0)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Capacidade máxima deve ser um número inteiro não negativo ou vazio.',
+      });
+    }
+
+    const local = await Local.create({ nome, logradouro, numero, complemento, bairro, cidade, estado, cep, observacoes, capacidadeMaxima });
     return res.status(201).json({ success: true, message: 'Local criado com sucesso!', data: local });
   } catch (error) {
     return next(error);
@@ -84,17 +91,26 @@ async function atualizar(req, res, next) {
       return res.status(404).json({ success: false, message: 'Local não encontrado.' });
     }
 
-    const { nome, logradouro, numero, complemento, bairro, cidade, estado, cep, observacoes } = req.body;
+    const { nome, logradouro, numero, complemento, bairro, cidade, estado, cep, observacoes, capacidadeMaxima } = req.body;
+
+    if (capacidadeMaxima !== undefined && capacidadeMaxima !== null && (!Number.isInteger(capacidadeMaxima) || capacidadeMaxima < 0)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Capacidade máxima deve ser um número inteiro não negativo ou vazio.',
+      });
+    }
+
     await local.update({
-      nome:        nome        || local.nome,
-      logradouro:  logradouro  || local.logradouro,
-      numero:      numero      || local.numero,
-      complemento: complemento !== undefined ? complemento : local.complemento,
-      bairro:      bairro      || local.bairro,
-      cidade:      cidade      || local.cidade,
-      estado:      estado      || local.estado,
-      cep:         cep         || local.cep,
-      observacoes: observacoes !== undefined ? observacoes : local.observacoes,
+      nome:             nome                    || local.nome,
+      logradouro:       logradouro              || local.logradouro,
+      numero:           numero                  || local.numero,
+      complemento:      complemento !== undefined ? complemento : local.complemento,
+      bairro:           bairro                  || local.bairro,
+      cidade:           cidade                  || local.cidade,
+      estado:           estado                  || local.estado,
+      cep:              cep                     || local.cep,
+      observacoes:      observacoes !== undefined ? observacoes : local.observacoes,
+      capacidadeMaxima: capacidadeMaxima !== undefined ? capacidadeMaxima : local.capacidadeMaxima,
       atualizadoEm: new Date(),
     });
 

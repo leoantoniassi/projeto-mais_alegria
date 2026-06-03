@@ -56,17 +56,20 @@ CREATE TABLE locais (
     loc_cidade        VARCHAR(100) NOT NULL,
     loc_estado        CHAR(2)      NOT NULL,
     loc_cep           VARCHAR(9)   NOT NULL,
-    loc_observacoes   TEXT,
-    loc_criado_em     TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    loc_atualizado_em TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    loc_deletado_em   TIMESTAMP,
+    loc_observacoes        TEXT,
+    loc_capacidade_maxima  INTEGER,
+    loc_criado_em          TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    loc_atualizado_em      TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    loc_deletado_em        TIMESTAMP,
 
-    CONSTRAINT ck_locais_estado CHECK (char_length(loc_estado) = 2)
-);
+    CONSTRAINT ck_locais_estado CHECK (char_length(loc_estado) = 2),
+    CONSTRAINT ck_locais_capacidade_maxima CHECK (loc_capacidade_maxima IS NULL OR loc_capacidade_maxima >= 0)
+  );
 
-COMMENT ON TABLE  locais               IS 'Locais de realização dos eventos (endereço completo).';
-COMMENT ON COLUMN locais.loc_estado    IS 'UF com 2 caracteres. Ex: SP, RJ, MG.';
-COMMENT ON COLUMN locais.loc_cep       IS 'CEP no formato 00000-000.';
+COMMENT ON TABLE  locais                     IS 'Locais de realização dos eventos (endereço completo).';
+COMMENT ON COLUMN locais.loc_estado          IS 'UF com 2 caracteres. Ex: SP, RJ, MG.';
+COMMENT ON COLUMN locais.loc_cep             IS 'CEP no formato 00000-000.';
+COMMENT ON COLUMN locais.loc_capacidade_maxima IS 'Capacidade máxima de pessoas suportada pelo local. Nullable — locais externos podem não ter limite definido.';
 
 -- ============================================================
 -- F. FUNCOES (lookup de funções de colaboradores)

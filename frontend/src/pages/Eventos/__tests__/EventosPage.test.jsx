@@ -1,0 +1,102 @@
+import React from 'react';
+import '@testing-library/jest-dom';
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import EventosPage from '../EventosPage';
+import { useAuth } from '../../../contexts/AuthContext';
+import { useConfirm } from '../../../contexts/ConfirmContext';
+import api from '../../../services/api';
+
+jest.mock('../../../contexts/AuthContext');
+jest.mock('../../../contexts/ConfirmContext');
+jest.mock('../../../services/api');
+
+const mockLocais = [
+  { id: '1', nome: 'Salão 1', capacidadeMaxima: 100 },
+  { id: '2', nome: 'Salão 2', capacidadeMaxima: null },
+];
+
+function setupApiMock() {
+  api.get.mockImplementation((url, _config) => {
+    if (url === '/eventos') {
+      return Promise.resolve({ data: { data: [], pagination: { total: 0 } } });
+    }
+    if (url === '/clientes') {
+      return Promise.resolve({ data: { data: [] } });
+    }
+    if (url === '/orcamentos') {
+      return Promise.resolve({ data: { data: [] } });
+    }
+    if (url === '/locais?limit=100') {
+      return Promise.resolve({ data: { data: mockLocais } });
+    }
+    return Promise.resolve({ data: {} });
+  });
+}
+
+describe('EventosPage — warning de capacidade excedida', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    useAuth.mockReturnValue({ user: { id: 1, nome: 'Gerente', role: 'gerente' } });
+    useConfirm.mockReturnValue(jest.fn().mockResolvedValue(true));
+    setupApiMock();
+  });
+
+  /** Helper: clica em "Novo Evento" e aguarda o painel abrir */
+  async function abrirFormulario(user) {
+    await screen.findByText('Novo Evento');
+    await user.click(screen.getByText('Novo Evento'));
+    await screen.findByText('Salvar');
+  }
+
+  test('deve exibir warning quando qtdPessoas excede capacidade do local', async () => {
+    const user = userEvent.setup();
+    render(<EventosPage />);
+    await abrirFormulario(user);
+
+    // Seleciona o 1o select do form (Local = Salão 1, capacidadeMaxima=100)
+    const [localSelect] = document.querySelectorAll('#evt-form select');
+    await user.selectOptions(localSelect, '1');
+
+    // Pega o 2o input[type=number] (Total / qtdPessoas)
+    const [, totalInput] = document.querySelectorAll('#evt-form input[type="number"]');
+    await user.clear(totalInput);
+    await user.type(totalInput, '150');
+
+    expect(await screen.findByText('Capacidade excedida!')).toBeInTheDocument();
+  });
+
+  test('NÃO deve exibir warning quando qtdPessoas está dentro da capacidade', async () => {
+    const user = userEvent.setup();
+    render(<EventosPage />);
+    await abrirFormulario(user);
+
+    const [localSelect] = document.querySelectorAll('#evt-form select');
+    await user.selectOptions(localSelect, '1');
+
+    const [, totalInput] = document.querySelectorAll('#evt-form input[type="number"]');
+    await user.clear(totalInput);
+    await user.type(totalInput, '80');
+
+    await waitFor(() => {
+      expect(screen.queryByText('Capacidade excedida!')).not.toBeInTheDocument();
+    });
+  });
+
+  test('NÃO deve exibir warning quando local não tem capacidadeMaxima definida', async () => {
+    const user = userEvent.setup();
+    render(<EventosPage />);
+    await abrirFormulario(user);
+
+    const [localSelect] = document.querySelectorAll('#evt-form select');
+    await user.selectOptions(localSelect, '2');
+
+    const [, totalInput] = document.querySelectorAll('#evt-form input[type="number"]');
+    await user.clear(totalInput);
+    await user.type(totalInput, '150');
+
+    await waitFor(() => {
+      expect(screen.queryByText('Capacidade excedida!')).not.toBeInTheDocument();
+    });
+  });
+});
