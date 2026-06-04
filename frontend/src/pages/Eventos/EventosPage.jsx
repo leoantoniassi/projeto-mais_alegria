@@ -102,15 +102,33 @@ export default function EventosPage() {
   const handleSave = async (e) => {
     e.preventDefault();
     try {
+      const toUTC = (val) => {
+        if (!val) return "";
+        if (val.includes("Z") || val.includes("+") || (val.lastIndexOf("-") > 10 && val.includes(":"))) {
+          return new Date(val).toISOString();
+        }
+        const suffix = val.length === 16 ? ":00-03:00" : "-03:00";
+        return new Date(val + suffix).toISOString();
+      };
       const payload = {
         ...form,
-        dataEvento: form.dataEvento ? new Date(form.dataEvento).toISOString() : "",
-        horarioTermino: form.horarioTermino ? new Date(form.horarioTermino).toISOString() : "",
+        dataEvento: toUTC(form.dataEvento),
+        horarioTermino: toUTC(form.horarioTermino),
       };
       const { data: res } = editing
         ? await api.put(`/eventos/${editing}`, payload)
         : await api.post("/eventos", payload);
-      if (res.warning) setToast({ message: res.warning, type: 'warning' });
+      if (res.warning) {
+        setToast({
+          message: `Evento ${editing ? "atualizado" : "criado"} com sucesso! Porém, a quantidade de convidados excede a capacidade máxima do local selecionado.`,
+          type: "warning",
+        });
+      } else {
+        setToast({
+          message: `Evento ${editing ? "atualizado" : "criado"} com sucesso!`,
+          type: "success",
+        });
+      }
       setShowPanel(false);
       setEditing(null);
       fetchData();
@@ -252,6 +270,21 @@ export default function EventosPage() {
     return m[s] || "bg-surface-container text-on-surface-variant";
   };
 
+  const toBrasiliaISO = (d) => {
+    if (!d) return "";
+    const date = new Date(d);
+    if (isNaN(date.getTime())) return "";
+    const formatter = new Intl.DateTimeFormat("sv-SE", {
+      timeZone: "America/Sao_Paulo",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+    return formatter.format(date).replace(" ", "T");
+  };
+
   const parseDate = (d) => {
     if (!d) return null;
     if (typeof d === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(d)) {
@@ -268,6 +301,7 @@ export default function EventosPage() {
           day: "2-digit",
           month: "short",
           year: "numeric",
+          timeZone: "America/Sao_Paulo",
         })
       : "";
   };
@@ -277,6 +311,7 @@ export default function EventosPage() {
       ? date.toLocaleTimeString("pt-BR", {
           hour: "2-digit",
           minute: "2-digit",
+          timeZone: "America/Sao_Paulo",
         })
       : "";
   };
@@ -416,22 +451,8 @@ export default function EventosPage() {
                             setEditing(evt.id);
                             setForm({
                               nome: evt.nome || "",
-                              dataEvento: evt.dataEvento
-                                ? new Date(
-                                    new Date(evt.dataEvento).getTime() -
-                                      new Date().getTimezoneOffset() * 60000,
-                                  )
-                                    .toISOString()
-                                    .slice(0, 16)
-                                : "",
-                              horarioTermino: evt.horarioTermino
-                                ? new Date(
-                                    new Date(evt.horarioTermino).getTime() -
-                                      new Date().getTimezoneOffset() * 60000,
-                                  )
-                                    .toISOString()
-                                    .slice(0, 16)
-                                : "",
+                              dataEvento: toBrasiliaISO(evt.dataEvento),
+                              horarioTermino: toBrasiliaISO(evt.horarioTermino),
                               localId: evt.localId || evt.local?.id || "",
                               clienteId: evt.clienteId || "",
                               orcamentoId: evt.orcamentoId || "",
@@ -518,9 +539,12 @@ export default function EventosPage() {
                       </div>
                     )}
                     {selectedEvento.local?.capacidadeMaxima && (selectedEvento.qtdPessoas || 0) > selectedEvento.local.capacidadeMaxima && (
-                      <div className="flex items-center gap-2 text-sm bg-error/20 text-error px-3 py-2 rounded-xl mt-2">
-                        <span className="material-symbols-outlined text-base">warning</span>
-                        <span>Capacidade excedida!</span>
+                      <div className="flex items-start gap-2.5 text-xs bg-red-950/40 border border-red-500/30 text-white p-3.5 rounded-2xl mt-4 shadow-sm">
+                        <span className="material-symbols-outlined text-base text-red-400 mt-0.5 shrink-0">warning</span>
+                        <div>
+                          <p className="font-bold text-red-200">Capacidade Excedida</p>
+                          <p className="opacity-80 mt-0.5">Este evento tem mais convidados ({selectedEvento.qtdPessoas}) do que a capacidade do salão ({selectedEvento.local.capacidadeMaxima} pessoas).</p>
+                        </div>
                       </div>
                     )}
                   </div>

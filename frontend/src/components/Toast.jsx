@@ -12,8 +12,16 @@ export default function Toast({ message, type = 'success', onClose }) {
     return () => clearTimeout(timer);
   }, [onClose]);
 
-  const bg = type === 'success' ? 'bg-secondary text-on-secondary' : 'bg-error text-on-error';
-  const icon = type === 'success' ? 'check_circle' : 'cancel';
+  const bg = type === 'success'
+    ? 'bg-secondary text-on-secondary'
+    : type === 'warning'
+      ? 'bg-[#E65100] text-white'
+      : 'bg-error text-on-error';
+  const icon = type === 'success'
+    ? 'check_circle'
+    : type === 'warning'
+      ? 'warning'
+      : 'cancel';
 
   return (
     <div

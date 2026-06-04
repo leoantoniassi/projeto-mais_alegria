@@ -10,6 +10,7 @@ services:
       POSTGRES_DB: ${DB_NAME}
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASS}
+      TZ: America/Sao_Paulo
     ports:
       - "${DB_PORT}:5432"
     volumes:
@@ -38,6 +39,7 @@ services:
       DB_USER: ${DB_USER}
       DB_PASS: ${DB_PASS}
       DB_NAME: ${DB_NAME}
+      TZ: America/Sao_Paulo
     ports:
       - "3001:3001"
     volumes:
