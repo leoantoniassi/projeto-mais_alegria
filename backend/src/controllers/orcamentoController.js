@@ -13,11 +13,32 @@ const {
 } = require("../models");
 const { gerarLinkWhatsApp } = require('../utils/whatsapp');
 
+// Validador simples de UUID v4
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+function isUUIDValido(str) {
+  return UUID_REGEX.test(str);
+}
+
+function respostaNaoEncontrado(res, mensagem = "Orçamento não encontrado.") {
+  return res.status(404).json({ success: false, message: mensagem });
+}
+
+function respostaErro(res, statusCode, mensagem) {
+  return res.status(statusCode).json({ success: false, message: mensagem });
+}
+
+const includesLista = [
+  { model: Cliente, as: "cliente", attributes: ["id", "nome", "email", "telefone"] },
+  { model: Local,   as: "local",   attributes: ["id", "nome", "cidade", "estado"] },
+];
+
 // GET /api/orcamentos
 async function listar(req, res, next) {
   try {
     const { page = 1, limit = 20, status, localId, incluirReprovados } = req.query;
-    const offset = (page - 1) * limit;
+    const pageNum = Math.max(1, parseInt(page, 10) || 1);
+    const limitNum = Math.min(100, Math.max(1, parseInt(limit, 10) || 20));
+    const offset = (pageNum - 1) * limitNum;
 
     let scope = 'defaultScope';
     const where = {};
@@ -33,20 +54,9 @@ async function listar(req, res, next) {
 
     const { count, rows } = await Orcamento.scope(scope).findAndCountAll({
       where,
-      include: [
-        {
-          model: Cliente,
-          as: "cliente",
-          attributes: ["id", "nome", "email", "telefone"],
-        },
-        {
-          model: Local,
-          as: "local",
-          attributes: ["id", "nome", "cidade", "estado"],
-        },
-      ],
-      limit: parseInt(limit),
-      offset: parseInt(offset),
+      include: includesLista,
+      limit: limitNum,
+      offset,
       order: [["criadoEm", "DESC"]],
     });
 
@@ -55,9 +65,9 @@ async function listar(req, res, next) {
       data: rows,
       pagination: {
         total: count,
-        page: parseInt(page),
-        limit: parseInt(limit),
-        totalPages: Math.ceil(count / limit),
+        page: pageNum,
+        limit: limitNum,
+        totalPages: Math.ceil(count / limitNum),
       },
     });
   } catch (error) {
@@ -70,28 +80,18 @@ async function buscarPorId(req, res, next) {
   try {
     const orcamento = await Orcamento.findByPk(req.params.id, {
       include: [
-        {
-          model: Cliente,
-          as: "cliente",
-          attributes: ["id", "nome", "email", "telefone"],
-        },
-        {
-          model: Local,
-          as: "local",
-        },
+        ...includesLista,
         {
           model: OrcamentoProduto,
           as: "orcamentoProdutos",
+          separate: true,
           include: [{ model: Produto, as: "produto", include: [{ model: CategoriaProduto, as: 'categoria' }] }],
         },
       ],
     });
 
     if (!orcamento) {
-      return res.status(404).json({
-        success: false,
-        message: "Orçamento não encontrado.",
-      });
+      return respostaNaoEncontrado(res);
     }
 
     return res.json({ success: true, data: orcamento });
@@ -100,110 +100,143 @@ async function buscarPorId(req, res, next) {
   }
 }
 
+const includesOrcamentoDetalhado = [
+  { model: Cliente, as: "cliente", attributes: ["id", "nome"] },
+  { model: Local,   as: "local",   attributes: ["id", "nome", "cidade", "estado"] },
+  { model: OrcamentoProduto, as: "orcamentoProdutos", separate: true, include: [{ model: Produto, as: "produto" }] },
+];
+
 // POST /api/orcamentos
 async function criar(req, res, next) {
   try {
+    if (req.user && req.user.role !== "gerente") {
+      return respostaErro(res, 403, "Apenas gerentes podem criar orçamentos.");
+    }
+
     const {
       clienteId,
       localId,
+      nome,
       valorTotal,
       dataValidade,
-      status,
+      dataEvento,
+      horarioTermino,
+      qtdPessoas,
+      qtdAdultos,
+      qtdCriancas,
+      qtdBebes,
       observacoes,
       produtos,
     } = req.body;
 
-    if (!clienteId) {
-      return res.status(400).json({
-        success: false,
-        message: "O ID do cliente é obrigatório.",
-      });
+    if (!clienteId || !nome || !dataEvento || !horarioTermino) {
+      return respostaErro(res, 400, "Cliente, nome, data do evento e horário de término são obrigatórios.");
+    }
+
+    if (qtdPessoas === undefined || qtdPessoas === null || qtdPessoas < 0) {
+      return respostaErro(res, 400, "O campo Total de Pessoas é obrigatório e deve ser um número não negativo.");
     }
 
     const cliente = await Cliente.findByPk(clienteId);
     if (!cliente) {
-      return res.status(404).json({
-        success: false,
-        message: "Cliente não encontrado.",
-      });
+      return respostaErro(res, 404, "Cliente não encontrado.");
     }
 
     if (localId) {
       const localExiste = await Local.findByPk(localId);
       if (!localExiste) {
-        return res.status(404).json({ success: false, message: "Local não encontrado." });
+        return respostaErro(res, 404, "Local não encontrado.");
       }
+    }
+
+    if (dataEvento && horarioTermino && new Date(horarioTermino) <= new Date(dataEvento)) {
+      return respostaErro(res, 400, "Horário de término deve ser posterior à data de início do evento.");
     }
 
     const orcamento = await Orcamento.create({
       clienteId,
       localId: localId || null,
+      nome,
       valorTotal: valorTotal || 0,
-      dataValidade,
-      status: status || "pendente",
+      dataValidade: (dataValidade && dataValidade !== '') ? dataValidade : null,
+      dataEvento,
+      horarioTermino,
+      qtdPessoas,
+      qtdAdultos: qtdAdultos || 0,
+      qtdCriancas: qtdCriancas || 0,
+      qtdBebes: qtdBebes || 0,
+      status: "pendente",
       observacoes,
     });
 
-    if (produtos && Array.isArray(produtos) && produtos.length > 0) {
-      const orcamentoProdutos = produtos.map((p) => ({
-        orcamentoId: orcamento.id,
-        produtoId:   p.produtoId,
-        quantidade:  p.quantidade  || 0,
-        precoUnitario: p.precoUnitario || 0,
-      }));
-      await OrcamentoProduto.bulkCreate(orcamentoProdutos);
+    if (produtos?.length > 0) {
+      await OrcamentoProduto.bulkCreate(
+        produtos.map((p) => ({
+          orcamentoId: orcamento.id,
+          produtoId:   p.produtoId,
+          quantidade:  p.quantidade  || 0,
+          precoUnitario: p.precoUnitario || 0,
+        }))
+      );
     }
 
-    const orcamentoCompleto = await Orcamento.findByPk(orcamento.id, {
-      include: [
-        { model: Cliente, as: "cliente", attributes: ["id", "nome"] },
-        { model: Local,   as: "local",   attributes: ["id", "nome", "cidade", "estado"] },
-        {
-          model: OrcamentoProduto,
-          as: "orcamentoProdutos",
-          include: [{ model: Produto, as: "produto" }],
-        },
-      ],
-    });
+    await orcamento.reload({ include: includesOrcamentoDetalhado });
 
     return res.status(201).json({
       success: true,
       message: "Orçamento criado com sucesso!",
-      data: orcamentoCompleto,
+      data: orcamento,
     });
   } catch (error) {
     return next(error);
   }
 }
 
+function pickDefined(obj, keys) {
+  return keys.reduce((acc, key) => {
+    if (obj[key] !== undefined) acc[key] = obj[key];
+    return acc;
+  }, {});
+}
+
 // PUT /api/orcamentos/:id
 async function atualizar(req, res, next) {
   try {
-    const orcamento = await Orcamento.findByPk(req.params.id);
-    if (!orcamento) {
-      return res.status(404).json({
-        success: false,
-        message: "Orçamento não encontrado.",
-      });
+    if (!isUUIDValido(req.params.id)) {
+      return respostaErro(res, 400, "ID do orçamento inválido.");
     }
 
-    const { clienteId, localId, valorTotal, dataValidade, observacoes } = req.body;
+    const orcamento = await Orcamento.findByPk(req.params.id);
+    if (!orcamento) {
+      return respostaNaoEncontrado(res);
+    }
+
+    const { clienteId, localId, nome, valorTotal, dataValidade, dataEvento, horarioTermino, qtdPessoas, qtdAdultos, qtdCriancas, qtdBebes, observacoes } = req.body;
 
     if (localId !== undefined && localId !== null) {
       const localExiste = await Local.findByPk(localId);
       if (!localExiste) {
-        return res.status(404).json({ success: false, message: "Local não encontrado." });
+        return respostaErro(res, 404, "Local não encontrado.");
       }
     }
 
-    await orcamento.update({
-      clienteId:    clienteId    || orcamento.clienteId,
-      localId:      localId      !== undefined ? localId      : orcamento.localId,
-      valorTotal:   valorTotal   !== undefined ? valorTotal   : orcamento.valorTotal,
-      dataValidade: dataValidade !== undefined ? dataValidade : orcamento.dataValidade,
-      observacoes:  observacoes  !== undefined ? observacoes  : orcamento.observacoes,
-      atualizadoEm: new Date(),
-    });
+    if (qtdPessoas !== undefined && (qtdPessoas === null || typeof qtdPessoas !== 'number' || qtdPessoas < 0)) {
+      return respostaErro(res, 400, "O campo Total de Pessoas deve ser um número não negativo.");
+    }
+
+    const dataEventoFinal = dataEvento !== undefined ? dataEvento : orcamento.dataEvento;
+    const horarioTerminoFinal = horarioTermino !== undefined ? horarioTermino : orcamento.horarioTermino;
+    if (dataEventoFinal && horarioTerminoFinal && new Date(horarioTerminoFinal) <= new Date(dataEventoFinal)) {
+      return respostaErro(res, 400, "Horário de término deve ser posterior à data de início do evento.");
+    }
+
+    const updates = pickDefined(
+      { clienteId, localId, nome, valorTotal, dataValidade: (dataValidade && dataValidade !== '') ? dataValidade : null, dataEvento, horarioTermino, qtdPessoas, qtdAdultos, qtdCriancas, qtdBebes, observacoes },
+      ['clienteId', 'localId', 'nome', 'valorTotal', 'dataValidade', 'dataEvento', 'horarioTermino', 'qtdPessoas', 'qtdAdultos', 'qtdCriancas', 'qtdBebes', 'observacoes']
+    );
+    updates.atualizadoEm = new Date();
+
+    await orcamento.update(updates);
 
     return res.json({
       success: true,
@@ -220,18 +253,12 @@ async function mudarStatus(req, res, next) {
   try {
     const orcamento = await Orcamento.findByPk(req.params.id);
     if (!orcamento) {
-      return res.status(404).json({
-        success: false,
-        message: "Orçamento não encontrado.",
-      });
+      return respostaNaoEncontrado(res);
     }
 
     const { status } = req.body;
     if (!["pendente", "aprovado", "reprovado"].includes(status)) {
-      return res.status(400).json({
-        success: false,
-        message: "Status inválido. Use: pendente, aprovado ou reprovado.",
-      });
+      return respostaErro(res, 400, "Status inválido. Use: pendente, aprovado ou reprovado.");
     }
 
     await orcamento.update({ status, atualizadoEm: new Date() });
@@ -251,10 +278,7 @@ async function remover(req, res, next) {
   try {
     const orcamento = await Orcamento.findByPk(req.params.id);
     if (!orcamento) {
-      return res.status(404).json({
-        success: false,
-        message: "Orçamento não encontrado.",
-      });
+      return respostaNaoEncontrado(res);
     }
 
     await orcamento.update({ deletadoEm: new Date() });
@@ -271,35 +295,40 @@ async function remover(req, res, next) {
 // Confirma o orçamento e envia para Eventos
 async function confirmarOrcamento(req, res, next) {
   try {
+    if (!isUUIDValido(req.params.id)) {
+      return respostaErro(res, 400, "ID do orçamento inválido.");
+    }
+
     const orcamento = await Orcamento.findByPk(req.params.id, {
       include: [{ model: Cliente, as: "cliente" }],
     });
 
     if (!orcamento) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Orçamento não encontrado." });
+      return respostaNaoEncontrado(res);
     }
 
-    // Converte dataValidade (DATEONLY) para TIMESTAMP sem deslocamento de fuso
-    let dataEvento = new Date();
-    if (orcamento.dataValidade) {
-      const dv = String(orcamento.dataValidade);
-      dataEvento = /^\d{4}-\d{2}-\d{2}$/.test(dv)
-        ? new Date(dv + 'T12:00:00')
-        : new Date(dv);
+    if (!orcamento.dataEvento || !orcamento.horarioTermino) {
+      return respostaErro(res, 400, "O orçamento precisa ter data e horário de início e término definidos para ser convertido em evento.");
     }
 
-    // Cria um evento a partir do orçamento, herdando o local
+    if (new Date(orcamento.horarioTermino) <= new Date(orcamento.dataEvento)) {
+      return respostaErro(res, 400, "Horário de término deve ser posterior à data de início do evento.");
+    }
+
     const evento = await Evento.create({
-      orcamentoId:   orcamento.id,
-      clienteId:     orcamento.clienteId,
-      localId:       orcamento.localId || null,
-      nome:          `Evento de ${orcamento.cliente ? orcamento.cliente.nome : "Cliente"}`,
-      dataEvento,
-      observacoes:   orcamento.observacoes,
+      orcamentoId:    orcamento.id,
+      clienteId:      orcamento.clienteId,
+      localId:        orcamento.localId || null,
+      nome:           orcamento.nome || `Evento de ${orcamento.cliente ? orcamento.cliente.nome : "Cliente"}`,
+      dataEvento:     orcamento.dataEvento,
+      horarioTermino: orcamento.horarioTermino,
+      qtdPessoas:     orcamento.qtdPessoas || 0,
+      qtdAdultos:     orcamento.qtdAdultos || 0,
+      qtdCriancas:    orcamento.qtdCriancas || 0,
+      qtdBebes:       orcamento.qtdBebes || 0,
+      observacoes:    orcamento.observacoes,
       valorOrcamento: orcamento.valorTotal || 0,
-      status:        "pendente",
+      status:         "pendente",
     });
 
     await orcamento.update({
@@ -323,9 +352,7 @@ async function rejeitarOrcamento(req, res, next) {
   try {
     const orcamento = await Orcamento.findByPk(req.params.id);
     if (!orcamento) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Orçamento não encontrado." });
+      return respostaNaoEncontrado(res);
     }
 
     await orcamento.update({ status: "reprovado", deletadoEm: new Date() });
@@ -347,17 +374,11 @@ async function whatsapp(req, res, next) {
     });
 
     if (!orcamento) {
-      return res.status(404).json({
-        success: false,
-        message: 'Orçamento não encontrado.',
-      });
+      return respostaNaoEncontrado(res);
     }
 
     if (!orcamento.cliente || !orcamento.cliente.telefone) {
-      return res.status(400).json({
-        success: false,
-        message: 'Cliente do orçamento não possui telefone cadastrado.',
-      });
+      return respostaErro(res, 400, "Cliente do orçamento não possui telefone cadastrado.");
     }
 
     const link = gerarLinkWhatsApp(

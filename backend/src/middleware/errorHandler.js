@@ -11,10 +11,7 @@ function errorHandler(err, req, res, _next) {
 
   // Erros de validação do Sequelize
   if (err.name === 'SequelizeValidationError') {
-    const errors = err.errors.map((e) => ({
-      campo: e.path,
-      mensagem: e.message,
-    }));
+    const errors = err.errors.map((e) => e.message);
     return res.status(400).json({
       success: false,
       message: 'Erro de validação.',
@@ -24,10 +21,7 @@ function errorHandler(err, req, res, _next) {
 
   // Erros de constraint única do Sequelize
   if (err.name === 'SequelizeUniqueConstraintError') {
-    const errors = err.errors.map((e) => ({
-      campo: e.path,
-      mensagem: `O valor informado para '${e.path}' já está em uso.`,
-    }));
+    const errors = err.errors.map((e) => `O valor informado já está em uso.`);
     return res.status(409).json({
       success: false,
       message: 'Registro duplicado.',
@@ -62,7 +56,7 @@ function errorHandler(err, req, res, _next) {
   const statusCode = err.statusCode || 500;
   return res.status(statusCode).json({
     success: false,
-    message: err.message || 'Erro interno do servidor.',
+    message: 'Erro interno do servidor.',
   });
 }
 

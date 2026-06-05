@@ -9,4 +9,8 @@ function fail(res, message, statusCode = 400) {
   return res.status(statusCode).json({ success: false, message });
 }
 
-module.exports = { success, fail };
+function warning(res, message) {
+  return res.json({ success: false, warning: true, requiresConfirmation: true, message });
+}
+
+module.exports = { success, fail, warning };

@@ -4,12 +4,19 @@
 const { Op } = require('sequelize');
 const { Cliente, Orcamento, Evento, Documento } = require('../models');
 const { gerarLinkWhatsApp } = require('../utils/whatsapp');
+const { warning } = require('../utils/response');
+const { isValidUUID } = require('../utils/validators');
 
 // GET /api/clientes
 async function listar(req, res, next) {
   try {
     const { page = 1, limit = 20, busca } = req.query;
-    const offset = (page - 1) * limit;
+    const pageNum = Math.max(1, parseInt(page, 10) || 1);
+    const limitNum = Math.min(100, Math.max(1, parseInt(limit, 10) || 20));
+
+    if (busca !== undefined && typeof busca !== 'string') {
+      return res.status(400).json({ success: false, message: 'Busca inválida.' });
+    }
 
     const where = {};
     if (busca) {
@@ -22,8 +29,8 @@ async function listar(req, res, next) {
 
     const { count, rows } = await Cliente.findAndCountAll({
       where,
-      limit: parseInt(limit),
-      offset: parseInt(offset),
+      limit: limitNum,
+      offset: (pageNum - 1) * limitNum,
       order: [['nome', 'ASC']],
     });
 
@@ -32,9 +39,9 @@ async function listar(req, res, next) {
       data: rows,
       pagination: {
         total: count,
-        page: parseInt(page),
-        limit: parseInt(limit),
-        totalPages: Math.ceil(count / limit),
+        page: pageNum,
+        limit: limitNum,
+        totalPages: Math.ceil(count / limitNum),
       },
     });
   } catch (error) {
@@ -45,6 +52,9 @@ async function listar(req, res, next) {
 // GET /api/clientes/:id
 async function buscarPorId(req, res, next) {
   try {
+    if (!isValidUUID(req.params.id)) {
+      return res.status(400).json({ success: false, message: 'ID do cliente inválido.' });
+    }
     const cliente = await Cliente.findByPk(req.params.id, {
       include: [
         { model: Orcamento, as: 'orcamentos' },
@@ -93,6 +103,9 @@ async function criar(req, res, next) {
 // PUT /api/clientes/:id
 async function atualizar(req, res, next) {
   try {
+    if (!isValidUUID(req.params.id)) {
+      return res.status(400).json({ success: false, message: 'ID do cliente inválido.' });
+    }
     const cliente = await Cliente.findByPk(req.params.id);
     if (!cliente) {
       return res.status(404).json({
@@ -123,12 +136,29 @@ async function atualizar(req, res, next) {
 // DELETE /api/clientes/:id (soft delete)
 async function remover(req, res, next) {
   try {
+    if (!isValidUUID(req.params.id)) {
+      return res.status(400).json({ success: false, message: 'ID do cliente inválido.' });
+    }
     const cliente = await Cliente.findByPk(req.params.id);
     if (!cliente) {
       return res.status(404).json({
         success: false,
         message: 'Cliente não encontrado.',
       });
+    }
+
+    if (req.query.force !== 'true') {
+      const eventosFuturos = await Evento.count({
+        where: {
+          clienteId: req.params.id,
+          dataEvento: { [Op.gt]: new Date() },
+          deletadoEm: null,
+        },
+      });
+
+      if (eventosFuturos > 0) {
+        return warning(res, `Este cliente possui ${eventosFuturos} evento(s) futuro(s). Deseja realmente excluí-lo?`);
+      }
     }
 
     await cliente.update({ deletadoEm: new Date() });
@@ -145,6 +175,9 @@ async function remover(req, res, next) {
 // GET /api/clientes/:id/whatsapp
 async function whatsapp(req, res, next) {
   try {
+    if (!isValidUUID(req.params.id)) {
+      return res.status(400).json({ success: false, message: 'ID do cliente inválido.' });
+    }
     const cliente = await Cliente.findByPk(req.params.id);
     if (!cliente) {
       return res.status(404).json({

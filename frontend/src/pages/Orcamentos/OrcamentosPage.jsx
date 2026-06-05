@@ -5,6 +5,62 @@ import { useConfirm } from '../../contexts/ConfirmContext';
 import { formatCurrency } from '../../utils/formatters';
 import Toast from '../../components/Toast';
 
+const EMPTY_FORM = { clienteId: '', nome: '', valorTotal: 0, dataValidade: '', dataEvento: '', horarioTermino: '', observacoes: '', localId: '', produtos: [], qtdPessoas: 0, qtdAdultos: 0, qtdCriancas: 0, qtdBebes: 0 };
+
+const sortByName = (items) => items.slice().sort((a, b) => a.nome.localeCompare(b.nome));
+
+function toBrasiliaISO(d) {
+  if (!d) return "";
+  const date = new Date(d);
+  if (isNaN(date.getTime())) return "";
+  const formatter = new Intl.DateTimeFormat("sv-SE", {
+    timeZone: "America/Sao_Paulo",
+    year: "numeric", month: "2-digit", day: "2-digit",
+    hour: "2-digit", minute: "2-digit",
+  });
+  return formatter.format(date).replace(" ", "T");
+}
+
+function toUTC(val) {
+  if (!val) return "";
+  try {
+    if (val.includes("Z") || val.includes("+") || (val.lastIndexOf("-") > 10 && val.includes(":"))) {
+      const d = new Date(val);
+      if (isNaN(d.getTime())) return "";
+      return d.toISOString();
+    }
+    const suffix = val.length === 16 ? ":00-03:00" : "-03:00";
+    const d = new Date(val + suffix);
+    if (isNaN(d.getTime())) return "";
+    return d.toISOString();
+  } catch {
+    return "";
+  }
+}
+
+function parseDate(d) {
+  if (!d) return null;
+  if (typeof d === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(d)) {
+    const [year, month, day] = d.split('-');
+    return new Date(year, month - 1, day);
+  }
+  return new Date(d);
+}
+
+function formatDate(d) {
+  const date = parseDate(d);
+  return date
+    ? date.toLocaleDateString("pt-BR", { day: "2-digit", month: "short", year: "numeric", timeZone: "America/Sao_Paulo" })
+    : "";
+}
+
+function formatDateTime(d) {
+  if (!d) return "—";
+  const date = parseDate(d);
+  if (!date) return "—";
+  return date.toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo" });
+}
+
 export default function OrcamentosPage() {
   const { user } = useAuth();
   const confirm = useConfirm();
@@ -19,7 +75,7 @@ export default function OrcamentosPage() {
   const [filtroLocal, setFiltroLocal] = useState('');
   const [mostrarReprovados, setMostrarReprovados] = useState(false);
   const [toast, setToast] = useState(null);
-  const [form, setForm] = useState({ clienteId: '', valorTotal: 0, dataValidade: '', observacoes: '', localId: '', produtos: [] });
+  const [form, setForm] = useState(EMPTY_FORM);
 
   useEffect(() => {
     api.get('/locais?limit=100').then(r => {
@@ -43,15 +99,34 @@ export default function OrcamentosPage() {
 
   useEffect(() => { fetchData(); }, [page, filtroLocal, mostrarReprovados]);
 
-  useEffect(() => { api.get('/clientes').then(r => { const items = Array.isArray(r.data.data) ? r.data.data : []; setClientes(items); }).catch(() => { }); }, []);
+  useEffect(() => { api.get('/clientes', { params: { limit: 100 } }).then(r => { const items = Array.isArray(r.data.data) ? r.data.data : []; setClientes(items); }).catch(() => { }); }, []);
 
   const handleSave = async (e) => {
     e.preventDefault();
+    if (!form.dataEvento || !form.horarioTermino) {
+      alert("Data e horário do evento e de término são obrigatórios.");
+      return;
+    }
+    const dataEventoUTC = toUTC(form.dataEvento);
+    const horarioTerminoUTC = toUTC(form.horarioTermino);
+    if (!dataEventoUTC || !horarioTerminoUTC) {
+      alert("Data ou horário inválido. Verifique os valores informados.");
+      return;
+    }
+    if (new Date(horarioTerminoUTC) <= new Date(dataEventoUTC)) {
+      alert("Horário de término deve ser posterior à data de início do evento.");
+      return;
+    }
     try {
-      if (editing) await api.put(`/orcamentos/${editing}`, form);
-      else await api.post('/orcamentos', form);
+      const payload = {
+        ...form,
+        dataEvento: dataEventoUTC,
+        horarioTermino: horarioTerminoUTC,
+      };
+      if (editing) await api.put(`/orcamentos/${editing}`, payload);
+      else await api.post('/orcamentos', payload);
       setShowPanel(false); setEditing(null); fetchData();
-    } catch (err) { alert(err.response?.data?.error || 'Erro'); }
+    } catch (err) { alert(err.response?.data?.message || err.response?.data?.error || 'Erro'); }
   };
 
   const handleStatus = async (id, status) => {
@@ -96,21 +171,11 @@ export default function OrcamentosPage() {
     return m[s] || 'bg-surface-container text-on-surface-variant';
   };
 
-  const formatDate = (d) => {
-    if (!d) return '';
-    // Para datas DATEONLY (ex: "2026-05-02"), evita deslocamento de fuso
-    if (typeof d === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(d)) {
-      const [year, month, day] = d.split('-');
-      return new Date(year, month - 1, day).toLocaleDateString('pt-BR');
-    }
-    return new Date(d).toLocaleDateString('pt-BR');
-  };
-
   return (
     <div>
       <section className="flex justify-between items-end mb-10">
         <div><h2 className="text-4xl font-extrabold text-on-surface tracking-tight mb-2 font-headline">Orçamentos</h2><p className="text-on-surface-variant">Gerencie propostas e negociações festivas.</p></div>
-        <button onClick={() => { setEditing(null); setForm({ clienteId: '', valorTotal: 0, dataValidade: '', observacoes: '', localId: '', produtos: [] }); setShowPanel(true); }} className="flex items-center gap-2 px-6 py-3 bg-primary text-on-primary font-bold rounded-full shadow-lg shadow-primary/30 hover:scale-[1.02] transition-transform">
+        <button onClick={() => { setEditing(null); setForm({ ...EMPTY_FORM }); setShowPanel(true); }} className="flex items-center gap-2 px-6 py-3 bg-primary text-on-primary font-bold rounded-full shadow-lg shadow-primary/30 hover:scale-[1.02] transition-transform">
           <span className="material-symbols-outlined">add</span> Novo Orçamento
         </button>
       </section>
@@ -138,7 +203,7 @@ export default function OrcamentosPage() {
                 onChange={(e) => setFiltroLocal(e.target.value)}
               >
                 <option value="">Todos os locais</option>
-                {locais.slice().sort((a, b) => a.nome.localeCompare(b.nome)).map(loc => <option key={loc.id} value={loc.id}>{loc.nome}</option>)}
+                {sortByName(locais).map(loc => <option key={loc.id} value={loc.id}>{loc.nome}</option>)}
               </select>
             </div>
           </div>
@@ -198,12 +263,19 @@ export default function OrcamentosPage() {
                                 e.stopPropagation();
                                 setEditing(o.id);
                                 setForm({
+                                  ...EMPTY_FORM,
                                   clienteId: o.clienteId || o.cliente?.id || o.Cliente?.id || '',
+                                  nome: o.nome || '',
                                   valorTotal: o.valorTotal || 0,
-                                  dataValidade: o.dataValidade ? new Date(new Date(o.dataValidade).getTime() - (new Date().getTimezoneOffset() * 60000)).toISOString().slice(0, 10) : '',
+                                  dataValidade: o.dataValidade ? toBrasiliaISO(o.dataValidade).slice(0, 10) : '',
+                                  dataEvento: toBrasiliaISO(o.dataEvento),
+                                  horarioTermino: toBrasiliaISO(o.horarioTermino),
                                   observacoes: o.observacoes || '',
                                   localId: o.localId || o.local?.id || '',
-                                  produtos: []
+                                  qtdPessoas: o.qtdPessoas || 0,
+                                  qtdAdultos: o.qtdAdultos || 0,
+                                  qtdCriancas: o.qtdCriancas || 0,
+                                  qtdBebes: o.qtdBebes || 0,
                                 });
                                 setShowPanel(true);
                               }}
@@ -236,11 +308,15 @@ export default function OrcamentosPage() {
             <div className="bg-tertiary text-on-tertiary p-6 rounded-2xl relative overflow-hidden shadow-xl">
               <div className="relative z-10">
                 <h3 className="text-xl font-bold mb-2">Detalhes</h3>
+                {selected.nome && <p className="text-lg font-bold mb-1">{selected.nome}</p>}
                 <p className="text-sm opacity-80 mb-6">{selected.Cliente?.nome || selected.cliente?.nome || 'Cliente'}</p>
                 <div className="space-y-4">
                   <div className="flex justify-between text-sm border-b border-white/10 pb-2"><span>Local</span><span className="font-bold capitalize">{selected.local?.nome || selected.local || '—'}</span></div>
                   <div className="flex justify-between text-sm border-b border-white/10 pb-2"><span>Valor Total</span><span className="font-bold text-primary">{formatCurrency(selected.valorTotal)}</span></div>
+                  <div className="flex justify-between text-sm border-b border-white/10 pb-2"><span>Data do Evento</span><span className="font-bold">{formatDateTime(selected.dataEvento)}</span></div>
+                  <div className="flex justify-between text-sm border-b border-white/10 pb-2"><span>Término</span><span className="font-bold">{formatDateTime(selected.horarioTermino)}</span></div>
                   <div className="flex justify-between text-sm border-b border-white/10 pb-2"><span>Validade</span><span className="font-bold">{formatDate(selected.dataValidade)}</span></div>
+                  <div className="flex justify-between text-sm border-b border-white/10 pb-2"><span>Público</span><span className="font-bold">{selected.qtdPessoas || 0} pessoas</span></div>
                   <div className="flex justify-between text-sm"><span>Status</span><span className="font-bold uppercase">{selected.status}</span></div>
                 </div>
                 {selected.observacoes && <p className="mt-4 text-sm opacity-80 italic">{selected.observacoes}</p>}
@@ -260,22 +336,49 @@ export default function OrcamentosPage() {
             <div className="p-8 border-b border-outline-variant/30 flex justify-between"><div><h3 className="text-2xl font-headline font-extrabold">{editing ? 'Editar Orçamento' : 'Novo Orçamento'}</h3></div><button onClick={() => setShowPanel(false)} className="p-2 hover:bg-surface-container rounded-full"><span className="material-symbols-outlined">close</span></button></div>
             <div className="flex-1 overflow-y-auto p-8">
               <form id="orc-form" className="space-y-6" onSubmit={handleSave}>
-                <div className="space-y-2"><label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-4">Cliente</label><select className="w-full bg-surface-container-low border-none rounded-full py-3.5 px-6 focus:ring-2 focus:ring-primary" value={form.clienteId} onChange={e => setForm({ ...form, clienteId: e.target.value })} required><option value="">Selecione...</option>{clientes.slice().sort((a, b) => a.nome.localeCompare(b.nome)).map(c => <option key={c.id} value={c.id}>{c.nome}</option>)}</select></div>
+                <div className="space-y-2">
+                  <label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-4">Nome do Evento</label>
+                  <input className="w-full bg-surface-container-low border-none rounded-full py-3.5 px-6 focus:ring-2 focus:ring-primary" value={form.nome} onChange={e => setForm({ ...form, nome: e.target.value })} required />
+                </div>
+                <div className="space-y-2"><label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-4">Cliente</label><select className="w-full bg-surface-container-low border-none rounded-full py-3.5 px-6 focus:ring-2 focus:ring-primary" value={form.clienteId} onChange={e => setForm({ ...form, clienteId: e.target.value })} required><option value="">Selecione...</option>{sortByName(clientes).map(c => <option key={c.id} value={c.id}>{c.nome}</option>)}</select></div>
 
                 {/* Seleção do Local */}
                 <div className="space-y-2">
                   <label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-4">Local</label>
                   <select className="w-full bg-surface-container-low border-none rounded-full py-3.5 px-6 focus:ring-2 focus:ring-primary" value={form.localId} onChange={e => setForm({ ...form, localId: e.target.value })} required>
                     <option value="">Selecione o local...</option>
-                    {locais.slice().sort((a, b) => a.nome.localeCompare(b.nome)).map(loc => <option key={loc.id} value={loc.id}>{loc.nome}</option>)}
+                    {sortByName(locais).map(loc => <option key={loc.id} value={loc.id}>{loc.nome}</option>)}
                   </select>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  {/* Atualizado com o Placeholder */}
-                  <div className="space-y-2"><label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-4">Valor Total</label><input type="number" step="0.01" placeholder="0.00" className="w-full bg-surface-container-low border-none rounded-full py-3.5 px-6 focus:ring-2 focus:ring-primary" value={form.valorTotal || ''} onChange={e => setForm({ ...form, valorTotal: e.target.value ? Number(e.target.value) : 0 })} required /></div>
-                  <div className="space-y-2"><label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-4">Validade</label><input type="date" className="w-full bg-surface-container-low border-none rounded-full py-3.5 px-6 focus:ring-2 focus:ring-primary" value={form.dataValidade} onChange={e => setForm({ ...form, dataValidade: e.target.value })} required /></div>
+                <div className="space-y-2">
+                  <label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-4">Valor Total</label>
+                  <input type="number" step="0.01" placeholder="0.00" className="w-full bg-surface-container-low border-none rounded-full py-3.5 px-6 focus:ring-2 focus:ring-primary" value={form.valorTotal || ''} onChange={e => setForm({ ...form, valorTotal: e.target.value ? Number(e.target.value) : 0 })} required />
                 </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2"><label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-4">Data e Hora do Evento</label><input type="datetime-local" className="w-full bg-surface-container-low border-none rounded-full py-3.5 px-6 focus:ring-2 focus:ring-primary" value={form.dataEvento} onChange={e => setForm({ ...form, dataEvento: e.target.value })} required /></div>
+                  <div className="space-y-2"><label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-4">Horário de Término</label><input type="datetime-local" className="w-full bg-surface-container-low border-none rounded-full py-3.5 px-6 focus:ring-2 focus:ring-primary" value={form.horarioTermino} onChange={e => setForm({ ...form, horarioTermino: e.target.value })} required /></div>
+                </div>
+                
+                <div className="grid grid-cols-4 gap-3">
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-2">Total</label>
+                    <input type="number" className="w-full bg-surface-container-low border-none rounded-full py-3 px-4 focus:ring-2 focus:ring-primary text-center" placeholder="0" value={form.qtdPessoas || ""} onChange={e => setForm({ ...form, qtdPessoas: e.target.value === '' ? 0 : Number(e.target.value) })} required />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-2">Adultos</label>
+                    <input type="number" className="w-full bg-surface-container-low border-none rounded-full py-3 px-4 focus:ring-2 focus:ring-primary text-center" placeholder="0" value={form.qtdAdultos || ""} onChange={e => setForm({ ...form, qtdAdultos: e.target.value === '' ? 0 : Number(e.target.value) })} />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-2">Crianças</label>
+                    <input type="number" className="w-full bg-surface-container-low border-none rounded-full py-3 px-4 focus:ring-2 focus:ring-primary text-center" placeholder="0" value={form.qtdCriancas || ""} onChange={e => setForm({ ...form, qtdCriancas: e.target.value === '' ? 0 : Number(e.target.value) })} />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-2">Bebês</label>
+                    <input type="number" className="w-full bg-surface-container-low border-none rounded-full py-3 px-4 focus:ring-2 focus:ring-primary text-center" placeholder="0" value={form.qtdBebes || ""} onChange={e => setForm({ ...form, qtdBebes: e.target.value === '' ? 0 : Number(e.target.value) })} />
+                  </div>
+                </div>
+
                 <div className="space-y-2">
                   <label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-4">Observações</label>
                   <textarea className="w-full bg-surface-container-low border-none rounded-2xl py-3.5 px-6 focus:ring-2 focus:ring-primary resize-none" rows={3} value={form.observacoes} onChange={e => setForm({ ...form, observacoes: e.target.value })} />

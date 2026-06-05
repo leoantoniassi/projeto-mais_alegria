@@ -216,9 +216,16 @@ CREATE TABLE orcamentos (
     orc_id              UUID          PRIMARY KEY DEFAULT uuid_generate_v4(),
     orc_cli_id          UUID          NOT NULL,
     orc_loc_id          UUID,
+    orc_nome            VARCHAR(150),
     orc_valor_total     NUMERIC(12,2) NOT NULL DEFAULT 0,
     orc_data_validade   DATE,
+    orc_data_evento      TIMESTAMP,
+    orc_horario_termino  TIMESTAMP,
     orc_status          VARCHAR(20)   NOT NULL DEFAULT 'pendente',
+    orc_qtd_pessoas     INTEGER       NOT NULL DEFAULT 0,
+    orc_qtd_adultos     INTEGER       NOT NULL DEFAULT 0,
+    orc_qtd_criancas    INTEGER       NOT NULL DEFAULT 0,
+    orc_qtd_bebes       INTEGER       NOT NULL DEFAULT 0,
     orc_observacoes     TEXT,
     orc_criado_em       TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     orc_atualizado_em   TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -233,7 +240,10 @@ CREATE TABLE orcamentos (
         ON UPDATE CASCADE ON DELETE SET NULL,
 
     CONSTRAINT ck_orcamentos_status
-        CHECK (orc_status IN ('pendente', 'aprovado', 'reprovado'))
+        CHECK (orc_status IN ('pendente', 'aprovado', 'reprovado')),
+
+    CONSTRAINT ck_orcamentos_horario_termino
+        CHECK (orc_horario_termino IS NULL OR orc_data_evento IS NULL OR orc_horario_termino > orc_data_evento)
 );
 
 COMMENT ON COLUMN orcamentos.orc_loc_id IS 'FK para o local do orçamento. Nullable — pode não ter local definido ainda.';

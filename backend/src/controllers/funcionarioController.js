@@ -2,14 +2,24 @@
 // Controller: Funcionários
 // ============================================================
 const { Op } = require('sequelize');
-const { Funcionario, Funcao } = require('../models');
+const { Funcionario, Funcao, Escala, Evento } = require('../models');
 const { gerarLinkWhatsApp } = require('../utils/whatsapp');
+const { warning } = require('../utils/response');
+const { isValidUUID } = require('../utils/validators');
 
 // GET /api/funcionarios
 async function listar(req, res, next) {
   try {
     const { page = 1, limit = 20, busca, funcaoId } = req.query;
-    const offset = (page - 1) * limit;
+    const pageNum = Math.max(1, parseInt(page, 10) || 1);
+    const limitNum = Math.min(100, Math.max(1, parseInt(limit, 10) || 20));
+
+    if (busca !== undefined && typeof busca !== 'string') {
+      return res.status(400).json({ success: false, message: 'Busca inválida.' });
+    }
+    if (funcaoId !== undefined && typeof funcaoId !== 'string') {
+      return res.status(400).json({ success: false, message: 'Função inválida.' });
+    }
 
     const where = {};
     if (busca) {
@@ -25,8 +35,8 @@ async function listar(req, res, next) {
     const { count, rows } = await Funcionario.findAndCountAll({
       where,
       include: [{ model: Funcao, as: 'funcao', attributes: ['id', 'nome'] }],
-      limit: parseInt(limit),
-      offset: parseInt(offset),
+      limit: limitNum,
+      offset: (pageNum - 1) * limitNum,
       order: [['nome', 'ASC']],
     });
 
@@ -35,9 +45,9 @@ async function listar(req, res, next) {
       data: rows,
       pagination: {
         total: count,
-        page: parseInt(page),
-        limit: parseInt(limit),
-        totalPages: Math.ceil(count / limit),
+        page: pageNum,
+        limit: limitNum,
+        totalPages: Math.ceil(count / limitNum),
       },
     });
   } catch (error) {
@@ -48,6 +58,9 @@ async function listar(req, res, next) {
 // GET /api/funcionarios/:id
 async function buscarPorId(req, res, next) {
   try {
+    if (!isValidUUID(req.params.id)) {
+      return res.status(400).json({ success: false, message: 'ID do funcionário inválido.' });
+    }
     const funcionario = await Funcionario.findByPk(req.params.id, {
       include: [{ model: Funcao, as: 'funcao', attributes: ['id', 'nome'] }],
     });
@@ -99,6 +112,9 @@ async function criar(req, res, next) {
 // PUT /api/funcionarios/:id
 async function atualizar(req, res, next) {
   try {
+    if (!isValidUUID(req.params.id)) {
+      return res.status(400).json({ success: false, message: 'ID do funcionário inválido.' });
+    }
     const funcionario = await Funcionario.findByPk(req.params.id);
     if (!funcionario) {
       return res.status(404).json({
@@ -137,12 +153,34 @@ async function atualizar(req, res, next) {
 // DELETE /api/funcionarios/:id (soft delete)
 async function remover(req, res, next) {
   try {
+    if (!isValidUUID(req.params.id)) {
+      return res.status(400).json({ success: false, message: 'ID do funcionário inválido.' });
+    }
     const funcionario = await Funcionario.findByPk(req.params.id);
     if (!funcionario) {
       return res.status(404).json({
         success: false,
         message: 'Funcionário não encontrado.',
       });
+    }
+
+    if (req.query.force !== 'true') {
+      const eventosFuturos = await Escala.count({
+        include: [{
+          model: Evento,
+          as: 'evento',
+          where: {
+            dataEvento: { [Op.gt]: new Date() },
+            deletadoEm: null,
+          },
+          required: true,
+        }],
+        where: { funcionarioId: req.params.id },
+      });
+
+      if (eventosFuturos > 0) {
+        return warning(res, `Este funcionário está alocado em ${eventosFuturos} evento(s) futuro(s). Deseja realmente excluí-lo?`);
+      }
     }
 
     await funcionario.update({ deletadoEm: new Date() });
@@ -159,6 +197,9 @@ async function remover(req, res, next) {
 // GET /api/funcionarios/:id/whatsapp
 async function whatsapp(req, res, next) {
   try {
+    if (!isValidUUID(req.params.id)) {
+      return res.status(400).json({ success: false, message: 'ID do funcionário inválido.' });
+    }
     const funcionario = await Funcionario.findByPk(req.params.id);
     if (!funcionario) {
       return res.status(404).json({

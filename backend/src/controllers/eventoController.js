@@ -16,6 +16,8 @@ const {
   Documento,
 } = require("../models");
 const { gerarLinkWhatsApp } = require('../utils/whatsapp');
+const { fail, warning } = require('../utils/response');
+const { isValidUUID } = require('../utils/validators');
 
 // ─── Funções auxiliares (DRY) ──────────────────────────────────
 
@@ -71,7 +73,15 @@ async function listar(req, res, next) {
     );
 
     const { page = 1, limit = 20, status, localId, incluirConcluidos } = req.query;
-    const offset = (page - 1) * limit;
+    const pageNum = Math.max(1, parseInt(page, 10) || 1);
+    const limitNum = Math.min(100, Math.max(1, parseInt(limit, 10) || 20));
+
+    if (status !== undefined && typeof status !== 'string') {
+      return res.status(400).json({ success: false, message: 'Status inválido.' });
+    }
+    if (localId !== undefined && typeof localId !== 'string') {
+      return res.status(400).json({ success: false, message: 'Local inválido.' });
+    }
 
     const where = { deletadoEm: null };
     if (status) {
@@ -89,8 +99,8 @@ async function listar(req, res, next) {
         { model: Cliente, as: "cliente", attributes: ["id", "nome"] },
         { model: Local,   as: "local",   attributes: ["id", "nome", "cidade", "estado", "capacidadeMaxima"] },
       ],
-      limit: parseInt(limit),
-      offset: parseInt(offset),
+      limit: limitNum,
+      offset: (pageNum - 1) * limitNum,
       order: [["dataEvento", "ASC"]],
     });
 
@@ -99,9 +109,9 @@ async function listar(req, res, next) {
       data: rows,
       pagination: {
         total: count,
-        page: parseInt(page),
-        limit: parseInt(limit),
-        totalPages: Math.ceil(count / limit),
+        page: pageNum,
+        limit: limitNum,
+        totalPages: Math.ceil(count / limitNum),
       },
     });
   } catch (error) {
@@ -112,6 +122,9 @@ async function listar(req, res, next) {
 // GET /api/eventos/:id
 async function buscarPorId(req, res, next) {
   try {
+    if (!isValidUUID(req.params.id)) {
+      return res.status(400).json({ success: false, message: 'ID do evento inválido.' });
+    }
     const evento = await Evento.findByPk(req.params.id, {
       include: [
         {
@@ -127,11 +140,13 @@ async function buscarPorId(req, res, next) {
         {
           model: Escala,
           as: "escala",
+          separate: true,
           include: [{ model: Funcionario, as: "funcionario", include: [{ model: Funcao, as: 'funcao' }] }],
         },
         {
           model: EventoProduto,
           as: "eventoProdutos",
+          separate: true,
           include: [{ model: Produto, as: "produto", include: [{ model: CategoriaProduto, as: 'categoria' }] }],
         },
         { model: Documento, as: "documentos" },
@@ -273,6 +288,9 @@ async function criar(req, res, next) {
 // PUT /api/eventos/:id
 async function atualizar(req, res, next) {
   try {
+    if (!isValidUUID(req.params.id)) {
+      return res.status(400).json({ success: false, message: 'ID do evento inválido.' });
+    }
     const evento = await Evento.findByPk(req.params.id);
     if (!evento) {
       return res.status(404).json({
@@ -357,6 +375,9 @@ async function atualizar(req, res, next) {
 // PATCH /api/eventos/:id/status
 async function mudarStatus(req, res, next) {
   try {
+    if (!isValidUUID(req.params.id)) {
+      return res.status(400).json({ success: false, message: 'ID do evento inválido.' });
+    }
     const evento = await Evento.findByPk(req.params.id);
     if (!evento) {
       return res.status(404).json({
@@ -406,12 +427,23 @@ async function mudarStatus(req, res, next) {
 // DELETE /api/eventos/:id (soft delete)
 async function remover(req, res, next) {
   try {
+    if (!isValidUUID(req.params.id)) {
+      return res.status(400).json({ success: false, message: 'ID do evento inválido.' });
+    }
     const evento = await Evento.findByPk(req.params.id);
     if (!evento) {
       return res.status(404).json({
         success: false,
         message: "Evento não encontrado.",
       });
+    }
+
+    const agora = new Date();
+    const dataEvento = new Date(evento.dataEvento);
+
+    if (dataEvento > agora && req.query.force !== 'true') {
+      const dataFormatada = dataEvento.toLocaleDateString('pt-BR');
+      return warning(res, `Este evento ainda não ocorreu (previsto para ${dataFormatada}). Tem certeza que deseja excluí-lo?`);
     }
 
     await evento.update({ deletadoEm: new Date() });
@@ -428,6 +460,9 @@ async function remover(req, res, next) {
 // GET /api/eventos/:id/whatsapp
 async function whatsapp(req, res, next) {
   try {
+    if (!isValidUUID(req.params.id)) {
+      return res.status(400).json({ success: false, message: 'ID do evento inválido.' });
+    }
     const evento = await Evento.findByPk(req.params.id, {
       include: [{ model: Cliente, as: 'cliente' }]
     });

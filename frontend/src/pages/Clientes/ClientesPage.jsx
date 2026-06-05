@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
 import api from '../../services/api';
 import { useAuth } from '../../contexts/AuthContext';
-import { useConfirm } from '../../contexts/ConfirmContext';
 import { validarCpfCnpj } from '../../utils/validators';
 import { formatCpfCnpj } from '../../utils/formatters';
+import Toast from '../../components/Toast';
+import useDeleteWithConfirm from '../../hooks/useDeleteWithConfirm';
 
 export default function ClientesPage() {
   const { user } = useAuth();
-  const confirm = useConfirm();
   const [clientes, setClientes] = useState([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
@@ -15,6 +15,8 @@ export default function ClientesPage() {
   const [showPanel, setShowPanel] = useState(false);
   const [editing, setEditing] = useState(null);
   const [form, setForm] = useState({ nome: '', email: '', telefone: '', rgCpf: '' });
+  const [toast, setToast] = useState(null);
+  const { executeDelete } = useDeleteWithConfirm();
 
   // Estado do modal de envio de catálogo
   const [showCatModal, setShowCatModal] = useState(false);
@@ -63,13 +65,8 @@ export default function ClientesPage() {
   };
 
   const handleDelete = async (id) => {
-    if (!(await confirm('Deseja realmente excluir este cliente?'))) return;
-    try {
-      await api.delete(`/clientes/${id}`);
-      fetchClientes();
-    } catch (err) {
-      alert(err.response?.data?.message || 'Erro ao excluir');
-    }
+    const toast = await executeDelete(id, '/clientes', 'Cliente', fetchClientes);
+    if (toast) setToast(toast);
   };
 
   const handleWhatsApp = async (id) => {
@@ -350,6 +347,7 @@ export default function ClientesPage() {
           </div>
         </div>
       )}
+      {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
     </div>
   );
 }

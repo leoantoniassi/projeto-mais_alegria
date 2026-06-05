@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
 import api from '../../services/api';
 import { useAuth } from '../../contexts/AuthContext';
-import { useConfirm } from '../../contexts/ConfirmContext';
+import Toast from '../../components/Toast';
+import useDeleteWithConfirm from '../../hooks/useDeleteWithConfirm';
 
 export default function FuncionariosPage() {
   const { user } = useAuth();
-  const confirm = useConfirm();
   const [funcionarios, setFuncionarios] = useState([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
@@ -14,6 +14,8 @@ export default function FuncionariosPage() {
   const [editing, setEditing] = useState(null);
   const [form, setForm] = useState({ nome: '', email: '', telefone: '', funcaoId: '' });
   const [funcoes, setFuncoes] = useState([]);
+  const [toast, setToast] = useState(null);
+  const { executeDelete } = useDeleteWithConfirm();
 
   useEffect(() => {
     api.get('/lookup/funcoes')
@@ -45,7 +47,10 @@ export default function FuncionariosPage() {
   };
 
   const handleEdit = (f) => { setForm({ nome: f.nome, email: f.email, telefone: f.telefone, funcaoId: f.funcaoId || f.funcao?.id || '' }); setEditing(f.id); setShowPanel(true); };
-  const handleDelete = async (id) => { if (!(await confirm('Excluir funcionário?'))) return; try { await api.delete(`/funcionarios/${id}`); fetchData(); } catch (err) { alert(err.response?.data?.message || 'Erro'); } };
+  const handleDelete = async (id) => {
+    const toast = await executeDelete(id, '/funcionarios', 'Funcionário', fetchData);
+    if (toast) setToast(toast);
+  };
   
   const handleWhatsApp = async (id) => {
     try {
@@ -166,6 +171,7 @@ export default function FuncionariosPage() {
           </div>
         </div>
       )}
+      {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
     </div>
   );
 }

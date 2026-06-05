@@ -8,7 +8,9 @@ const { Local } = require('../models');
 async function listar(req, res, next) {
   try {
     const { page = 1, limit = 50, busca, cidade } = req.query;
-    const offset = (page - 1) * limit;
+    const pageNum = Math.max(1, parseInt(page, 10) || 1);
+    const limitNum = Math.min(100, Math.max(1, parseInt(limit, 10) || 50));
+    const offset = (pageNum - 1) * limitNum;
 
     const where = {};
     if (busca) {
@@ -24,8 +26,8 @@ async function listar(req, res, next) {
 
     const { count, rows } = await Local.findAndCountAll({
       where,
-      limit: parseInt(limit),
-      offset: parseInt(offset),
+      limit: limitNum,
+      offset,
       order: [['nome', 'ASC']],
     });
 
@@ -34,9 +36,9 @@ async function listar(req, res, next) {
       data: rows,
       pagination: {
         total: count,
-        page: parseInt(page),
-        limit: parseInt(limit),
-        totalPages: Math.ceil(count / limit),
+        page: pageNum,
+        limit: limitNum,
+        totalPages: Math.ceil(count / limitNum),
       },
     });
   } catch (error) {

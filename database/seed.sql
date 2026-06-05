@@ -182,27 +182,27 @@ INSERT INTO produtos (prd_nome, prd_cap_id, prd_quantidade, prd_estoque_minimo, 
 ('Produto 20', (SELECT cap_id FROM categorias_produto WHERE cap_nome = 'Doce'), 287, 49, 'un', 68.00);
 
 -- 5. ORCAMENTOS
-INSERT INTO orcamentos (orc_cli_id, orc_loc_id, orc_valor_total, orc_data_validade, orc_status, orc_observacoes) VALUES
-((SELECT cli_id FROM clientes WHERE cli_nome = 'Cliente 1'), (SELECT loc_id FROM locais WHERE loc_nome = 'Salão 1'), 9225.00, '2026-01-15', 'aprovado', 'Obs do orcamento 1'),
-((SELECT cli_id FROM clientes WHERE cli_nome = 'Cliente 2'), (SELECT loc_id FROM locais WHERE loc_nome = 'Salão 2'), 5426.00, '2026-03-15', 'reprovado', 'Obs do orcamento 2'),
-((SELECT cli_id FROM clientes WHERE cli_nome = 'Cliente 3'), (SELECT loc_id FROM locais WHERE loc_nome = 'Externo'), 5725.00, '2026-03-15', 'pendente', 'Obs do orcamento 3'),
-((SELECT cli_id FROM clientes WHERE cli_nome = 'Cliente 4'), (SELECT loc_id FROM locais WHERE loc_nome = 'Salão 1'), 3368.00, '2026-11-15', 'pendente', 'Obs do orcamento 4'),
-((SELECT cli_id FROM clientes WHERE cli_nome = 'Cliente 5'), (SELECT loc_id FROM locais WHERE loc_nome = 'Salão 2'), 3339.00, '2026-09-15', 'aprovado', 'Obs do orcamento 5'),
-((SELECT cli_id FROM clientes WHERE cli_nome = 'Cliente 6'), (SELECT loc_id FROM locais WHERE loc_nome = 'Externo'), 5356.00, '2026-07-15', 'aprovado', 'Obs do orcamento 6'),
-((SELECT cli_id FROM clientes WHERE cli_nome = 'Cliente 7'), (SELECT loc_id FROM locais WHERE loc_nome = 'Salão 1'), 5383.00, '2026-08-15', 'aprovado', 'Obs do orcamento 7'),
-((SELECT cli_id FROM clientes WHERE cli_nome = 'Cliente 8'), (SELECT loc_id FROM locais WHERE loc_nome = 'Salão 2'), 4042.00, '2026-09-15', 'pendente', 'Obs do orcamento 8'),
-((SELECT cli_id FROM clientes WHERE cli_nome = 'Cliente 9'), (SELECT loc_id FROM locais WHERE loc_nome = 'Externo'), 7947.00, '2026-01-15', 'reprovado', 'Obs do orcamento 9'),
-((SELECT cli_id FROM clientes WHERE cli_nome = 'Cliente 10'), (SELECT loc_id FROM locais WHERE loc_nome = 'Salão 1'), 3546.00, '2026-11-15', 'reprovado', 'Obs do orcamento 10'),
-((SELECT cli_id FROM clientes WHERE cli_nome = 'Cliente 11'), (SELECT loc_id FROM locais WHERE loc_nome = 'Salão 2'), 6028.00, '2026-06-15', 'pendente', 'Obs do orcamento 11'),
-((SELECT cli_id FROM clientes WHERE cli_nome = 'Cliente 12'), (SELECT loc_id FROM locais WHERE loc_nome = 'Externo'), 2232.00, '2026-04-15', 'aprovado', 'Obs do orcamento 12'),
-((SELECT cli_id FROM clientes WHERE cli_nome = 'Cliente 13'), (SELECT loc_id FROM locais WHERE loc_nome = 'Salão 1'), 8889.00, '2026-01-15', 'aprovado', 'Obs do orcamento 13'),
-((SELECT cli_id FROM clientes WHERE cli_nome = 'Cliente 14'), (SELECT loc_id FROM locais WHERE loc_nome = 'Salão 2'), 8479.00, '2026-10-15', 'pendente', 'Obs do orcamento 14'),
-((SELECT cli_id FROM clientes WHERE cli_nome = 'Cliente 15'), (SELECT loc_id FROM locais WHERE loc_nome = 'Externo'), 4415.00, '2026-03-15', 'pendente', 'Obs do orcamento 15'),
-((SELECT cli_id FROM clientes WHERE cli_nome = 'Cliente 16'), (SELECT loc_id FROM locais WHERE loc_nome = 'Salão 1'), 2975.00, '2026-03-15', 'pendente', 'Obs do orcamento 16'),
-((SELECT cli_id FROM clientes WHERE cli_nome = 'Cliente 17'), (SELECT loc_id FROM locais WHERE loc_nome = 'Salão 2'), 7400.00, '2026-01-15', 'aprovado', 'Obs do orcamento 17'),
-((SELECT cli_id FROM clientes WHERE cli_nome = 'Cliente 18'), (SELECT loc_id FROM locais WHERE loc_nome = 'Externo'), 2689.00, '2026-12-15', 'aprovado', 'Obs do orcamento 18'),
-((SELECT cli_id FROM clientes WHERE cli_nome = 'Cliente 19'), (SELECT loc_id FROM locais WHERE loc_nome = 'Salão 1'), 9864.00, '2026-01-15', 'aprovado', 'Obs do orcamento 19'),
-((SELECT cli_id FROM clientes WHERE cli_nome = 'Cliente 20'), (SELECT loc_id FROM locais WHERE loc_nome = 'Salão 2'), 8430.00, '2026-05-15', 'pendente', 'Obs do orcamento 20');
+INSERT INTO orcamentos (orc_cli_id, orc_loc_id, orc_nome, orc_valor_total, orc_data_validade, orc_data_evento, orc_horario_termino, orc_status, orc_qtd_pessoas, orc_qtd_adultos, orc_qtd_criancas, orc_qtd_bebes, orc_observacoes) VALUES
+((SELECT cli_id FROM clientes WHERE cli_nome = 'Cliente 1'), (SELECT loc_id FROM locais WHERE loc_nome = 'Salão 1'), 'Evento 1', 9225.00, '2026-01-15', '2026-05-17 14:00:00', '2026-05-17 18:00:00', 'aprovado', 150, 110, 35, 5, 'Obs do orcamento 1'),
+((SELECT cli_id FROM clientes WHERE cli_nome = 'Cliente 2'), (SELECT loc_id FROM locais WHERE loc_nome = 'Salão 2'), 'Evento 2', 5426.00, '2026-03-15', '2026-12-14 14:00:00', '2026-12-14 18:00:00', 'reprovado', 80, 65, 10, 5, 'Obs do orcamento 2'),
+((SELECT cli_id FROM clientes WHERE cli_nome = 'Cliente 3'), (SELECT loc_id FROM locais WHERE loc_nome = 'Externo'), 'Evento 3', 5725.00, '2026-03-15', '2026-01-27 14:00:00', '2026-01-27 18:00:00', 'pendente', 120, 90, 25, 5, 'Obs do orcamento 3'),
+((SELECT cli_id FROM clientes WHERE cli_nome = 'Cliente 4'), (SELECT loc_id FROM locais WHERE loc_nome = 'Salão 1'), 'Evento 4', 3368.00, '2026-11-15', '2026-01-27 14:00:00', '2026-01-27 18:00:00', 'pendente', 50, 40, 8, 2, 'Obs do orcamento 4'),
+((SELECT cli_id FROM clientes WHERE cli_nome = 'Cliente 5'), (SELECT loc_id FROM locais WHERE loc_nome = 'Salão 2'), 'Evento 5', 3339.00, '2026-09-15', '2026-05-06 14:00:00', '2026-05-06 18:00:00', 'aprovado', 200, 160, 30, 10, 'Obs do orcamento 5'),
+((SELECT cli_id FROM clientes WHERE cli_nome = 'Cliente 6'), (SELECT loc_id FROM locais WHERE loc_nome = 'Externo'), 'Evento 6', 5356.00, '2026-07-15', '2026-07-28 14:00:00', '2026-07-28 18:00:00', 'aprovado', 95, 75, 15, 5, 'Obs do orcamento 6'),
+((SELECT cli_id FROM clientes WHERE cli_nome = 'Cliente 7'), (SELECT loc_id FROM locais WHERE loc_nome = 'Salão 1'), 'Evento 7', 5383.00, '2026-08-15', '2026-04-16 14:00:00', '2026-04-16 18:00:00', 'aprovado', 60, 50, 10, 0, 'Obs do orcamento 7'),
+((SELECT cli_id FROM clientes WHERE cli_nome = 'Cliente 8'), (SELECT loc_id FROM locais WHERE loc_nome = 'Salão 2'), 'Evento 8', 4042.00, '2026-09-15', '2026-05-17 14:00:00', '2026-05-17 18:00:00', 'pendente', 115, 95, 15, 5, 'Obs do orcamento 8'),
+((SELECT cli_id FROM clientes WHERE cli_nome = 'Cliente 9'), (SELECT loc_id FROM locais WHERE loc_nome = 'Externo'), 'Evento 9', 7947.00, '2026-01-15', '2026-10-15 14:00:00', '2026-10-15 18:00:00', 'reprovado', 130, 100, 25, 5, 'Obs do orcamento 9'),
+((SELECT cli_id FROM clientes WHERE cli_nome = 'Cliente 10'), (SELECT loc_id FROM locais WHERE loc_nome = 'Salão 1'), 'Evento 10', 3546.00, '2026-11-15', '2026-10-06 14:00:00', '2026-10-06 18:00:00', 'reprovado', 45, 35, 8, 2, 'Obs do orcamento 10'),
+((SELECT cli_id FROM clientes WHERE cli_nome = 'Cliente 11'), (SELECT loc_id FROM locais WHERE loc_nome = 'Salão 2'), 'Evento 11', 6028.00, '2026-06-15', '2026-03-01 14:00:00', '2026-03-01 18:00:00', 'pendente', 175, 140, 30, 5, 'Obs do orcamento 11'),
+((SELECT cli_id FROM clientes WHERE cli_nome = 'Cliente 12'), (SELECT loc_id FROM locais WHERE loc_nome = 'Externo'), 'Evento 12', 2232.00, '2026-04-15', '2026-07-16 14:00:00', '2026-07-16 18:00:00', 'aprovado', 70, 60, 8, 2, 'Obs do orcamento 12'),
+((SELECT cli_id FROM clientes WHERE cli_nome = 'Cliente 13'), (SELECT loc_id FROM locais WHERE loc_nome = 'Salão 1'), 'Evento 13', 8889.00, '2026-01-15', '2026-08-20 14:00:00', '2026-08-20 18:00:00', 'aprovado', 105, 85, 15, 5, 'Obs do orcamento 13'),
+((SELECT cli_id FROM clientes WHERE cli_nome = 'Cliente 14'), (SELECT loc_id FROM locais WHERE loc_nome = 'Salão 2'), 'Evento 14', 8479.00, '2026-10-15', '2026-12-21 14:00:00', '2026-12-21 18:00:00', 'pendente', 90, 70, 18, 2, 'Obs do orcamento 14'),
+((SELECT cli_id FROM clientes WHERE cli_nome = 'Cliente 15'), (SELECT loc_id FROM locais WHERE loc_nome = 'Externo'), 'Evento 15', 4415.00, '2026-03-15', '2026-05-22 14:00:00', '2026-05-22 18:00:00', 'pendente', 140, 110, 25, 5, 'Obs do orcamento 15'),
+((SELECT cli_id FROM clientes WHERE cli_nome = 'Cliente 16'), (SELECT loc_id FROM locais WHERE loc_nome = 'Salão 1'), 'Evento 16', 2975.00, '2026-03-15', '2026-06-01 14:00:00', '2026-06-01 18:00:00', 'pendente', 65, 55, 8, 2, 'Obs do orcamento 16'),
+((SELECT cli_id FROM clientes WHERE cli_nome = 'Cliente 17'), (SELECT loc_id FROM locais WHERE loc_nome = 'Salão 2'), 'Evento 17', 7400.00, '2026-01-15', '2026-09-10 14:00:00', '2026-09-10 18:00:00', 'aprovado', 85, 70, 12, 3, 'Obs do orcamento 17'),
+((SELECT cli_id FROM clientes WHERE cli_nome = 'Cliente 18'), (SELECT loc_id FROM locais WHERE loc_nome = 'Externo'), 'Evento 18', 2689.00, '2026-12-15', '2026-01-10 14:00:00', '2026-01-10 18:00:00', 'aprovado', 110, 90, 15, 5, 'Obs do orcamento 18'),
+((SELECT cli_id FROM clientes WHERE cli_nome = 'Cliente 19'), (SELECT loc_id FROM locais WHERE loc_nome = 'Salão 1'), 'Evento 19', 9864.00, '2026-01-15', '2026-10-08 14:00:00', '2026-10-08 18:00:00', 'aprovado', 160, 130, 25, 5, 'Obs do orcamento 19'),
+((SELECT cli_id FROM clientes WHERE cli_nome = 'Cliente 20'), (SELECT loc_id FROM locais WHERE loc_nome = 'Salão 2'), 'Evento 20', 8430.00, '2026-05-15', '2026-05-22 14:00:00', '2026-05-22 18:00:00', 'pendente', 125, 100, 20, 5, 'Obs do orcamento 20');
 
 -- 6. EVENTOS
 INSERT INTO eventos (evt_cli_id, evt_orc_id, evt_loc_id, evt_nome, evt_data_evento, evt_horario_termino, evt_status, evt_qtd_pessoas, evt_qtd_adultos, evt_qtd_criancas, evt_qtd_bebes, evt_observacoes) VALUES

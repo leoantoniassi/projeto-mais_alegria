@@ -25,13 +25,18 @@ describe('EventoController — verificação de capacidade', () => {
     });
   });
 
-  const mockCliente = { id: 'cli-1', nome: 'Cliente Teste' };
-  const mockLocalComCapacidade = { id: 'loc-1', nome: 'Salão Festas', capacidadeMaxima: 100 };
-  const mockLocalSemCapacidade = { id: 'loc-2', nome: 'Salão Sem Cap', capacidadeMaxima: null };
+  const EVT_ID = '550e8400-e29b-41d4-a716-446655440001';
+  const CLI_ID = '550e8400-e29b-41d4-a716-446655440010';
+  const LOC_1  = '550e8400-e29b-41d4-a716-446655440020';
+  const LOC_2  = '550e8400-e29b-41d4-a716-446655440021';
+
+  const mockCliente = { id: CLI_ID, nome: 'Cliente Teste' };
+  const mockLocalComCapacidade = { id: LOC_1, nome: 'Salão Festas', capacidadeMaxima: 100 };
+  const mockLocalSemCapacidade = { id: LOC_2, nome: 'Salão Sem Cap', capacidadeMaxima: null };
   const mockEvento = {
-    id: 'evt-1',
-    clienteId: 'cli-1',
-    localId: 'loc-1',
+    id: EVT_ID,
+    clienteId: CLI_ID,
+    localId: LOC_1,
     nome: 'Evento Teste',
     dataEvento: '2026-12-31',
     qtdPessoas: 80,
@@ -42,7 +47,7 @@ describe('EventoController — verificação de capacidade', () => {
   };
 
   const eventoPayload = {
-    clienteId: 'cli-1',
+    clienteId: CLI_ID,
     nome: 'Evento Teste',
     dataEvento: '2026-12-31',
     horarioTermino: '2026-12-31T23:59:59.000Z',
@@ -56,7 +61,7 @@ describe('EventoController — verificação de capacidade', () => {
 
       const res = await request(app)
         .post('/api/eventos')
-        .send({ ...eventoPayload, localId: 'loc-1', qtdPessoas: 40 });
+        .send({ ...eventoPayload, localId: LOC_1, qtdPessoas: 40 });
 
       expect(res.status).toBe(201);
       expect(res.body.warning).toBeNull();
@@ -69,7 +74,7 @@ describe('EventoController — verificação de capacidade', () => {
 
       const res = await request(app)
         .post('/api/eventos')
-        .send({ ...eventoPayload, localId: 'loc-1', qtdPessoas: 150, qtdAdultos: 100, qtdCriancas: 40, qtdBebes: 10 });
+        .send({ ...eventoPayload, localId: LOC_1, qtdPessoas: 150, qtdAdultos: 100, qtdCriancas: 40, qtdBebes: 10 });
 
       expect(res.status).toBe(201);
       expect(res.body.warning).toBeTruthy();
@@ -97,7 +102,7 @@ describe('EventoController — verificação de capacidade', () => {
 
       const res = await request(app)
         .post('/api/eventos')
-        .send({ ...eventoPayload, localId: 'loc-2', qtdPessoas: 150, qtdAdultos: 100, qtdCriancas: 40, qtdBebes: 10 });
+        .send({ ...eventoPayload, localId: LOC_2, qtdPessoas: 150, qtdAdultos: 100, qtdCriancas: 40, qtdBebes: 10 });
 
       expect(res.status).toBe(201);
       expect(res.body.warning).toBeNull();
@@ -118,7 +123,7 @@ describe('EventoController — verificação de capacidade', () => {
     test('deve retornar 400 se horarioTermino não for informado', async () => {
       const res = await request(app)
         .post('/api/eventos')
-        .send({ clienteId: 'cli-1', nome: 'Evento Teste', dataEvento: '2026-12-31', qtdPessoas: 50 });
+        .send({ clienteId: CLI_ID, nome: 'Evento Teste', dataEvento: '2026-12-31', qtdPessoas: 50 });
 
       expect(res.status).toBe(400);
       expect(res.body.message).toContain('horário de término');
@@ -149,8 +154,8 @@ describe('EventoController — verificação de capacidade', () => {
       Local.findByPk.mockResolvedValue(mockLocalComCapacidade);
 
       const res = await request(app)
-        .put('/api/eventos/evt-1')
-        .send({ localId: 'loc-1', qtdPessoas: 150, qtdAdultos: 100, qtdCriancas: 40, qtdBebes: 10 });
+        .put('/api/eventos/' + EVT_ID)
+        .send({ localId: LOC_1, qtdPessoas: 150, qtdAdultos: 100, qtdCriancas: 40, qtdBebes: 10 });
 
       expect(res.status).toBe(200);
       expect(res.body.warning).toBeTruthy();
@@ -162,8 +167,8 @@ describe('EventoController — verificação de capacidade', () => {
       Local.findByPk.mockResolvedValue(mockLocalComCapacidade);
 
       const res = await request(app)
-        .put('/api/eventos/evt-1')
-        .send({ localId: 'loc-1', qtdPessoas: 0 });
+        .put('/api/eventos/' + EVT_ID)
+        .send({ localId: LOC_1, qtdPessoas: 0 });
 
       expect(res.status).toBe(200);
       expect(res.body.warning).toBeNull();
@@ -174,7 +179,7 @@ describe('EventoController — verificação de capacidade', () => {
       Evento.findByPk.mockResolvedValue({ ...mockEvento, update: updateMock });
 
       const res = await request(app)
-        .put('/api/eventos/evt-1')
+        .put('/api/eventos/' + EVT_ID)
         .send({ nome: 'Evento Atualizado' });
 
       expect(res.status).toBe(200);
@@ -185,7 +190,7 @@ describe('EventoController — verificação de capacidade', () => {
       Evento.findByPk.mockResolvedValue({ ...mockEvento, update: jest.fn().mockResolvedValue(true) });
 
       const res = await request(app)
-        .put('/api/eventos/evt-1')
+        .put('/api/eventos/' + EVT_ID)
         .send({ horarioTermino: '2026-12-31T23:59:59.000Z' });
 
       expect(res.status).toBe(200);
@@ -196,7 +201,7 @@ describe('EventoController — verificação de capacidade', () => {
       Evento.findByPk.mockResolvedValue({ ...mockEvento, update: jest.fn().mockResolvedValue(true) });
 
       const res = await request(app)
-        .put('/api/eventos/evt-1')
+        .put('/api/eventos/' + EVT_ID)
         .send({ horarioTermino: 'invalido' });
 
       expect(res.status).toBe(400);

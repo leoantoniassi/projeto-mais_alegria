@@ -3,6 +3,7 @@ import api from "../../services/api";
 import { useAuth } from "../../contexts/AuthContext";
 import { useConfirm } from "../../contexts/ConfirmContext";
 import Toast from "../../components/Toast";
+import useDeleteWithConfirm from "../../hooks/useDeleteWithConfirm";
 
 export default function EventosPage() {
   const { user } = useAuth();
@@ -48,6 +49,7 @@ export default function EventosPage() {
   const [salvandoEscala, setSalvandoEscala] = useState(false);
   const [errosEscala, setErrosEscala] = useState([]);
   const [toast, setToast] = useState(null);
+  const { executeDelete } = useDeleteWithConfirm();
 
   const fetchData = async () => {
     try {
@@ -68,7 +70,7 @@ export default function EventosPage() {
 
   useEffect(() => {
     api
-      .get("/clientes")
+      .get("/clientes", { params: { limit: 100 } })
       .then((r) => {
         const items = Array.isArray(r.data.data) ? r.data.data : [];
         setClientes(items);
@@ -138,13 +140,8 @@ export default function EventosPage() {
   };
 
   const handleDelete = async (id) => {
-    if (!(await confirm("Excluir evento?"))) return;
-    try {
-      await api.delete(`/eventos/${id}`);
-      fetchData();
-    } catch (err) {
-      alert(err.response?.data?.message || "Erro");
-    }
+    const toast = await executeDelete(id, '/eventos', 'Evento', fetchData);
+    if (toast) setToast(toast);
   };
 
   const handleCancel = async (id) => {
@@ -846,7 +843,14 @@ export default function EventosPage() {
                   <label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-4">Nome do Evento</label>
                   <input className="w-full bg-surface-container-low border-none rounded-full py-3.5 px-6 focus:ring-2 focus:ring-primary" value={form.nome} onChange={e => setForm({ ...form, nome: e.target.value })} required />
                 </div>
-                <div className="grid grid-cols-3 gap-4">
+                <div className="space-y-2">
+                  <label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-4">Local</label>
+                  <select className="w-full bg-surface-container-low border-none rounded-full py-3.5 px-6 focus:ring-2 focus:ring-primary" value={form.localId} onChange={e => setForm({ ...form, localId: e.target.value })} required>
+                    <option value="">Selecione o local...</option>
+                    {locais.slice().sort((a, b) => a.nome.localeCompare(b.nome)).map(loc => <option key={loc.id} value={loc.id}>{loc.nome}</option>)}
+                  </select>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-4">Data e Hora</label>
                     <input type="datetime-local" className="w-full bg-surface-container-low border-none rounded-full py-3.5 px-6 focus:ring-2 focus:ring-primary" value={form.dataEvento} onChange={e => setForm({ ...form, dataEvento: e.target.value })} required />
@@ -854,13 +858,6 @@ export default function EventosPage() {
                   <div className="space-y-2">
                     <label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-4">Horário de Término</label>
                     <input type="datetime-local" className="w-full bg-surface-container-low border-none rounded-full py-3.5 px-6 focus:ring-2 focus:ring-primary" value={form.horarioTermino} onChange={e => setForm({ ...form, horarioTermino: e.target.value })} required />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-4">Local</label>
-                    <select className="w-full bg-surface-container-low border-none rounded-full py-3.5 px-6 focus:ring-2 focus:ring-primary" value={form.localId} onChange={e => setForm({ ...form, localId: e.target.value })} required>
-                      <option value="">Selecione o local...</option>
-                      {locais.slice().sort((a, b) => a.nome.localeCompare(b.nome)).map(loc => <option key={loc.id} value={loc.id}>{loc.nome}</option>)}
-                    </select>
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4">

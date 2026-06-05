@@ -30,10 +30,72 @@ const Orcamento = sequelize.define(
       defaultValue: 0,
       field: "orc_valor_total",
     },
+    nome: {
+      type: DataTypes.STRING(150),
+      allowNull: true,
+      field: "orc_nome",
+    },
+    qtdPessoas: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 0,
+      field: "orc_qtd_pessoas",
+    },
+    qtdAdultos: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 0,
+      field: "orc_qtd_adultos",
+    },
+    qtdCriancas: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 0,
+      field: "orc_qtd_criancas",
+    },
+    qtdBebes: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 0,
+      field: "orc_qtd_bebes",
+    },
     dataValidade: {
       type: DataTypes.DATEONLY,
       allowNull: true,
       field: "orc_data_validade",
+    },
+    dataEvento: {
+      type: DataTypes.DATE,
+      allowNull: true,
+      field: "orc_data_evento",
+      validate: {
+        dataValida(value) {
+          if (value && isNaN(new Date(value).getTime())) {
+            throw new Error("Data do evento inválida.");
+          }
+        },
+      },
+    },
+    horarioTermino: {
+      type: DataTypes.DATE,
+      allowNull: true,
+      field: "orc_horario_termino",
+      validate: {
+        dataValida(value) {
+          if (value && isNaN(new Date(value).getTime())) {
+            throw new Error("Horário de término inválido.");
+          }
+        },
+        aposInicioEvento(value) {
+          if (value && this.dataEvento) {
+            const fim = new Date(value);
+            const inicio = new Date(this.dataEvento);
+            if (!isNaN(inicio.getTime()) && !isNaN(fim.getTime()) && fim <= inicio) {
+              throw new Error("Horário de término deve ser posterior à data de início do evento.");
+            }
+          }
+        },
+      },
     },
     status: {
       type: DataTypes.STRING(20),
