@@ -52,6 +52,11 @@ export default function EstoquePage() {
     return m[c] || 'bg-surface-container text-on-surface-variant';
   };
 
+  const isLowStock = (p) => {
+    const min = Number(p.estoqueMinimo);
+    return min > 0 && Number(p.quantidade) <= min;
+  };
+
   const totalValue = produtos.reduce((sum, p) => sum + (Number(p.custoUnitario) * Number(p.quantidade)), 0);
 
   return (
@@ -66,7 +71,7 @@ export default function EstoquePage() {
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
         <div className="p-6 bg-white rounded-2xl border-b-4 border-primary"><p className="text-xs uppercase tracking-widest text-on-surface-variant font-bold mb-4">Total de Itens</p><div className="flex items-end justify-between"><span className="text-4xl font-extrabold text-on-surface">{total}</span><span className="material-symbols-outlined text-primary/40 text-4xl">inventory</span></div></div>
-        <div className="p-6 bg-white rounded-2xl border-b-4 border-error"><p className="text-xs uppercase tracking-widest text-on-surface-variant font-bold mb-4">Estoque Baixo</p><div className="flex items-end justify-between">        <span className="text-4xl font-extrabold text-error">{produtos.filter(p => Number(p.estoqueMinimo) > 0 && p.quantidade <= p.estoqueMinimo).length}</span><span className="material-symbols-outlined text-error/30 text-4xl">warning</span></div></div>
+        <div className="p-6 bg-white rounded-2xl border-b-4 border-error"><p className="text-xs uppercase tracking-widest text-on-surface-variant font-bold mb-4">Estoque Baixo</p><div className="flex items-end justify-between">        <span className="text-4xl font-extrabold text-error">{produtos.filter(isLowStock).length}</span><span className="material-symbols-outlined text-error/30 text-4xl">warning</span></div></div>
         <div className="p-6 bg-white rounded-2xl border-b-4 border-tertiary"><p className="text-xs uppercase tracking-widest text-on-surface-variant font-bold mb-4">Categorias</p><div className="flex items-end justify-between"><span className="text-4xl font-extrabold text-tertiary">{[...new Set(produtos.map(p => p.categoria?.nome || p.categoria))].length}</span><span className="material-symbols-outlined text-tertiary/20 text-4xl">category</span></div></div>
         <div className="p-6 bg-secondary text-on-secondary rounded-2xl shadow-xl shadow-secondary/20"><p className="text-xs uppercase tracking-widest text-on-secondary/70 font-bold mb-4">Valor Total</p><div className="flex items-end justify-between"><span className="text-2xl font-extrabold">{formatCurrency(totalValue)}</span><span className="material-symbols-outlined text-on-secondary/30 text-4xl">payments</span></div></div>
       </div>
@@ -83,11 +88,11 @@ export default function EstoquePage() {
                 <td className="px-8 py-6"><span className={`px-4 py-1.5 ${catColor(p.categoria?.nome || p.categoria)} rounded-full text-xs font-bold`}>{p.categoria?.nome || p.categoria || '—'}</span></td>
                 <td className="px-8 py-6">
                   <div className="flex items-center gap-2">
-                    <span className={`font-bold text-lg ${Number(p.estoqueMinimo) > 0 && p.quantidade <= p.estoqueMinimo ? 'text-error animate-pulse' : 'text-on-surface'}`}>
+                    <span className={`font-bold text-lg ${isLowStock(p) ? 'text-error animate-pulse' : 'text-on-surface'}`}>
                       {p.quantidade}
                     </span>
                     <span className="text-on-surface-variant text-xs font-medium">{p.unidadeMedida}</span>
-                    {Number(p.estoqueMinimo) > 0 && p.quantidade <= p.estoqueMinimo && (
+                    {isLowStock(p) && (
                       <span className="material-symbols-outlined text-error text-sm ml-1" title="Estoque Baixo!">warning</span>
                     )}
                   </div>
