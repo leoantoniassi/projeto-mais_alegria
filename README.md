@@ -290,6 +290,28 @@ Foi conduzido um estudo de dispersão sobre três variáveis quantitativas:
 
 ---
 
+### 13.3 Rol de Dados Brutos Utilizados
+
+Os dados brutos coletados da semente inicial (`database/seed.sql`) do banco de dados e utilizados para todas as fórmulas e tabelas acima são:
+
+1. **Quantidade Total de Pessoas (`evt_qtd_pessoas`)**:  
+   `[150, 80, 120, 50, 200, 95, 60, 115, 130, 45, 175, 70, 105, 90, 140, 65, 85, 110, 160, 125]`
+
+2. **Quantidade de Adultos (`evt_qtd_adultos`)**:  
+   `[110, 65, 90, 40, 160, 75, 50, 95, 100, 35, 140, 60, 85, 70, 110, 55, 70, 90, 130, 100]`
+
+3. **Quantidade de Crianças (`evt_qtd_criancas`)**:  
+   `[35, 10, 25, 8, 30, 15, 10, 15, 25, 8, 30, 8, 15, 18, 25, 8, 12, 15, 25, 20]`
+
+4. **Valor Total Orçado (`orc_valor_total`)**:  
+   `[9225.00, 5426.00, 5725.00, 3368.00, 3339.00, 5356.00, 5383.00, 4042.00, 7947.00, 3546.00, 6028.00, 2232.00, 8889.00, 8479.00, 4415.00, 2975.00, 7400.00, 2689.00, 9864.00, 8430.00]`
+
+5. **Status do Evento (`evt_status`)**:  
+   `['confirmado', 'concluido', 'confirmado', 'confirmado', 'confirmado', 'confirmado', 'cancelado', 'confirmado', 'confirmado', 'concluido', 'pendente', 'pendente', 'pendente', 'cancelado', 'cancelado', 'cancelado', 'cancelado', 'pendente', 'pendente', 'concluido']`
+
+---
+
+
 ## 14. Referências Bibliográficas
 
 - Documentação Oficial do React: https://pt-br.reactjs.org/
