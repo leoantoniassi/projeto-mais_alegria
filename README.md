@@ -253,9 +253,44 @@ A aplicação será construída com uma arquitetura dividida: o Frontend dinâmi
 
 O sistema do **Projeto Mais Alegria** centralizará as operações da empresa, substituindo planilhas soltas e pastas físicas por uma solução digital integrada. Com um banco de dados relacional bem estruturado e funcionalidades focadas na agilidade (como o atalho do WhatsApp e a gestão rápida de orçamentos), a equipe economizará tempo administrativo, podendo focar no que realmente importa: entregar eventos inesquecíveis aos seus clientes.
 
+## 13. Módulo de Estatística Descritiva
+
+Com base na amostragem de dados fictícios do banco de dados (20 registros de eventos e orçamentos), foram calculadas as seguintes estatísticas descritivas para apoiar o planejamento operacional do sistema:
+
+### 13.1 Medidas de Tendência Central (Média, Mediana e Moda)
+Foram selecionadas cinco variáveis principais (quatro quantitativas e uma qualitativa) para esta análise:
+
+| Variável | Tipo | Média | Mediana | Moda | Tipo de Moda |
+| :--- | :--- | :---: | :---: | :---: | :---: |
+| **Qtd. Total de Pessoas** (`evt_qtd_pessoas`) | Quantitativa Discreta | 108,50 | 107,50 | N/A | Amodal |
+| **Qtd. de Adultos** (`evt_qtd_adultos`) | Quantitativa Discreta | 86,50 | 87,50 | 70, 90, 100, 110 | Multimodal |
+| **Qtd. de Crianças** (`evt_qtd_criancas`) | Quantitativa Discreta | 17,85 | 15,00 | 8, 15, 25 | Multimodal |
+| **Valor Total Orçado** (`orc_valor_total`) | Quantitativa Contínua | R$ 5.737,90 | R$ 5.404,50 | N/A | Amodal |
+| **Status do Evento** (`evt_status`) | Qualitativa Nominal | N/A | N/A | 'confirmado' | Unimodal (freq. 7) |
+
+#### Interpretação
+* **Qtd. Total de Pessoas e Valor Orçado**: Apresentam distribuição amodal por serem variáveis contínuas ou de ampla variação, com médias de 108,50 pessoas e R$ 5.737,90 por orçamento, respectivamente.
+* **Qtd. de Adultos e Crianças**: A distribuição é multimodal, mostrando tamanhos padrões recorrentes de grupos de convidados (especialmente de crianças, que se concentram em 8, 15 ou 25 convidados por festa).
+* **Status do Evento**: O status 'confirmado' é a moda da base, refletindo a eficácia das conversões de orçamentos para eventos fechados.
+
 ---
 
-## 13. Referências Bibliográficas
+### 13.2 Medidas de Variabilidade e Dispersão
+Foi conduzido um estudo de dispersão sobre três variáveis quantitativas:
+
+| Variável | Média | Variância Amostral | Desvio Padrão Amostral | Coeficiente de Variação (CV) |
+| :--- | :---: | :---: | :---: | :---: |
+| **Qtd. Total de Pessoas** (`evt_qtd_pessoas`) | 108,50 | 1.797,63 | 42,40 pessoas | 39,08% |
+| **Qtd. de Adultos** (`evt_qtd_adultos`) | 86,50 | 1.089,74 | 33,01 adultos | 38,16% |
+| **Qtd. de Crianças** (`evt_qtd_criancas`) | 17,85 | 72,45 | 8,51 crianças | **47,68%** |
+
+#### Análise do Coeficiente de Variação (CV)
+* **Maior Variabilidade Relativa**: **Quantidade de Crianças (`evt_qtd_criancas`)** com **47,68%**. O público infantil varia substancialmente de evento para evento, apresentando menor homogeneidade.
+* **Menor Variabilidade Relativa**: **Quantidade de Adultos (`evt_qtd_adultos`)** com **38,16%**. O público de adultos é o componente mais uniforme/estável no porte das festas contratadas.
+
+---
+
+## 14. Referências Bibliográficas
 
 - Documentação Oficial do React: https://pt-br.reactjs.org/
 - Documentação Oficial do Node.js: https://nodejs.org/pt-br/docs/

@@ -561,4 +561,48 @@ O middleware `errorHandler.js` trata globalmente:
 
 ---
 
+## 15. Módulo de Estatística Descritiva
+
+Com base na amostragem de dados fictícios do banco de dados (20 registros de eventos e orçamentos), foram calculadas as seguintes medidas de tendência central e de variabilidade.
+
+### 15.1 Medidas de Tendência Central (Média, Mediana e Moda)
+Foram analisadas cinco variáveis principais: quatro quantitativas e uma qualitativa.
+
+| Variável | Tipo | Média | Mediana | Moda | Tipo de Moda |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **Qtd. Total de Pessoas** (`evt_qtd_pessoas`) | Quantitativa Discreta | 108,50 | 107,50 | N/A | Amodal |
+| **Qtd. de Adultos** (`evt_qtd_adultos`) | Quantitativa Discreta | 86,50 | 87,50 | 70, 90, 100, 110 | Multimodal (freq. 2) |
+| **Qtd. de Crianças** (`evt_qtd_criancas`) | Quantitativa Discreta | 17,85 | 15,00 | 8, 15, 25 | Multimodal (freq. 4) |
+| **Valor Total Orçado** (`orc_valor_total`) | Quantitativa Contínua | R$ 5.737,90 | R$ 5.404,50 | N/A | Amodal |
+| **Status do Evento** (`evt_status`) | Qualitativa Nominal | N/A | N/A | 'confirmado' | Unimodal (freq. 7) |
+
+#### Interpretação dos Resultados
+* **Quantidade Total de Pessoas**: A média de ~108 pessoas e mediana de 107,50 apontam para um equilíbrio no porte dos eventos na base. Sendo amodal, não há uma capacidade padrão de convidados que se sobressaia.
+* **Quantidade de Adultos**: A média de 86,50 adultos mostra que eles compõem a maior fatia do público dos eventos. A característica multimodal aponta para múltiplos tamanhos padrões de festas contratadas (70, 90, 100 e 110 adultos).
+* **Quantidade de Crianças**: Média de ~18 crianças por evento. O comportamento multimodal com concentrações em 8, 15 e 25 crianças demonstra que o público infantil se agrupa de acordo com o porte do aniversário/evento familiar.
+* **Valor Total Orçado**: Média de R$ 5.737,90 com metade dos orçamentos abaixo de R$ 5.404,50. A ausência de moda é típica de variáveis financeiras devido à personalização extrema do preço final de cada contrato.
+* **Status do Evento**: O status mais comum na amostragem é 'confirmado' (moda com 7 ocorrências), indicando bom andamento dos contratos comerciais.
+
+---
+
+### 15.2 Medidas de Variabilidade e Dispersão
+Foram selecionadas três variáveis quantitativas do item anterior para avaliação de dispersão:
+
+| Variável | Média | Variância Amostral | Desvio Padrão Amostral | Coeficiente de Variação (CV) |
+| :--- | :---: | :---: | :---: | :---: |
+| **Qtd. Total de Pessoas** (`evt_qtd_pessoas`) | 108,50 | 1.797,63 | 42,40 pessoas | 39,08% |
+| **Qtd. de Adultos** (`evt_qtd_adultos`) | 86,50 | 1.089,74 | 33,01 adultos | 38,16% |
+| **Qtd. de Crianças** (`evt_qtd_criancas`) | 17,85 | 72,45 | 8,51 crianças | **47,68%** |
+
+#### Interpretação das Medidas de Variabilidade
+* **Qtd. Total de Pessoas**: O desvio padrão de 42,40 pessoas mostra que os públicos dos eventos flutuam de forma perceptível em torno da média de 108,50.
+* **Qtd. de Adultos**: O desvio padrão indica que a quantidade de adultos varia em média 33 convidados em relação à média geral (86,50).
+* **Qtd. de Crianças**: O desvio padrão absoluto é pequeno (8,51 crianças), contudo a dispersão relativa é a maior da análise (CV de 47,68%).
+
+#### Análise do Coeficiente de Variação (CV)
+* **Maior Variabilidade Relativa**: **Quantidade de Crianças (`evt_qtd_criancas`)** com **47,68%**. Isso indica uma distribuição muito mais heterogênea desse público (existem eventos quase sem crianças e outros com proporção elevada).
+* **Menor Variabilidade Relativa**: **Quantidade de Adultos (`evt_qtd_adultos`)** com **38,16%**. Isso indica que a proporção de adultos é ligeiramente mais uniforme/homogênea entre os eventos cadastrados.
+
+---
+
 *Documentação gerada em 22/04/2026 — Projeto Mais Alegria © FATEC*
