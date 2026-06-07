@@ -24,7 +24,7 @@ const Usuario = sequelize.define('Usuario', {
   },
   senha: {
     type: DataTypes.STRING(255),
-    allowNull: false,
+    allowNull: true, // null enquanto o usuário convidado ainda não definiu senha
     field: 'usr_senha',
   },
   role: {
@@ -35,6 +35,25 @@ const Usuario = sequelize.define('Usuario', {
     validate: {
       isIn: [['admin', 'gerente', 'operador']],
     },
+  },
+  status: {
+    type: DataTypes.STRING(30),
+    allowNull: false,
+    defaultValue: 'ativo',
+    field: 'usr_status',
+    validate: {
+      isIn: [['pendente', 'ativo']],
+    },
+  },
+  conviteToken: {
+    type: DataTypes.STRING(255),
+    allowNull: true,
+    field: 'usr_convite_token',
+  },
+  conviteExpiracao: {
+    type: DataTypes.DATE,
+    allowNull: true,
+    field: 'usr_convite_expiracao',
   },
   criadoEm: {
     type: DataTypes.DATE,

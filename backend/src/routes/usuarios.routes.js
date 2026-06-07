@@ -6,7 +6,11 @@ const auth = require('../middleware/auth');
 const authorize = require('../middleware/roles');
 const controller = require('../controllers/usuarioController');
 
-// Todas as rotas exigem autenticação
+// ── Rotas Públicas (sem autenticação) ────────────────────────
+// IMPORTANTE: deve vir ANTES do router.use(auth)
+router.post('/definir-senha', controller.definirSenhaConvite);
+
+// ── Rotas Protegidas (exigem autenticação JWT) ────────────────
 router.use(auth);
 
 // Listagem de usuários
@@ -16,5 +20,8 @@ router.get('/', controller.listar);
 router.post('/', authorize('gerente'), controller.criar);
 router.put('/:id', authorize('gerente'), controller.atualizar);
 router.delete('/:id', authorize('gerente'), controller.remover);
+
+// Convite de novo usuário via e-mail (apenas gerente)
+router.post('/convidar', authorize('gerente'), controller.convidarUsuario);
 
 module.exports = router;

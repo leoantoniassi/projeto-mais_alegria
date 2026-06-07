@@ -40,6 +40,12 @@ services:
       DB_PASS: ${DB_PASS}
       DB_NAME: ${DB_NAME}
       TZ: America/Sao_Paulo
+      EMAIL_HOST: ${EMAIL_HOST}
+      EMAIL_PORT: ${EMAIL_PORT}
+      EMAIL_USER: ${EMAIL_USER}
+      EMAIL_PASS: ${EMAIL_PASS}
+      EMAIL_FROM: ${EMAIL_FROM}
+      FRONTEND_URL: ${FRONTEND_URL}
     ports:
       - "3001:3001"
     volumes:

@@ -10,7 +10,12 @@
     "test": "jest --detectOpenHandles",
     "test:watch": "jest --watch --detectOpenHandles"
   },
-  "keywords": ["eventos", "gestão", "api", "express"],
+  "keywords": [
+    "eventos",
+    "gestão",
+    "api",
+    "express"
+  ],
   "author": "Projeto Mais Alegria",
   "license": "ISC",
   "dependencies": {
@@ -22,6 +27,7 @@
     "helmet": "^8.0.0",
     "jsonwebtoken": "^9.0.2",
     "multer": "^1.4.5-lts.1",
+    "nodemailer": "^8.0.10",
     "pg": "^8.13.1",
     "pg-hstore": "^2.3.4",
     "sequelize": "^6.37.5"

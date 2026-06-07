@@ -30,17 +30,24 @@ DROP TABLE IF EXISTS categorias_produto    CASCADE;
 -- 0. USUARIOS
 -- ============================================================
 CREATE TABLE usuarios (
-    usr_id        UUID         PRIMARY KEY DEFAULT uuid_generate_v4(),
-    usr_nome      VARCHAR(150) NOT NULL,
-    usr_email     VARCHAR(150) NOT NULL UNIQUE,
-    usr_senha     VARCHAR(255) NOT NULL,
-    usr_role      VARCHAR(20)  NOT NULL DEFAULT 'operador',
-    usr_criado_em TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT ck_usuarios_role CHECK (usr_role IN ('gerente', 'operador'))
+    usr_id                UUID         PRIMARY KEY DEFAULT uuid_generate_v4(),
+    usr_nome              VARCHAR(150) NOT NULL,
+    usr_email             VARCHAR(150) NOT NULL UNIQUE,
+    usr_senha             VARCHAR(255),
+    usr_role              VARCHAR(20)  NOT NULL DEFAULT 'operador',
+    usr_status            VARCHAR(30)  NOT NULL DEFAULT 'ativo',
+    usr_convite_token     VARCHAR(100) UNIQUE,
+    usr_convite_expiracao TIMESTAMP,
+    usr_criado_em         TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT ck_usuarios_role CHECK (usr_role IN ('gerente', 'operador')),
+    CONSTRAINT ck_usuarios_status CHECK (usr_status IN ('pendente', 'ativo'))
 );
+
+CREATE INDEX idx_usuarios_convite_token ON usuarios(usr_convite_token);
 
 COMMENT ON TABLE  usuarios          IS 'Usuários do sistema com controle de acesso por role.';
 COMMENT ON COLUMN usuarios.usr_role IS 'Papel no sistema: gerente ou operador.';
+COMMENT ON COLUMN usuarios.usr_status IS 'Status da conta: pendente ou ativo.';
 
 -- ============================================================
 -- L. LOCAIS
