@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import api from '../../services/api';
 import { useAuth } from '../../contexts/AuthContext';
 import { useConfirm } from '../../contexts/ConfirmContext';
@@ -106,6 +106,50 @@ export default function DocumentosPage() {
     if (tipo === 'png') return { icon: 'image', color: 'text-tertiary', bg: 'bg-tertiary/10' };
     return { icon: 'description', color: 'text-primary', bg: 'bg-primary/10' };
   };
+  const filteredClientes = useMemo(() => {
+    if (!form.eventoId) return clientes;
+    const ev = eventos.find(e => e.id === form.eventoId);
+    return ev ? clientes.filter(c => c.id === ev.clienteId) : clientes;
+  }, [clientes, eventos, form.eventoId]);
+
+  const filteredEventos = useMemo(() => {
+    if (!form.clienteId) return eventos;
+    return eventos.filter(ev => ev.clienteId === form.clienteId);
+  }, [eventos, form.clienteId]);
+
+  const handleClienteChange = useCallback((clienteId) => {
+    setForm(prev => {
+      let nextEventoId = prev.eventoId;
+      if (clienteId && nextEventoId) {
+        const ev = eventos.find(e => e.id === nextEventoId);
+        if (ev && ev.clienteId !== clienteId) {
+          nextEventoId = '';
+        }
+      }
+      return {
+        ...prev,
+        clienteId,
+        eventoId: nextEventoId
+      };
+    });
+  }, [eventos]);
+
+  const handleEventoChange = useCallback((eventoId) => {
+    setForm(prev => {
+      let nextClienteId = prev.clienteId;
+      if (eventoId) {
+        const ev = eventos.find(e => e.id === eventoId);
+        if (ev && ev.clienteId) {
+          nextClienteId = ev.clienteId;
+        }
+      }
+      return {
+        ...prev,
+        eventoId,
+        clienteId: nextClienteId
+      };
+    });
+  }, [eventos]);
 
   return (
     <div>
@@ -244,10 +288,11 @@ export default function DocumentosPage() {
               <form id="doc-form" className="space-y-6" onSubmit={handleSave}>
 
                 <div className="space-y-2">
-                  <label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-4">
+                  <label htmlFor="nomeArquivo" className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-4">
                     Nome do Documento *
                   </label>
                   <input
+                    id="nomeArquivo"
                     className="w-full bg-surface-container-low border-none rounded-full py-3.5 px-6 focus:bg-white focus:ring-2 focus:ring-primary transition-all"
                     placeholder="Ex: Contrato João Carlos — Festa Jun/2026"
                     value={form.nomeArquivo}
@@ -257,10 +302,11 @@ export default function DocumentosPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-4">
+                  <label htmlFor="caminhoUrl" className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-4">
                     Localização do Arquivo *
                   </label>
                   <input
+                    id="caminhoUrl"
                     className="w-full bg-surface-container-low border-none rounded-full py-3.5 px-6 focus:bg-white focus:ring-2 focus:ring-primary transition-all"
                     type="text"
                     placeholder="C:\Contratos\joao.pdf  ou  https://drive.google.com/..."
@@ -274,32 +320,34 @@ export default function DocumentosPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-4">
+                  <label htmlFor="clienteId" className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-4">
                     Cliente
                   </label>
                   <select
+                    id="clienteId"
                     className="w-full bg-surface-container-low border-none rounded-full py-3.5 px-6 focus:bg-white focus:ring-2 focus:ring-primary transition-all appearance-none"
                     value={form.clienteId}
-                    onChange={(e) => setForm({ ...form, clienteId: e.target.value })}
+                    onChange={(e) => handleClienteChange(e.target.value)}
                   >
                     <option value="">— Nenhum cliente selecionado —</option>
-                    {clientes.slice().sort((a, b) => a.nome.localeCompare(b.nome)).map((c) => (
+                    {filteredClientes.slice().sort((a, b) => a.nome.localeCompare(b.nome)).map((c) => (
                       <option key={c.id} value={c.id}>{c.nome}</option>
                     ))}
                   </select>
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-4">
+                  <label htmlFor="eventoId" className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-4">
                     Evento (opcional)
                   </label>
                   <select
+                    id="eventoId"
                     className="w-full bg-surface-container-low border-none rounded-full py-3.5 px-6 focus:bg-white focus:ring-2 focus:ring-primary transition-all appearance-none"
                     value={form.eventoId}
-                    onChange={(e) => setForm({ ...form, eventoId: e.target.value })}
+                    onChange={(e) => handleEventoChange(e.target.value)}
                   >
                     <option value="">— Nenhum evento selecionado —</option>
-                    {eventos.slice().sort((a, b) => a.nome.localeCompare(b.nome)).map((ev) => (
+                    {filteredEventos.slice().sort((a, b) => a.nome.localeCompare(b.nome)).map((ev) => (
                       <option key={ev.id} value={ev.id}>{ev.nome}</option>
                     ))}
                   </select>

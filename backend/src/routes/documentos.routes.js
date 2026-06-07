@@ -5,10 +5,10 @@ const controller = require('../controllers/documentoController');
 
 router.use(auth);
 
-router.get('/', authorize('admin', 'gerente', 'usuario'), controller.listar);
-router.get('/:id/arquivo', authorize('admin', 'gerente', 'usuario'), controller.abrirArquivo);
-router.post('/', authorize('admin', 'gerente'), controller.criar);
-router.put('/:id', authorize('admin', 'gerente'), controller.atualizar);
+router.get('/', authorize('admin', 'gerente', 'operador'), controller.listar);
+router.get('/:id/arquivo', authorize('admin', 'gerente', 'operador'), controller.abrirArquivo);
+router.post('/', authorize('admin', 'gerente', 'operador'), controller.criar);
+router.put('/:id', authorize('admin', 'gerente', 'operador'), controller.atualizar);
 router.delete('/:id', authorize('gerente'), controller.remover);
 
 module.exports = router;

@@ -158,3 +158,76 @@ describe('DocumentosPage — handleAbrir', () => {
     });
   });
 });
+
+describe('DocumentosPage — Filtro Cruzado Cliente e Evento', () => {
+  const mockClientes = [
+    { id: 'cli-1', nome: 'Cliente Alfa' },
+    { id: 'cli-2', nome: 'Cliente Beta' },
+  ];
+
+  const mockEventos = [
+    { id: 'evt-1', nome: 'Evento Alfa 1', clienteId: 'cli-1' },
+    { id: 'evt-2', nome: 'Evento Alfa 2', clienteId: 'cli-1' },
+    { id: 'evt-3', nome: 'Evento Beta 1', clienteId: 'cli-2' },
+  ];
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    useAuth.mockReturnValue({ user: { id: 1, nome: 'Gerente', role: 'gerente' } });
+    useConfirm.mockReturnValue(jest.fn().mockResolvedValue(true));
+
+    api.get.mockImplementation((url) => {
+      if (url === '/documentos') {
+        return Promise.resolve({ data: { data: [] } });
+      }
+      if (url === '/clientes') {
+        return Promise.resolve({ data: { data: mockClientes } });
+      }
+      if (url === '/eventos') {
+        return Promise.resolve({ data: { data: mockEventos } });
+      }
+      return Promise.reject(new Error('not found'));
+    });
+  });
+
+  test('filtragem dos eventos ao selecionar um cliente', async () => {
+    render(<DocumentosPage />);
+
+    // Abre o modal
+    const novoBtn = await screen.findByText('Novo Documento');
+    await userEvent.click(novoBtn);
+
+    // Seleciona Cliente Alfa
+    const clienteSelect = screen.getByLabelText(/Cliente/i, { selector: 'select' });
+    await userEvent.selectOptions(clienteSelect, 'cli-1');
+
+    // Verifica se apenas os eventos do Cliente Alfa são exibidos
+    const eventoSelect = screen.getByLabelText(/Evento/i, { selector: 'select' });
+    const options = Array.from(eventoSelect.options).map(o => o.value);
+
+    expect(options).toContain('evt-1');
+    expect(options).toContain('evt-2');
+    expect(options).not.toContain('evt-3');
+  });
+
+  test('auto-seleção e filtro do cliente ao selecionar um evento', async () => {
+    render(<DocumentosPage />);
+
+    // Abre o modal
+    const novoBtn = await screen.findByText('Novo Documento');
+    await userEvent.click(novoBtn);
+
+    // Seleciona Evento Beta 1
+    const eventoSelect = screen.getByLabelText(/Evento/i, { selector: 'select' });
+    await userEvent.selectOptions(eventoSelect, 'evt-3');
+
+    // Verifica se o Cliente Beta foi auto-selecionado
+    const clienteSelect = screen.getByLabelText(/Cliente/i, { selector: 'select' });
+    expect(clienteSelect.value).toBe('cli-2');
+
+    // Verifica se a lista de clientes agora só contém Cliente Beta (e a opção vazia)
+    const clientOptions = Array.from(clienteSelect.options).map(o => o.value);
+    expect(clientOptions).toContain('cli-2');
+    expect(clientOptions).not.toContain('cli-1');
+  });
+});
