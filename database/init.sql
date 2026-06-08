@@ -38,12 +38,15 @@ CREATE TABLE usuarios (
     usr_status            VARCHAR(30)  NOT NULL DEFAULT 'ativo',
     usr_convite_token     VARCHAR(100) UNIQUE,
     usr_convite_expiracao TIMESTAMP,
+    usr_reset_token       VARCHAR(255),
+    usr_reset_expiracao   TIMESTAMP,
     usr_criado_em         TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT ck_usuarios_role CHECK (usr_role IN ('gerente', 'operador')),
     CONSTRAINT ck_usuarios_status CHECK (usr_status IN ('pendente', 'ativo'))
 );
 
 CREATE INDEX idx_usuarios_convite_token ON usuarios(usr_convite_token);
+CREATE INDEX idx_usuarios_reset_token ON usuarios(usr_reset_token) WHERE usr_reset_token IS NOT NULL;
 
 COMMENT ON TABLE  usuarios          IS 'Usuários do sistema com controle de acesso por role.';
 COMMENT ON COLUMN usuarios.usr_role IS 'Papel no sistema: gerente ou operador.';

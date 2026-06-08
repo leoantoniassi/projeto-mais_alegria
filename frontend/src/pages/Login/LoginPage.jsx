@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 
 export default function LoginPage() {
@@ -112,6 +112,14 @@ export default function LoginPage() {
                 >
                   <span className="material-symbols-outlined">{showPassword ? 'visibility_off' : 'visibility'}</span>
                 </button>
+              </div>
+              <div className="flex justify-end px-4">
+                <Link
+                  to="/recuperar-senha"
+                  className="text-xs font-semibold text-secondary hover:text-primary transition-colors"
+                >
+                  Esqueci minha senha
+                </Link>
               </div>
             </div>
 

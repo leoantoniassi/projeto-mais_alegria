@@ -55,6 +55,16 @@ const Usuario = sequelize.define('Usuario', {
     allowNull: true,
     field: 'usr_convite_expiracao',
   },
+  resetToken: {
+    type: DataTypes.STRING(255),
+    allowNull: true,
+    field: 'usr_reset_token',
+  },
+  resetExpiracao: {
+    type: DataTypes.DATE,
+    allowNull: true,
+    field: 'usr_reset_expiracao',
+  },
   criadoEm: {
     type: DataTypes.DATE,
     allowNull: false,

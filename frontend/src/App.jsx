@@ -15,6 +15,8 @@ import FornecedoresPage from './pages/Fornecedores/FornecedoresPage';
 import UsuariosPage from './pages/Usuarios/UsuariosPage';
 import CadastrosPage from './pages/Cadastros/CadastrosPage';
 import DefinirSenhaPage from './pages/DefinirSenha/DefinirSenhaPage';
+import RecuperarSenhaPage from './pages/Login/RecuperarSenhaPage';
+import RedefinirSenhaPage from './pages/Login/RedefinirSenhaPage';
 
 function ProtectedRoute({ children }) {
   const { isAuthenticated, loading } = useAuth();
@@ -56,6 +58,8 @@ function AppRoutes() {
   return (
     <Routes>
       <Route path="/login" element={<LoginRoute />} />
+      <Route path="/recuperar-senha" element={<RecuperarSenhaPage />} />
+      <Route path="/redefinir-senha" element={<RedefinirSenhaPage />} />
       {/* Rota pública para ativação de conta via convite */}
       <Route path="/definir-senha" element={<DefinirSenhaPage />} />
       <Route
