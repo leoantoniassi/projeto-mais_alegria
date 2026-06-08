@@ -201,6 +201,14 @@ async function criar(req, res, next) {
       return res.status(400).json({ success: false, message: erroTermino });
     }
 
+    const statusFinal = status || "pendente";
+    if (!["pendente", "confirmado", "concluido", "cancelado"].includes(statusFinal)) {
+      return res.status(400).json({
+        success: false,
+        message: "Status inválido. Use: pendente, confirmado, concluido ou cancelado.",
+      });
+    }
+
     if (qtdPessoas === undefined || qtdPessoas === null || qtdPessoas < 0) {
       return res.status(400).json({
         success: false,
@@ -242,7 +250,7 @@ async function criar(req, res, next) {
     }
 
     // RN Canvas 2: Evento confirmado requer orçamento aprovado
-    if (status === "confirmado") {
+    if (statusFinal === "confirmado") {
       if (!orcamentoId) {
         return res.status(400).json({
           success: false,
@@ -265,7 +273,7 @@ async function criar(req, res, next) {
       nome,
       dataEvento,
       horarioTermino,
-      status: status || "pendente",
+      status: statusFinal,
       qtdPessoas,
       qtdAdultos,
       qtdCriancas,

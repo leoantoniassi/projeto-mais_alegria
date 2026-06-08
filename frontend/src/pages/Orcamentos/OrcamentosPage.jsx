@@ -63,6 +63,7 @@ function formatDateTime(d) {
 
 export default function OrcamentosPage() {
   const { user } = useAuth();
+  const isOperador = user?.role === 'operador';
   const confirm = useConfirm();
   const [orcamentos, setOrcamentos] = useState([]);
   const [total, setTotal] = useState(0);
@@ -238,60 +239,58 @@ export default function OrcamentosPage() {
                         >
                           <span className="material-symbols-outlined text-sm filled">chat</span>
                         </button>
-                        {user?.role !== 'operador' && (
+                        {o.status === 'pendente' && (
                           <>
-                            {o.status === 'pendente' && (
-                              <>
-                                <button
-                                  onClick={e => { e.stopPropagation(); handleConfirm(o.id); }}
-                                  className="p-1.5 text-secondary hover:bg-secondary/10 rounded-full"
-                                  title="Aprovar e Confirmar"
-                                >
-                                  <span className="material-symbols-outlined text-lg">check</span>
-                                </button>
-                                <button
-                                  onClick={e => { e.stopPropagation(); handleReject(o.id); }}
-                                  className="p-1.5 text-error hover:bg-error/10 rounded-full"
-                                  title="Rejeitar"
-                                >
-                                  <span className="material-symbols-outlined text-lg">close</span>
-                                </button>
-                              </>
-                            )}
                             <button
-                              onClick={e => {
-                                e.stopPropagation();
-                                setEditing(o.id);
-                                setForm({
-                                  ...EMPTY_FORM,
-                                  clienteId: o.clienteId || o.cliente?.id || o.Cliente?.id || '',
-                                  nome: o.nome || '',
-                                  valorTotal: o.valorTotal || 0,
-                                  dataValidade: o.dataValidade ? toBrasiliaISO(o.dataValidade).slice(0, 10) : '',
-                                  dataEvento: toBrasiliaISO(o.dataEvento),
-                                  horarioTermino: toBrasiliaISO(o.horarioTermino),
-                                  observacoes: o.observacoes || '',
-                                  localId: o.localId || o.local?.id || '',
-                                  qtdPessoas: o.qtdPessoas || 0,
-                                  qtdAdultos: o.qtdAdultos || 0,
-                                  qtdCriancas: o.qtdCriancas || 0,
-                                  qtdBebes: o.qtdBebes || 0,
-                                });
-                                setShowPanel(true);
-                              }}
-                              className="p-1.5 text-on-surface-variant hover:text-primary rounded-full transition-colors"
-                              title="Editar"
+                              onClick={e => { e.stopPropagation(); handleConfirm(o.id); }}
+                              className="p-1.5 text-secondary hover:bg-secondary/10 rounded-full"
+                              title="Aprovar e Confirmar"
                             >
-                              <span className="material-symbols-outlined text-lg">edit</span>
+                              <span className="material-symbols-outlined text-lg">check</span>
                             </button>
                             <button
-                              onClick={e => { e.stopPropagation(); handleDelete(o.id); }}
-                              className="p-1.5 text-on-surface-variant hover:text-error rounded-full"
-                              title="Excluir"
+                              onClick={e => { e.stopPropagation(); handleReject(o.id); }}
+                              className="p-1.5 text-error hover:bg-error/10 rounded-full"
+                              title="Rejeitar"
                             >
-                              <span className="material-symbols-outlined text-lg">delete</span>
+                              <span className="material-symbols-outlined text-lg">close</span>
                             </button>
                           </>
+                        )}
+                        <button
+                          onClick={e => {
+                            e.stopPropagation();
+                            setEditing(o.id);
+                            setForm({
+                              ...EMPTY_FORM,
+                              clienteId: o.clienteId || o.cliente?.id || o.Cliente?.id || '',
+                              nome: o.nome || '',
+                              valorTotal: o.valorTotal || 0,
+                              dataValidade: o.dataValidade ? toBrasiliaISO(o.dataValidade).slice(0, 10) : '',
+                              dataEvento: toBrasiliaISO(o.dataEvento),
+                              horarioTermino: toBrasiliaISO(o.horarioTermino),
+                              observacoes: o.observacoes || '',
+                              localId: o.localId || o.local?.id || '',
+                              qtdPessoas: o.qtdPessoas || 0,
+                              qtdAdultos: o.qtdAdultos || 0,
+                              qtdCriancas: o.qtdCriancas || 0,
+                              qtdBebes: o.qtdBebes || 0,
+                            });
+                            setShowPanel(true);
+                          }}
+                          className="p-1.5 text-on-surface-variant hover:text-primary rounded-full transition-colors"
+                          title="Editar"
+                        >
+                          <span className="material-symbols-outlined text-lg">edit</span>
+                        </button>
+                        {!isOperador && (
+                          <button
+                            onClick={e => { e.stopPropagation(); handleDelete(o.id); }}
+                            className="p-1.5 text-on-surface-variant hover:text-error rounded-full"
+                            title="Excluir"
+                          >
+                            <span className="material-symbols-outlined text-lg">delete</span>
+                          </button>
                         )}
                       </div>
                     </td>
@@ -354,6 +353,10 @@ export default function OrcamentosPage() {
                 <div className="space-y-2">
                   <label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-4">Valor Total</label>
                   <input type="number" step="0.01" placeholder="0.00" className="w-full bg-surface-container-low border-none rounded-full py-3.5 px-6 focus:ring-2 focus:ring-primary" value={form.valorTotal || ''} onChange={e => setForm({ ...form, valorTotal: e.target.value ? Number(e.target.value) : 0 })} required />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-4">Data de Validade</label>
+                  <input type="date" className="w-full bg-surface-container-low border-none rounded-full py-3.5 px-6 focus:ring-2 focus:ring-primary" value={form.dataValidade} onChange={e => setForm({ ...form, dataValidade: e.target.value })} />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2"><label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant px-4">Data e Hora do Evento</label><input type="datetime-local" className="w-full bg-surface-container-low border-none rounded-full py-3.5 px-6 focus:ring-2 focus:ring-primary" value={form.dataEvento} onChange={e => setForm({ ...form, dataEvento: e.target.value })} required /></div>

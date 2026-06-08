@@ -11,13 +11,8 @@ const {
   CategoriaProduto,
   Evento,
 } = require("../models");
+const { isValidUUID } = require('../utils/validators');
 const { gerarLinkWhatsApp } = require('../utils/whatsapp');
-
-// Validador simples de UUID v4
-const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-function isUUIDValido(str) {
-  return UUID_REGEX.test(str);
-}
 
 function respostaNaoEncontrado(res, mensagem = "Orçamento não encontrado.") {
   return res.status(404).json({ success: false, message: mensagem });
@@ -109,10 +104,6 @@ const includesOrcamentoDetalhado = [
 // POST /api/orcamentos
 async function criar(req, res, next) {
   try {
-    if (req.user && req.user.role !== "gerente") {
-      return respostaErro(res, 403, "Apenas gerentes podem criar orçamentos.");
-    }
-
     const {
       clienteId,
       localId,
@@ -149,9 +140,8 @@ async function criar(req, res, next) {
       }
     }
 
-    if (dataEvento && horarioTermino && new Date(horarioTermino) <= new Date(dataEvento)) {
-      return respostaErro(res, 400, "Horário de término deve ser posterior à data de início do evento.");
-    }
+    const erroData = validarDatas(dataEvento, horarioTermino);
+    if (erroData) return respostaErro(res, 400, erroData);
 
     const orcamento = await Orcamento.create({
       clienteId,
@@ -199,10 +189,17 @@ function pickDefined(obj, keys) {
   }, {});
 }
 
+function validarDatas(dataEvento, horarioTermino) {
+  if (dataEvento && horarioTermino && new Date(horarioTermino) <= new Date(dataEvento)) {
+    return "Horário de término deve ser posterior à data de início do evento.";
+  }
+  return null;
+}
+
 // PUT /api/orcamentos/:id
 async function atualizar(req, res, next) {
   try {
-    if (!isUUIDValido(req.params.id)) {
+    if (!isValidUUID(req.params.id)) {
       return respostaErro(res, 400, "ID do orçamento inválido.");
     }
 
@@ -226,9 +223,8 @@ async function atualizar(req, res, next) {
 
     const dataEventoFinal = dataEvento !== undefined ? dataEvento : orcamento.dataEvento;
     const horarioTerminoFinal = horarioTermino !== undefined ? horarioTermino : orcamento.horarioTermino;
-    if (dataEventoFinal && horarioTerminoFinal && new Date(horarioTerminoFinal) <= new Date(dataEventoFinal)) {
-      return respostaErro(res, 400, "Horário de término deve ser posterior à data de início do evento.");
-    }
+    const erroData = validarDatas(dataEventoFinal, horarioTerminoFinal);
+    if (erroData) return respostaErro(res, 400, erroData);
 
     const updates = pickDefined(
       { clienteId, localId, nome, valorTotal, dataValidade: (dataValidade && dataValidade !== '') ? dataValidade : null, dataEvento, horarioTermino, qtdPessoas, qtdAdultos, qtdCriancas, qtdBebes, observacoes },
@@ -251,6 +247,9 @@ async function atualizar(req, res, next) {
 // PATCH /api/orcamentos/:id/status
 async function mudarStatus(req, res, next) {
   try {
+    if (!isValidUUID(req.params.id)) {
+      return respostaErro(res, 400, "ID do orçamento inválido.");
+    }
     const orcamento = await Orcamento.findByPk(req.params.id);
     if (!orcamento) {
       return respostaNaoEncontrado(res);
@@ -276,6 +275,9 @@ async function mudarStatus(req, res, next) {
 // DELETE /api/orcamentos/:id (soft delete)
 async function remover(req, res, next) {
   try {
+    if (!isValidUUID(req.params.id)) {
+      return respostaErro(res, 400, "ID do orçamento inválido.");
+    }
     const orcamento = await Orcamento.findByPk(req.params.id);
     if (!orcamento) {
       return respostaNaoEncontrado(res);
@@ -295,7 +297,7 @@ async function remover(req, res, next) {
 // Confirma o orçamento e envia para Eventos
 async function confirmarOrcamento(req, res, next) {
   try {
-    if (!isUUIDValido(req.params.id)) {
+    if (!isValidUUID(req.params.id)) {
       return respostaErro(res, 400, "ID do orçamento inválido.");
     }
 
@@ -311,9 +313,8 @@ async function confirmarOrcamento(req, res, next) {
       return respostaErro(res, 400, "O orçamento precisa ter data e horário de início e término definidos para ser convertido em evento.");
     }
 
-    if (new Date(orcamento.horarioTermino) <= new Date(orcamento.dataEvento)) {
-      return respostaErro(res, 400, "Horário de término deve ser posterior à data de início do evento.");
-    }
+    const erroData = validarDatas(orcamento.dataEvento, orcamento.horarioTermino);
+    if (erroData) return respostaErro(res, 400, erroData);
 
     const evento = await Evento.create({
       orcamentoId:    orcamento.id,
@@ -350,9 +351,18 @@ async function confirmarOrcamento(req, res, next) {
 // Rejeita o orçamento e o remove
 async function rejeitarOrcamento(req, res, next) {
   try {
+    if (!isValidUUID(req.params.id)) {
+      return respostaErro(res, 400, "ID do orçamento inválido.");
+    }
+
     const orcamento = await Orcamento.findByPk(req.params.id);
     if (!orcamento) {
       return respostaNaoEncontrado(res);
+    }
+
+    // Impede rejeição de orçamentos já aprovados (integridade do fluxo de negócio)
+    if (orcamento.status === "aprovado") {
+      return respostaErro(res, 400, "Orçamento já aprovado não pode ser rejeitado.");
     }
 
     await orcamento.update({ status: "reprovado", deletadoEm: new Date() });

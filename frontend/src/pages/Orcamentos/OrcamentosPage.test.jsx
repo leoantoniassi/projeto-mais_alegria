@@ -99,19 +99,17 @@ describe('OrcamentosPage — controle de acesso por papel (role)', () => {
   });
 
   // ---------------------------------------------------------------
-  // Teste 2 — Operador NÃO vê botões aprovar / reprovar
+  // Teste 2 — Operador VÊ botões aprovar / reprovar (role alterada)
   // ---------------------------------------------------------------
-  test('2 - operador NAO ve botoes aprovar/reprovar em orcamento pendente', async () => {
+  test('2 - operador VE botoes aprovar/reprovar em orcamento pendente (role alterada)', async () => {
     useAuth.mockReturnValue({
       user: { id: 2, nome: 'Operador', email: 'o@test.com', role: 'operador' },
     });
 
     render(<OrcamentosPage />);
 
-    await screen.findByText('Cliente Pendente');
-
-    expect(screen.queryByTitle('Aprovar e Confirmar')).not.toBeInTheDocument();
-    expect(screen.queryByTitle('Rejeitar')).not.toBeInTheDocument();
+    expect(await screen.findByTitle('Aprovar e Confirmar')).toBeInTheDocument();
+    expect(screen.getByTitle('Rejeitar')).toBeInTheDocument();
   });
 
   // ---------------------------------------------------------------
@@ -129,9 +127,9 @@ describe('OrcamentosPage — controle de acesso por papel (role)', () => {
   });
 
   // ---------------------------------------------------------------
-  // Teste 4 — Operador NÃO vê botões editar / excluir
+  // Teste 4 — Operador VÊ botão Editar mas NÃO vê Excluir
   // ---------------------------------------------------------------
-  test('4 - operador NAO ve botoes editar/excluir', async () => {
+  test('4 - operador VE Editar mas NAO ve Excluir', async () => {
     useAuth.mockReturnValue({
       user: { id: 2, nome: 'Operador', email: 'o@test.com', role: 'operador' },
     });
@@ -140,7 +138,7 @@ describe('OrcamentosPage — controle de acesso por papel (role)', () => {
 
     await screen.findByText('Cliente Pendente');
 
-    expect(screen.queryByTitle('Editar')).not.toBeInTheDocument();
+    expect(screen.getByTitle('Editar')).toBeInTheDocument();
     expect(screen.queryByTitle('Excluir')).not.toBeInTheDocument();
   });
 
@@ -181,7 +179,68 @@ describe('OrcamentosPage — controle de acesso por papel (role)', () => {
   });
 
   // ---------------------------------------------------------------
-  // Teste 7 — Orçamento não-pendente: gerente NÃO vê aprovar/reprovar
+  // Teste 7a — Operador vê botão Excluir em orçamento? NÃO.
+  // ---------------------------------------------------------------
+  test('7a - operador NAO ve botao Excluir em orcamento pendente', async () => {
+    useAuth.mockReturnValue({
+      user: { id: 2, nome: 'Operador', email: 'o@test.com', role: 'operador' },
+    });
+
+    render(<OrcamentosPage />);
+
+    await screen.findByText('Cliente Pendente');
+
+    expect(screen.queryByTitle('Excluir')).not.toBeInTheDocument();
+  });
+
+  // ---------------------------------------------------------------
+  // Teste 7b — Gerente vê botão Excluir em orçamento
+  // ---------------------------------------------------------------
+  test('7b - gerente VE botao Excluir em orcamento pendente', async () => {
+    useAuth.mockReturnValue({
+      user: { id: 1, nome: 'Gerente', email: 'g@test.com', role: 'gerente' },
+    });
+
+    render(<OrcamentosPage />);
+
+    await screen.findByText('Cliente Pendente');
+
+    expect(screen.getByTitle('Excluir')).toBeInTheDocument();
+  });
+
+  // ---------------------------------------------------------------
+  // Teste 7c — Operador vê botão Editar em orçamento
+  // ---------------------------------------------------------------
+  test('7c - operador VE botao Editar em orcamento pendente', async () => {
+    useAuth.mockReturnValue({
+      user: { id: 2, nome: 'Operador', email: 'o@test.com', role: 'operador' },
+    });
+
+    render(<OrcamentosPage />);
+
+    await screen.findByText('Cliente Pendente');
+
+    expect(screen.getByTitle('Editar')).toBeInTheDocument();
+  });
+
+  // ---------------------------------------------------------------
+  // Teste 7d — Operador vê botões Aprovar/Rejeitar em orçamento pendente
+  // ---------------------------------------------------------------
+  test('7d - operador VE botoes Aprovar/Rejeitar em orcamento pendente', async () => {
+    useAuth.mockReturnValue({
+      user: { id: 2, nome: 'Operador', email: 'o@test.com', role: 'operador' },
+    });
+
+    render(<OrcamentosPage />);
+
+    await screen.findByText('Cliente Pendente');
+
+    expect(screen.getByTitle('Aprovar e Confirmar')).toBeInTheDocument();
+    expect(screen.getByTitle('Rejeitar')).toBeInTheDocument();
+  });
+
+  // ---------------------------------------------------------------
+  // Teste 8 — Orçamento não-pendente: gerente NÃO vê aprovar/reprovar
   // ---------------------------------------------------------------
   test.each([
     ['aprovado', mockAprovado],

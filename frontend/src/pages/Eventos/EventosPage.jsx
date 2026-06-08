@@ -642,7 +642,7 @@ export default function EventosPage() {
                           </p>
                         </div>
                       </div>
-                      {user?.role === "gerente" && (
+                      {user?.role !== "operador" && (
                         <button
                           onClick={() => handleRemoverDaEscala(entry.id)}
                           className="p-1.5 text-outline hover:text-error rounded-full hover:bg-error/10 transition-colors opacity-0 group-hover:opacity-100"

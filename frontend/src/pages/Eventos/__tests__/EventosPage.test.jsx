@@ -35,6 +35,61 @@ function setupApiMock() {
 }
 
 describe('EventosPage — warning de capacidade excedida', () => {
+  // Role-based tests para o botão Excluir
+  describe('controle de acesso por papel (role) — Excluir', () => {
+    function setupApiMockWithEvento() {
+      api.get.mockImplementation((url, _config) => {
+        if (url === '/eventos') {
+          return Promise.resolve({
+            data: {
+              data: [{
+                id: 'evt-1',
+                cliente: { nome: 'Cliente Teste' },
+                local: { nome: 'Salão' },
+                nome: 'Evento Teste',
+                dataEvento: '2026-12-31',
+                horarioTermino: '2026-12-31T23:59:59.000Z',
+                status: 'pendente',
+                qtdPessoas: 50,
+                qtdAdultos: 30,
+                qtdCriancas: 15,
+                qtdBebes: 5,
+                orcamentoId: null,
+                clientId: 'cli-1',
+              }],
+              pagination: { total: 1 },
+            },
+          });
+        }
+        if (url === '/clientes') {
+          return Promise.resolve({ data: { data: [] } });
+        }
+        if (url === '/orcamentos') {
+          return Promise.resolve({ data: { data: [] } });
+        }
+        if (url === '/locais?limit=100') {
+          return Promise.resolve({ data: { data: [] } });
+        }
+        return Promise.resolve({ data: {} });
+      });
+    }
+
+    test('operador NAO ve botao Excluir em evento', async () => {
+      useAuth.mockReturnValue({ user: { id: 2, nome: 'Operador', role: 'operador' } });
+      setupApiMockWithEvento();
+      render(<EventosPage />);
+      expect(await screen.findByText('Cliente Teste')).toBeInTheDocument();
+      expect(screen.queryByTitle('Excluir')).not.toBeInTheDocument();
+    });
+
+    test('gerente VE botao Excluir em evento', async () => {
+      useAuth.mockReturnValue({ user: { id: 1, nome: 'Gerente', role: 'gerente' } });
+      setupApiMockWithEvento();
+      render(<EventosPage />);
+      expect(await screen.findByText('Cliente Teste')).toBeInTheDocument();
+      expect(screen.getByTitle('Excluir')).toBeInTheDocument();
+    });
+  });
   beforeEach(() => {
     jest.clearAllMocks();
     useAuth.mockReturnValue({ user: { id: 1, nome: 'Gerente', role: 'gerente' } });

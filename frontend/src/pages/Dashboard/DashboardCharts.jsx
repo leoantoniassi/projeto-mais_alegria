@@ -104,7 +104,7 @@ export default function DashboardCharts() {
                       <div className="bg-surface-container-highest text-on-surface p-3 rounded-xl shadow-lg border border-outline-variant/20">
                         <p className="font-bold">{d.nome}</p>
                         <p className="text-sm">Convidados: {d.convidados}</p>
-                        <p className="text-sm text-primary font-bold">Custo: R$ {d.custo.toLocaleString()}</p>
+                        <p className="text-sm text-on-surface font-bold">Custo: R$ {d.custo.toLocaleString()}</p>
                       </div>
                     );
                   }

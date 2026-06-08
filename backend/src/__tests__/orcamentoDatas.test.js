@@ -143,16 +143,17 @@ describe('OrcamentoDatas — dataEvento e horarioTermino', () => {
       expect(res.body.message).toMatch(/posterior|término/i);
     });
 
-    test('deve retornar 403 se operador tentar criar orçamento', async () => {
+    test('deve permitir que operador crie orçamento (role alterada)', async () => {
       mockUser = { id: 'user-2', role: 'operador' };
       Cliente.findByPk.mockResolvedValue(mockCliente);
+      Orcamento.create.mockResolvedValue(makeOrcamento());
 
       const res = await request(app)
         .post('/api/orcamentos')
         .send(orcamentoPayload);
 
-      expect(res.status).toBe(403);
-      expect(res.body.message).toMatch(/apenas gerentes/i);
+      expect(res.status).toBe(201);
+      expect(res.body.success).toBe(true);
     });
   });
 
@@ -264,15 +265,16 @@ describe('OrcamentoDatas — dataEvento e horarioTermino', () => {
       expect(res.body.message).toMatch(/inválido/i);
     });
 
-    test('deve retornar 403 se operador tentar confirmar orçamento', async () => {
+    test('deve permitir que operador confirme orçamento (role alterada)', async () => {
       mockUser = { id: 'user-2', role: 'operador' };
       Orcamento.findByPk.mockResolvedValue(makeOrcamento());
+      Evento.create.mockResolvedValue({ id: 'evt-1', orcamentoId: 'orc-1' });
 
       const res = await request(app)
         .post('/api/orcamentos/550e8400-e29b-41d4-a716-446655440000/confirmar');
 
-      expect(res.status).toBe(403);
-      expect(res.body.message).toMatch(/acesso negado|apenas gerente/i);
+      expect(res.status).toBe(200);
+      expect(res.body.success).toBe(true);
     });
   });
 });

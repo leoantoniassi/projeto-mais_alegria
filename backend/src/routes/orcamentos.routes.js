@@ -10,13 +10,13 @@ router.use(auth);
 
 router.get('/', controller.listar);
 router.get('/:id', controller.buscarPorId);
-router.post('/', controller.criar);
-router.put('/:id', authorize('gerente'), controller.atualizar);
-router.patch('/:id/status', authorize('gerente'), controller.mudarStatus);
-router.post('/:id/confirmar', authorize('gerente'), controller.confirmarOrcamento);
-router.post('/:id/rejeitar', authorize('gerente'), controller.rejeitarOrcamento);
+router.post('/', authorize('gerente', 'operador'), controller.criar);
+router.put('/:id', authorize('gerente', 'operador'), controller.atualizar);
+router.patch('/:id/status', authorize('gerente', 'operador'), controller.mudarStatus);
+router.post('/:id/confirmar', authorize('gerente', 'operador'), controller.confirmarOrcamento);
+router.post('/:id/rejeitar', authorize('gerente', 'operador'), controller.rejeitarOrcamento);
 router.delete('/:id', authorize('gerente'), controller.remover);
-router.get('/:id/whatsapp', controller.whatsapp);
+router.get('/:id/whatsapp', authorize('gerente', 'operador'), controller.whatsapp);
 
 
 module.exports = router;
