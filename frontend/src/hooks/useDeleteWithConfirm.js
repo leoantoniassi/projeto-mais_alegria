@@ -27,7 +27,7 @@ export default function useDeleteWithConfirm() {
       refetch();
       return toast;
     } catch (err) {
-      alert(err.response?.data?.message || 'Erro');
+      await confirm(err.response?.data?.message || 'Erro', { title: 'Erro', showCancel: false });
       return null;
     }
   };

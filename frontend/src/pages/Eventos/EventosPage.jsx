@@ -135,7 +135,7 @@ export default function EventosPage() {
       setEditing(null);
       fetchData();
     } catch (err) {
-      alert(err.response?.data?.message || "Erro");
+      await confirm(err.response?.data?.message || "Erro", { title: 'Erro', showCancel: false });
     }
   };
 
@@ -151,7 +151,7 @@ export default function EventosPage() {
       setToast({ message: 'Evento cancelado com sucesso!', type: 'success' });
       fetchData();
     } catch (err) {
-      alert(err.response?.data?.message || 'Erro ao cancelar evento');
+      await confirm(err.response?.data?.message || 'Erro ao cancelar evento', { title: 'Erro', showCancel: false });
     }
   };
 
@@ -162,7 +162,7 @@ export default function EventosPage() {
         window.open(res.data.link, '_blank');
       }
     } catch (err) {
-      alert(err.response?.data?.message || 'Erro ao gerar link do WhatsApp');
+      await confirm(err.response?.data?.message || 'Erro ao gerar link do WhatsApp', { title: 'Erro', showCancel: false });
     }
   };
 
@@ -190,7 +190,7 @@ export default function EventosPage() {
       const { data: res } = await api.get(`/escala/evento/${selectedEvento.id}`);
       setEscalaAtual(Array.isArray(res.data) ? res.data : []);
     } catch (err) {
-      alert(err.response?.data?.message || "Erro ao remover da escala.");
+      await confirm(err.response?.data?.message || "Erro ao remover da escala.", { title: 'Erro', showCancel: false });
     }
   };
 
@@ -213,7 +213,7 @@ export default function EventosPage() {
 
   const handleSalvarEscala = async () => {
     if (selecionados.length === 0) {
-      alert("Selecione ao menos um funcionário.");
+      await confirm("Selecione ao menos um funcionário.", { title: 'Atenção', showCancel: false });
       return;
     }
     setSalvandoEscala(true);
@@ -233,7 +233,7 @@ export default function EventosPage() {
       setFuncionariosDisponiveis(Array.isArray(res2.data) ? res2.data : []);
       setSelecionados([]);
     } catch (err) {
-      alert(err.response?.data?.message || "Erro ao salvar escala.");
+      await confirm(err.response?.data?.message || "Erro ao salvar escala.", { title: 'Erro', showCancel: false });
     } finally {
       setSalvandoEscala(false);
     }

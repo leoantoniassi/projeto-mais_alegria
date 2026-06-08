@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import api from '../../services/api';
 import { useAuth } from '../../contexts/AuthContext';
+import { useConfirm } from '../../contexts/ConfirmContext';
 import { validarCpfCnpj } from '../../utils/validators';
 import { formatCpfCnpj } from '../../utils/formatters';
 import Toast from '../../components/Toast';
@@ -8,6 +9,7 @@ import useDeleteWithConfirm from '../../hooks/useDeleteWithConfirm';
 
 export default function ClientesPage() {
   const { user } = useAuth();
+  const confirm = useConfirm();
   const [clientes, setClientes] = useState([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
@@ -39,7 +41,7 @@ export default function ClientesPage() {
     e.preventDefault();
     
     if (!validarCpfCnpj(form.rgCpf)) {
-      alert('CPF ou CNPJ inválido!');
+      await confirm('CPF ou CNPJ inválido!', { title: 'Erro', showCancel: false });
       return;
     }
 
@@ -54,7 +56,7 @@ export default function ClientesPage() {
       setForm({ nome: '', email: '', telefone: '', rgCpf: '' });
       fetchClientes();
     } catch (err) {
-      alert(err.response?.data?.message || 'Erro ao salvar');
+      await confirm(err.response?.data?.message || 'Erro ao salvar', { title: 'Erro', showCancel: false });
     }
   };
 

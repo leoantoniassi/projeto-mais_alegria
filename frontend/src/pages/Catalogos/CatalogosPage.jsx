@@ -58,7 +58,7 @@ export default function CatalogosPage() {
       setShowPanel(false);
       fetchCatalogos();
     } catch (err) {
-      alert(err.response?.data?.message || 'Erro ao salvar catálogo');
+      await confirm(err.response?.data?.message || 'Erro ao salvar catálogo', { title: 'Erro', showCancel: false });
     } finally {
       setSaving(false);
     }
@@ -70,7 +70,7 @@ export default function CatalogosPage() {
       await api.delete(`/catalogos/${id}`);
       fetchCatalogos();
     } catch (err) {
-      alert(err.response?.data?.message || 'Erro ao excluir');
+      await confirm(err.response?.data?.message || 'Erro ao excluir', { title: 'Erro', showCancel: false });
     }
   };
 

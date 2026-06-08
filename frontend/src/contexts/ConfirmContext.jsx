@@ -12,6 +12,7 @@ export function ConfirmProvider({ children }) {
     message: '',
     title: 'Confirmação',
     isDanger: false,
+    showCancel: true,
     resolve: null,
   });
 
@@ -20,13 +21,14 @@ export function ConfirmProvider({ children }) {
       // Verifica se a mensagem de exclusão para aplicar o estilo vermelho
       const isDanger = options.isDanger !== undefined 
         ? options.isDanger 
-        : message.toLowerCase().includes('excluir') || message.toLowerCase().includes('rejeitar');
+        : message.toLowerCase().includes('excluir') || message.toLowerCase().includes('rejeitar') || options.title?.toLowerCase().includes('erro');
 
       setConfirmState({
         isOpen: true,
         message,
         title: options.title || 'Confirmação',
         isDanger,
+        showCancel: options.showCancel !== undefined ? options.showCancel : true,
         resolve,
       });
     });
@@ -70,12 +72,14 @@ export function ConfirmProvider({ children }) {
             </p>
             
             <div className="flex gap-3 justify-end">
-              <button 
-                onClick={handleCancel}
-                className="px-6 py-2.5 rounded-full font-bold bg-surface-container hover:bg-surface-container-high text-on-surface-variant transition-colors"
-              >
-                Cancelar
-              </button>
+              {confirmState.showCancel && (
+                <button 
+                  onClick={handleCancel}
+                  className="px-6 py-2.5 rounded-full font-bold bg-surface-container hover:bg-surface-container-high text-on-surface-variant transition-colors"
+                >
+                  Cancelar
+                </button>
+              )}
               <button 
                 onClick={handleConfirm}
                 className={`px-6 py-2.5 rounded-full font-bold shadow-md transition-all hover:scale-105 active:scale-95 ${

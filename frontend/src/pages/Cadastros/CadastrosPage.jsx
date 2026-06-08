@@ -140,7 +140,7 @@ export default function CadastrosPage() {
       });
       fetchItems(activeTab);
     } catch (err) {
-      alert(err.response?.data?.message || 'Erro ao salvar');
+      await confirm(err.response?.data?.message || 'Erro ao salvar', { title: 'Erro', showCancel: false });
     }
   };
 
@@ -185,7 +185,7 @@ export default function CadastrosPage() {
       await api.delete(`${activeTable.endpoint}/${id}`);
       fetchItems(activeTab);
     } catch (err) {
-      alert(err.response?.data?.message || 'Erro ao excluir. O registro pode estar em uso.');
+      await confirm(err.response?.data?.message || 'Erro ao excluir. O registro pode estar em uso.', { title: 'Erro', showCancel: false });
     }
   };
 

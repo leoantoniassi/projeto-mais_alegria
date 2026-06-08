@@ -43,7 +43,7 @@ export default function FornecedoresPage() {
   const handleSave = async (e) => {
     e.preventDefault();
     if (!validarCpfCnpj(form.cnpj)) {
-      alert('CNPJ inválido!');
+      await confirm('CNPJ inválido!', { title: 'Atenção', showCancel: false });
       return;
     }
     try {
@@ -57,7 +57,7 @@ export default function FornecedoresPage() {
       setForm({ nome: '', email: '', telefone: '', cnpj: '', categoriaId: '' });
       fetchFornecedores();
     } catch (err) {
-      alert(err.response?.data?.message || 'Erro ao salvar');
+      await confirm(err.response?.data?.message || 'Erro ao salvar', { title: 'Erro', showCancel: false });
     }
   };
 
@@ -73,7 +73,7 @@ export default function FornecedoresPage() {
       await api.delete(`/fornecedores/${id}`);
       fetchFornecedores();
     } catch (err) {
-      alert(err.response?.data?.message || 'Erro ao excluir');
+      await confirm(err.response?.data?.message || 'Erro ao excluir', { title: 'Erro', showCancel: false });
     }
   };
 

@@ -73,7 +73,7 @@ export default function UsuariosPage() {
       setForm({ nome: '', email: '', senha: '', role: 'operador' });
       fetchData();
     } catch (err) {
-      alert(err.response?.data?.message || 'Erro ao salvar usuário');
+      await confirm(err.response?.data?.message || 'Erro ao salvar usuário', { title: 'Erro', showCancel: false });
     }
   };
 
@@ -89,7 +89,7 @@ export default function UsuariosPage() {
       await api.delete(`/usuarios/${id}`);
       fetchData();
     } catch (err) {
-      alert(err.response?.data?.message || 'Erro ao excluir usuário');
+      await confirm(err.response?.data?.message || 'Erro ao excluir usuário', { title: 'Erro', showCancel: false });
     }
   };
 

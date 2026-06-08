@@ -105,17 +105,17 @@ export default function OrcamentosPage() {
   const handleSave = async (e) => {
     e.preventDefault();
     if (!form.dataEvento || !form.horarioTermino) {
-      alert("Data e horário do evento e de término são obrigatórios.");
+      await confirm("Data e horário do evento e de término são obrigatórios.", { title: 'Atenção', showCancel: false });
       return;
     }
     const dataEventoUTC = toUTC(form.dataEvento);
     const horarioTerminoUTC = toUTC(form.horarioTermino);
     if (!dataEventoUTC || !horarioTerminoUTC) {
-      alert("Data ou horário inválido. Verifique os valores informados.");
+      await confirm("Data ou horário inválido. Verifique os valores informados.", { title: 'Atenção', showCancel: false });
       return;
     }
     if (new Date(horarioTerminoUTC) <= new Date(dataEventoUTC)) {
-      alert("Horário de término deve ser posterior à data de início do evento.");
+      await confirm("Horário de término deve ser posterior à data de início do evento.", { title: 'Atenção', showCancel: false });
       return;
     }
     try {
@@ -127,14 +127,14 @@ export default function OrcamentosPage() {
       if (editing) await api.put(`/orcamentos/${editing}`, payload);
       else await api.post('/orcamentos', payload);
       setShowPanel(false); setEditing(null); fetchData();
-    } catch (err) { alert(err.response?.data?.message || err.response?.data?.error || 'Erro'); }
+    } catch (err) { await confirm(err.response?.data?.message || err.response?.data?.error || 'Erro', { title: 'Erro', showCancel: false }); }
   };
 
   const handleStatus = async (id, status) => {
-    try { await api.patch(`/orcamentos/${id}/status`, { status }); fetchData(); } catch (err) { alert(err.response?.data?.error || 'Erro'); }
+    try { await api.patch(`/orcamentos/${id}/status`, { status }); fetchData(); } catch (err) { await confirm(err.response?.data?.error || 'Erro', { title: 'Erro', showCancel: false }); }
   };
 
-  const handleDelete = async (id) => { if (!(await confirm('Excluir orçamento?'))) return; try { await api.delete(`/orcamentos/${id}`); fetchData(); } catch (err) { alert(err.response?.data?.error || 'Erro'); } };
+  const handleDelete = async (id) => { if (!(await confirm('Excluir orçamento?'))) return; try { await api.delete(`/orcamentos/${id}`); fetchData(); } catch (err) { await confirm(err.response?.data?.error || 'Erro', { title: 'Erro', showCancel: false }); } };
 
   const handleConfirm = async (id) => {
     if (!(await confirm('Você tem certeza que deseja confirmar este orçamento? Ele será convertido em um evento automaticamente.', { title: 'Confirmar Orçamento', isDanger: false }))) return;
@@ -143,7 +143,7 @@ export default function OrcamentosPage() {
       setToast({ message: 'Orçamento aprovado e convertido em evento!', type: 'success' });
       fetchData();
     } catch (err) {
-      alert(err.response?.data?.error || 'Erro ao confirmar orçamento');
+      await confirm(err.response?.data?.error || 'Erro ao confirmar orçamento', { title: 'Erro', showCancel: false });
     }
   };
 
@@ -154,7 +154,7 @@ export default function OrcamentosPage() {
       setToast({ message: 'Orçamento reprovado com sucesso!', type: 'success' });
       fetchData();
     } catch (err) {
-      alert(err.response?.data?.error || 'Erro ao rejeitar orçamento');
+      await confirm(err.response?.data?.error || 'Erro ao rejeitar orçamento', { title: 'Erro', showCancel: false });
     }
   };
 
@@ -163,7 +163,7 @@ export default function OrcamentosPage() {
       const { data: res } = await api.get(`/orcamentos/${id}/whatsapp`);
       window.open(res.data?.link || res.url, '_blank');
     } catch (err) {
-      alert('Erro ao abrir o WhatsApp');
+      await confirm('Erro ao abrir o WhatsApp', { title: 'Erro', showCancel: false });
     }
   };
 

@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
 import api from '../../services/api';
 import { useAuth } from '../../contexts/AuthContext';
+import { useConfirm } from '../../contexts/ConfirmContext';
 import Toast from '../../components/Toast';
 import useDeleteWithConfirm from '../../hooks/useDeleteWithConfirm';
 
 export default function FuncionariosPage() {
   const { user } = useAuth();
+  const confirm = useConfirm();
   const [funcionarios, setFuncionarios] = useState([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
@@ -43,7 +45,7 @@ export default function FuncionariosPage() {
       if (editing) await api.put(`/funcionarios/${editing}`, form);
       else await api.post('/funcionarios', form);
       setShowPanel(false); setEditing(null); setForm({ nome: '', email: '', telefone: '', funcaoId: '' }); fetchData();
-    } catch (err) { alert(err.response?.data?.message || 'Erro ao salvar'); }
+    } catch (err) { await confirm(err.response?.data?.message || 'Erro ao salvar', { title: 'Erro', showCancel: false }); }
   };
 
   const handleEdit = (f) => { setForm({ nome: f.nome, email: f.email, telefone: f.telefone, funcaoId: f.funcaoId || f.funcao?.id || '' }); setEditing(f.id); setShowPanel(true); };
@@ -57,7 +59,7 @@ export default function FuncionariosPage() {
       const { data: res } = await api.get(`/funcionarios/${id}/whatsapp`);
       window.open(res.data?.link || res.url, '_blank');
     } catch (err) {
-      alert('Erro ao abrir o WhatsApp');
+      await confirm('Erro ao abrir o WhatsApp', { title: 'Erro', showCancel: false });
     }
   };
 

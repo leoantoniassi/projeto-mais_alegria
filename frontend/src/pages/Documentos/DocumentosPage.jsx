@@ -68,7 +68,7 @@ export default function DocumentosPage() {
       setShowPanel(false);
       fetchData();
     } catch (err) {
-      alert(err.response?.data?.message || 'Erro ao salvar documento');
+      await confirm(err.response?.data?.message || 'Erro ao salvar documento', { title: 'Erro', showCancel: false });
     } finally {
       setSaving(false);
     }
@@ -80,7 +80,7 @@ export default function DocumentosPage() {
       await api.delete(`/documentos/${id}`);
       fetchData();
     } catch (err) {
-      alert(err.response?.data?.message || 'Erro ao excluir');
+      await confirm(err.response?.data?.message || 'Erro ao excluir', { title: 'Erro', showCancel: false });
     }
   };
 
@@ -95,7 +95,7 @@ export default function DocumentosPage() {
         const blobUrl = window.URL.createObjectURL(response.data);
         window.open(blobUrl, '_blank');
       } catch {
-        alert('Erro ao abrir o arquivo. Verifique se o caminho está acessível pelo servidor.');
+        await confirm('Erro ao abrir o arquivo. Verifique se o caminho está acessível pelo servidor.', { title: 'Erro', showCancel: false });
       }
     }
   };

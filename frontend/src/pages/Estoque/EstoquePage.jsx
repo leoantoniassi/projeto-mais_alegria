@@ -41,11 +41,11 @@ export default function EstoquePage() {
       if (editing) await api.put(`/produtos/${editing}`, form);
       else await api.post('/produtos', form);
       setShowPanel(false); setEditing(null); setForm({ nome: '', categoriaId: '', quantidade: '', estoqueMinimo: '', unidadeMedida: 'un', custoUnitario: '' }); fetchData();
-    } catch (err) { alert(err.response?.data?.error || 'Erro'); }
+    } catch (err) { await confirm(err.response?.data?.error || 'Erro', { title: 'Erro', showCancel: false }); }
   };
 
   const handleEdit = (p) => { setForm({ nome: p.nome, categoriaId: p.categoriaId || p.categoria?.id || '', quantidade: p.quantidade ?? '', estoqueMinimo: p.estoqueMinimo ?? '', unidadeMedida: p.unidadeMedida, custoUnitario: p.custoUnitario ?? '' }); setEditing(p.id); setShowPanel(true); };
-  const handleDelete = async (id) => { if (!(await confirm('Excluir item?'))) return; try { await api.delete(`/produtos/${id}`); fetchData(); } catch (err) { alert(err.response?.data?.error || 'Erro'); } };
+  const handleDelete = async (id) => { if (!(await confirm('Excluir item?'))) return; try { await api.delete(`/produtos/${id}`); fetchData(); } catch (err) { await confirm(err.response?.data?.error || 'Erro', { title: 'Erro', showCancel: false }); } };
 
   const catColor = (c) => {
     const m = { Alimento: 'bg-primary/30 text-on-primary-container', Bebida: 'bg-tertiary-container text-on-tertiary-container', Descartável: 'bg-surface-container-highest text-on-surface-variant', Decoração: 'bg-secondary-container text-on-secondary-container' };
