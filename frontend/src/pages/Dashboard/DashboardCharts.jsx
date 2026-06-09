@@ -36,7 +36,7 @@ export default function DashboardCharts() {
           <div className="flex h-full items-center justify-center text-on-surface-variant">Sem dados para exibir</div>
         ) : (
           <ResponsiveContainer width="100%" height="80%">
-            <AreaChart data={data.timeSeries} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+            <AreaChart data={data.timeSeries} margin={{ top: 10, right: 30, left: 20, bottom: 20 }}>
               <defs>
                 <linearGradient id="colorEventos" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="#4F46E5" stopOpacity={0.3}/>
@@ -44,8 +44,8 @@ export default function DashboardCharts() {
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
-              <XAxis dataKey="mes" tick={{fill: '#71717A', fontSize: 12}} tickLine={false} axisLine={false} />
-              <YAxis tick={{fill: '#71717A', fontSize: 12}} tickLine={false} axisLine={false} allowDecimals={false} />
+              <XAxis dataKey="mes" tick={{fill: '#71717A', fontSize: 12}} tickLine={false} axisLine={false} label={{ value: 'Mês do Evento', position: 'insideBottom', offset: -15, fill: '#71717A', fontSize: 12, fontWeight: 'bold' }} />
+              <YAxis tick={{fill: '#71717A', fontSize: 12}} tickLine={false} axisLine={false} allowDecimals={false} label={{ value: 'Qtd de Eventos', angle: -90, position: 'insideLeft', dx: -20, fill: '#71717A', fontSize: 12, fontWeight: 'bold' }} />
               <Tooltip 
                 contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                 itemStyle={{ color: '#4F46E5', fontWeight: 'bold' }}
@@ -63,10 +63,10 @@ export default function DashboardCharts() {
           <div className="flex h-full items-center justify-center text-on-surface-variant">Sem dados para exibir</div>
         ) : (
           <ResponsiveContainer width="100%" height="80%">
-            <BarChart data={data.infra} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+            <BarChart data={data.infra} margin={{ top: 10, right: 30, left: 20, bottom: 20 }}>
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
-              <XAxis dataKey="name" tick={{fill: '#71717A', fontSize: 11}} tickLine={false} axisLine={false} />
-              <YAxis tick={{fill: '#71717A', fontSize: 12}} tickLine={false} axisLine={false} allowDecimals={false} />
+              <XAxis dataKey="name" tick={{fill: '#71717A', fontSize: 11}} tickLine={false} axisLine={false} label={{ value: 'Local', position: 'insideBottom', offset: -15, fill: '#71717A', fontSize: 12, fontWeight: 'bold' }} />
+              <YAxis tick={{fill: '#71717A', fontSize: 12}} tickLine={false} axisLine={false} allowDecimals={false} label={{ value: 'Qtd de Eventos', angle: -90, position: 'insideLeft', dx: -20, fill: '#71717A', fontSize: 12, fontWeight: 'bold' }} />
               <Tooltip 
                 formatter={(value) => [`${value} eventos`, 'Quantidade']}
                 contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
@@ -91,10 +91,10 @@ export default function DashboardCharts() {
           </div>
         ) : (
           <ResponsiveContainer width="100%" height="80%">
-            <ScatterChart margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
+            <ScatterChart margin={{ top: 20, right: 30, bottom: 20, left: 40 }}>
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
-              <XAxis type="number" dataKey="convidados" name="Convidados" tick={{fill: '#71717A', fontSize: 12}} tickLine={false} axisLine={false} />
-              <YAxis type="number" dataKey="custo" name="Custo Total" unit=" R$" tick={{fill: '#71717A', fontSize: 12}} tickLine={false} axisLine={false} />
+              <XAxis type="number" dataKey="convidados" name="Convidados" tick={{fill: '#71717A', fontSize: 12}} tickLine={false} axisLine={false} label={{ value: 'Número de Convidados', position: 'insideBottom', offset: -15, fill: '#71717A', fontSize: 12, fontWeight: 'bold' }} />
+              <YAxis type="number" dataKey="custo" name="Custo Total" unit=" R$" tick={{fill: '#71717A', fontSize: 12}} tickLine={false} axisLine={false} label={{ value: 'Custo Total (R$)', angle: -90, position: 'insideLeft', dx: -40, fill: '#71717A', fontSize: 12, fontWeight: 'bold' }} />
               <Tooltip 
                 cursor={{ strokeDasharray: '3 3' }}
                 content={({ payload }) => {

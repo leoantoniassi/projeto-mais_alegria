@@ -405,7 +405,7 @@ export default function EventosPage() {
               <thead>
                 <tr className="text-on-surface-variant text-xs uppercase tracking-widest font-bold">
                   <th className="pb-4 px-4">Evento</th>
-                  <th className="pb-4 px-4 hidden sm:table-cell">Data & Hora</th>
+                  <th className="pb-4 px-4 hidden sm:table-cell min-w-[160px]">Data & Hora</th>
                   <th className="pb-4 px-4 hidden md:table-cell">Local</th>
                   <th className="pb-4 px-4 hidden sm:table-cell">Cliente</th>
                   <th className="pb-4 px-4">Status</th>
@@ -427,7 +427,7 @@ export default function EventosPage() {
                     onClick={() => setSelectedEvento(evt)}
                   >
                     <td className="py-4 px-4 font-semibold text-sm">{evt.nome}</td>
-                    <td className="py-4 px-4 text-sm hidden sm:table-cell">
+                    <td className="py-4 px-4 text-sm hidden sm:table-cell whitespace-nowrap">
                       {formatDate(evt.dataEvento)}{" "}
                       <span className="text-outline block text-[11px]">
                         {formatTime(evt.dataEvento)} — {formatTime(evt.horarioTermino)}

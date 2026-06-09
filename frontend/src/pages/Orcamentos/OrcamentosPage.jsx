@@ -234,7 +234,7 @@ export default function OrcamentosPage() {
               <thead>
                 <tr className="text-on-surface-variant text-xs uppercase tracking-widest font-bold">
                   <th className="pb-4 px-4">Orçamento (Evento)</th>
-                  <th className="pb-4 px-4 hidden sm:table-cell">Data & Hora</th>
+                  <th className="pb-4 px-4 hidden sm:table-cell min-w-[160px]">Data & Hora</th>
                   <th className="pb-4 px-4 hidden sm:table-cell">Cliente</th>
                   <th className="pb-4 px-4 hidden md:table-cell">Local</th>
                   <th className="pb-4 px-4">Valor Total</th>
@@ -247,7 +247,7 @@ export default function OrcamentosPage() {
                 {orcamentos.map((o) => (
                   <tr key={o.id} className="group hover:bg-surface-container-low transition-colors cursor-pointer" onClick={() => setSelected(o)}>
                     <td className="py-4 px-4 font-semibold text-sm">{o.nome || '—'}</td>
-                    <td className="py-4 px-4 text-sm hidden sm:table-cell">
+                    <td className="py-4 px-4 text-sm hidden sm:table-cell whitespace-nowrap">
                       {formatDate(o.dataEvento)}{" "}
                       <span className="text-outline block text-[11px]">
                         {formatTime(o.dataEvento)} — {formatTime(o.horarioTermino)}

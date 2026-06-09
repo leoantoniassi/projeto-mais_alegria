@@ -122,7 +122,7 @@ export default function DashboardPage() {
               <tr className="bg-surface-container-low">
                 <th className="px-8 py-4 text-[11px] font-bold text-on-surface-variant uppercase tracking-widest">Evento</th>
                 <th className="px-8 py-4 text-[11px] font-bold text-on-surface-variant uppercase tracking-widest">Cliente</th>
-                <th className="px-8 py-4 text-[11px] font-bold text-on-surface-variant uppercase tracking-widest">Data & Hora</th>
+                <th className="px-8 py-4 text-[11px] font-bold text-on-surface-variant uppercase tracking-widest min-w-[160px]">Data & Hora</th>
                 <th className="px-8 py-4 text-[11px] font-bold text-on-surface-variant uppercase tracking-widest">Status</th>
                 <th className="px-8 py-4 text-[11px] font-bold text-on-surface-variant uppercase tracking-widest"></th>
               </tr>
@@ -149,7 +149,7 @@ export default function DashboardPage() {
                   <td className="px-8 py-5 text-sm text-on-surface-variant">
                     {evt.cliente?.nome || '—'}
                   </td>
-                  <td className="px-8 py-5">
+                  <td className="px-8 py-5 whitespace-nowrap">
                     <p className="text-sm text-on-surface font-medium">{formatDate(evt.dataEvento)}</p>
                     <p className="text-[11px] text-on-surface-variant">{formatTime(evt.dataEvento)}</p>
                   </td>
