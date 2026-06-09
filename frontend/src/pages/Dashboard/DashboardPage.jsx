@@ -27,7 +27,7 @@ export default function DashboardPage() {
 
   const statusBadge = (status) => {
     const map = {
-      confirmado: 'bg-secondary text-on-secondary',
+      
       pendente: 'bg-primary text-on-primary',
       planejamento: 'bg-primary text-on-primary',
       cancelado: 'bg-error text-on-error',

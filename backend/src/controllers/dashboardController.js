@@ -15,7 +15,7 @@ async function stats(req, res, next) {
       totalEventos,
       orcamentosPendentes,
       orcamentosAprovados,
-      eventosConfirmados,
+      
       eventosPendentes,
       eventosProximos30Dias,
     ] = await Promise.all([
@@ -48,7 +48,7 @@ async function stats(req, res, next) {
         totalEventos,
         orcamentosPendentes,
         orcamentosAprovados,
-        eventosConfirmados,
+        
         eventosPendentes,
         eventosProximos30Dias,
       },
@@ -64,7 +64,7 @@ async function proximosEventos(req, res, next) {
     const eventos = await Evento.findAll({
       where: {
         dataEvento: { [Op.gte]: new Date() },
-        status: { [Op.in]: ['pendente', 'confirmado'] },
+        status: 'pendente',
       },
       include: [
         { model: Cliente, as: 'cliente', attributes: ['id', 'nome', 'telefone'] },

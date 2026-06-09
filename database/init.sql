@@ -294,7 +294,7 @@ CREATE TABLE eventos (
         ON UPDATE CASCADE ON DELETE SET NULL,
 
     CONSTRAINT ck_eventos_status
-        CHECK (evt_status IN ('pendente', 'confirmado', 'cancelado', 'concluido')),
+        CHECK (evt_status IN ('pendente', 'cancelado', 'concluido')),
 
     CONSTRAINT ck_eventos_horario_termino
         CHECK (evt_horario_termino > evt_data_evento)

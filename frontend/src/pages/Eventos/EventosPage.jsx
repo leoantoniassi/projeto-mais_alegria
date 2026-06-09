@@ -264,7 +264,6 @@ export default function EventosPage() {
 
   const statusBadge = (s) => {
     const m = {
-      confirmado: "bg-secondary-container text-on-secondary-container",
       pendente: "bg-primary-container text-on-primary-container",
       planejamento: "bg-primary-container text-on-primary-container",
       cancelado: "bg-error-container text-on-error-container",

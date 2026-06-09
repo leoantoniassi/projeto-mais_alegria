@@ -48,7 +48,7 @@ const Evento = sequelize.define('Evento', {
     defaultValue: 'pendente',
     field: 'evt_status',
     validate: {
-      isIn: [['pendente', 'confirmado', 'concluido', 'cancelado']],
+      isIn: [['pendente', 'concluido', 'cancelado']],
     },
   },
   qtdPessoas: {

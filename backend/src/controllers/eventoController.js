@@ -67,7 +67,7 @@ async function listar(req, res, next) {
       {
         where: {
           dataEvento: { [Op.lt]: hoje },
-          status: { [Op.in]: ['pendente', 'confirmado'] },
+          status: 'pendente',
           deletadoEm: null,
         },
       }
@@ -210,10 +210,10 @@ async function criar(req, res, next) {
     }
 
     const statusFinal = status || "pendente";
-    if (!["pendente", "confirmado", "concluido", "cancelado"].includes(statusFinal)) {
+    if (!["pendente", "concluido", "cancelado"].includes(statusFinal)) {
       return res.status(400).json({
         success: false,
-        message: "Status inválido. Use: pendente, confirmado, concluido ou cancelado.",
+        message: "Status inválido. Use: pendente, concluido ou cancelado.",
       });
     }
 
@@ -263,22 +263,7 @@ async function criar(req, res, next) {
       if (valorDb !== null) orcamentoValor = valorDb;
     }
 
-    // RN Canvas 2: Evento confirmado requer orçamento aprovado
-    if (statusFinal === "confirmado") {
-      if (!orcamentoId) {
-        return res.status(400).json({
-          success: false,
-          message: "Um evento confirmado precisa de um orçamento aprovado associado.",
-        });
-      }
-      const orcamento = await Orcamento.findByPk(orcamentoId);
-      if (!orcamento || orcamento.status !== "aprovado") {
-        return res.status(400).json({
-          success: false,
-          message: 'O orçamento associado precisa estar com status "aprovado".',
-        });
-      }
-    }
+    // (Removido: evento confirmado requer orçamento aprovado)
 
     const evento = await Evento.create({
       clienteId,
@@ -427,29 +412,11 @@ async function mudarStatus(req, res, next) {
     }
 
     const { status } = req.body;
-    if (!["pendente", "confirmado", "concluido", "cancelado"].includes(status)) {
+    if (!["pendente", "concluido", "cancelado"].includes(status)) {
       return res.status(400).json({
         success: false,
-        message: "Status inválido. Use: pendente, confirmado, concluido ou cancelado.",
+        message: "Status inválido. Use: pendente, concluido ou cancelado.",
       });
-    }
-
-    // RN Canvas 2: Evento confirmado requer orçamento aprovado
-    if (status === "confirmado" && !evento.orcamentoId) {
-      return res.status(400).json({
-        success: false,
-        message: "Para confirmar o evento, é necessário um orçamento aprovado associado.",
-      });
-    }
-
-    if (status === "confirmado" && evento.orcamentoId) {
-      const orcamento = await Orcamento.findByPk(evento.orcamentoId);
-      if (!orcamento || orcamento.status !== "aprovado") {
-        return res.status(400).json({
-          success: false,
-          message: 'O orçamento associado precisa estar com status "aprovado".',
-        });
-      }
     }
 
     await evento.update({ status, atualizadoEm: new Date() });

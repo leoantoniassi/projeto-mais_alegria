@@ -121,10 +121,7 @@ describe('Roles — Eventos (operador)', () => {
       expect(res.status).toBe(201);
     });
 
-    test('deve aceitar status válido: confirmado', async () => {
-      Cliente.findByPk.mockResolvedValue(mockCliente);
-      Evento.create.mockResolvedValue(mockEvento);
-      Orcamento.findByPk.mockResolvedValue({ id: 'orc-1', status: 'aprovado' });
+    
 
       const res = await request(app)
         .post('/api/eventos')
