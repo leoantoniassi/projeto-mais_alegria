@@ -49,7 +49,7 @@ Para o desenvolvimento deste projeto, serão utilizadas as seguintes tecnologias
 - _RF2:_ O sistema deve possuir uma função/botão de atalho para enviar mensagens diretamente para o WhatsApp do cliente cadastrado, funcionário cadastrado ou cliente associado a um evento.
 - _RF3:_ O sistema deve permitir o CRUD de Funcionários, com campos para categorização por funções (ex: recreadores, cozinheiros, garçons, etc.).
 - _RF4:_ O sistema deve possuir um módulo de gerenciamento de documentos que suporte upload físico e registros de links/URLs externas (como PDFs, imagens).
-- _RF5:_ O sistema deve permitir o CRUD de Eventos, registrando data, local, funcionários alocados e informações gerais. Os status dos eventos devem seguir um ciclo de vida (`pendente`, `confirmado`, `concluido`, `cancelado`), com transição automática para `concluido` após a data do evento passar.
+- _RF5:_ O sistema deve permitir o CRUD de Eventos, registrando data, local, funcionários alocados e informações gerais. Os status dos eventos devem seguir um ciclo de vida (`pendente`, `concluido`, `cancelado`), com transição automática para `concluido` após a data do evento passar.
 - _RF6:_ O sistema deve permitir o CRUD de Orçamentos, registrando valor total, data de validade, status (pendente, aprovado, reprovado) e informações gerais.
 - _RF7:_ O sistema deve permitir o CRUD de Locais de Eventos, com busca automática de endereço via CEP utilizando a API ViaCEP.
 - _RF8:_ O sistema deve permitir o CRUD de Fornecedores, com categorização e botão de atalho rápido para contato via WhatsApp.
@@ -205,7 +205,7 @@ O projeto é altamente viável, pois resolve dores reais de gestão de eventos u
 
 ### RN2: Fluxo de Orçamentos e Eventos
 
-- Um "Evento" só pode ter seu status alterado para "Confirmado" se houver um "Orçamento" previamente aprovado pelo cliente associado.
+- (Regra descontinuada: A vinculação obrigatória de orçamentos aprovados foi removida para simplificar o fluxo operacional).
 
 ### RN3: Alocação de Funcionários
 
@@ -266,12 +266,12 @@ Foram selecionadas cinco variáveis principais (quatro quantitativas e uma quali
 | **Qtd. de Adultos** (`evt_qtd_adultos`) | Quantitativa Discreta | 86,50 | 87,50 | 70, 90, 100, 110 | Multimodal |
 | **Qtd. de Crianças** (`evt_qtd_criancas`) | Quantitativa Discreta | 17,85 | 15,00 | 8, 15, 25 | Multimodal |
 | **Valor Total Orçado** (`orc_valor_total`) | Quantitativa Contínua | R$ 5.737,90 | R$ 5.404,50 | N/A | Amodal |
-| **Status do Evento** (`evt_status`) | Qualitativa Nominal | N/A | N/A | 'confirmado' | Unimodal (freq. 7) |
+| **Status do Evento** (`evt_status`) | Qualitativa Nominal | N/A | N/A | 'pendente' | Unimodal (freq. 11) |
 
 #### Interpretação
 * **Qtd. Total de Pessoas e Valor Orçado**: Apresentam distribuição amodal por serem variáveis contínuas ou de ampla variação, com médias de 108,50 pessoas e R$ 5.737,90 por orçamento, respectivamente.
 * **Qtd. de Adultos e Crianças**: A distribuição é multimodal, mostrando tamanhos padrões recorrentes de grupos de convidados (especialmente de crianças, que se concentram em 8, 15 ou 25 convidados por festa).
-* **Status do Evento**: O status 'confirmado' é a moda da base, refletindo a eficácia das conversões de orçamentos para eventos fechados.
+* **Status do Evento**: O status 'pendente' é a moda da base, refletindo a grande quantidade de eventos em fase de planejamento e agendamentos futuros.
 
 ---
 
@@ -307,7 +307,7 @@ Os dados brutos coletados da semente inicial (`database/seed.sql`) do banco de d
    `[9225.00, 5426.00, 5725.00, 3368.00, 3339.00, 5356.00, 5383.00, 4042.00, 7947.00, 3546.00, 6028.00, 2232.00, 8889.00, 8479.00, 4415.00, 2975.00, 7400.00, 2689.00, 9864.00, 8430.00]`
 
 5. **Status do Evento (`evt_status`)**:  
-   `['confirmado', 'concluido', 'confirmado', 'confirmado', 'confirmado', 'confirmado', 'cancelado', 'confirmado', 'confirmado', 'concluido', 'pendente', 'pendente', 'pendente', 'cancelado', 'cancelado', 'cancelado', 'cancelado', 'pendente', 'pendente', 'concluido']`
+   `['pendente', 'concluido', 'pendente', 'pendente', 'pendente', 'pendente', 'cancelado', 'pendente', 'pendente', 'concluido', 'pendente', 'pendente', 'pendente', 'cancelado', 'cancelado', 'cancelado', 'cancelado', 'pendente', 'pendente', 'concluido']`
 
 ---
 

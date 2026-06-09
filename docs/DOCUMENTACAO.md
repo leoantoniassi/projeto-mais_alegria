@@ -388,7 +388,7 @@ Todas as rotas são prefixadas com `/api`. Respostas seguem o padrão:
 
 | Código | Regra | Implementação |
 |---|---|---|
-| **RN1** | Evento confirmado exige orçamento aprovado | `eventoController.criar()` e `mudarStatus()` |
+| **RN1** | (Regra descontinuada) Vinculação de orçamento aprovado | - |
 | **RN2** | Funcionário não pode ser alocado em dois eventos no mesmo dia | `escalaController.alocar()` — verifica conflito de data |
 | **RN3** | Soft delete em todas as entidades principais | Campo `deletado_em` + `defaultScope` no Sequelize |
 | **RN4** | Eventos com mais de 50 pessoas exigem detalhamento do público | `eventoController.criar()` e `atualizar()` — obriga qtd adultos/crianças/bebês |
@@ -574,14 +574,14 @@ Foram analisadas cinco variáveis principais: quatro quantitativas e uma qualita
 | **Qtd. de Adultos** (`evt_qtd_adultos`) | Quantitativa Discreta | 86,50 | 87,50 | 70, 90, 100, 110 | Multimodal (freq. 2) |
 | **Qtd. de Crianças** (`evt_qtd_criancas`) | Quantitativa Discreta | 17,85 | 15,00 | 8, 15, 25 | Multimodal (freq. 4) |
 | **Valor Total Orçado** (`orc_valor_total`) | Quantitativa Contínua | R$ 5.737,90 | R$ 5.404,50 | N/A | Amodal |
-| **Status do Evento** (`evt_status`) | Qualitativa Nominal | N/A | N/A | 'confirmado' | Unimodal (freq. 7) |
+| **Status do Evento** (`evt_status`) | Qualitativa Nominal | N/A | N/A | 'pendente' | Unimodal (freq. 11) |
 
 #### Interpretação dos Resultados
 * **Quantidade Total de Pessoas**: A média de ~108 pessoas e mediana de 107,50 apontam para um equilíbrio no porte dos eventos na base. Sendo amodal, não há uma capacidade padrão de convidados que se sobressaia.
 * **Quantidade de Adultos**: A média de 86,50 adultos mostra que eles compõem a maior fatia do público dos eventos. A característica multimodal aponta para múltiplos tamanhos padrões de festas contratadas (70, 90, 100 e 110 adultos).
 * **Quantidade de Crianças**: Média de ~18 crianças por evento. O comportamento multimodal com concentrações em 8, 15 e 25 crianças demonstra que o público infantil se agrupa de acordo com o porte do aniversário/evento familiar.
 * **Valor Total Orçado**: Média de R$ 5.737,90 com metade dos orçamentos abaixo de R$ 5.404,50. A ausência de moda é típica de variáveis financeiras devido à personalização extrema do preço final de cada contrato.
-* **Status do Evento**: O status mais comum na amostragem é 'confirmado' (moda com 7 ocorrências), indicando bom andamento dos contratos comerciais.
+* **Status do Evento**: O status mais comum na amostragem é 'pendente' (moda com 11 ocorrências), refletindo a grande quantidade de eventos em fase de planejamento e agendamentos futuros.
 
 ---
 
