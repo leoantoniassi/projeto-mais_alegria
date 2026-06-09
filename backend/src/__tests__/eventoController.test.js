@@ -61,10 +61,10 @@ describe('EventoController — verificação de capacidade', () => {
 
       const res = await request(app)
         .post('/api/eventos')
-        .send({ ...eventoPayload, localId: LOC_1, qtdPessoas: 40 });
+        .send({ ...eventoPayload, localId: LOC_1, qtdPessoas: 40, qtdAdultos: 40 });
 
       expect(res.status).toBe(201);
-      expect(res.body.warning).toBeNull();
+      expect(res.body.warning).toBeUndefined();
     });
 
     test('deve criar evento com qtdPessoas EXCEDENDO capacidade (retornar warning)', async () => {
@@ -89,7 +89,7 @@ describe('EventoController — verificação de capacidade', () => {
 
       const res = await request(app)
         .post('/api/eventos')
-        .send({ ...eventoPayload, qtdPessoas: 80 });
+        .send({ ...eventoPayload, qtdPessoas: 80, qtdAdultos: 80 });
 
       expect(res.status).toBe(201);
       expect(res.body.warning).toBeUndefined();
@@ -105,7 +105,7 @@ describe('EventoController — verificação de capacidade', () => {
         .send({ ...eventoPayload, localId: LOC_2, qtdPessoas: 150, qtdAdultos: 100, qtdCriancas: 40, qtdBebes: 10 });
 
       expect(res.status).toBe(201);
-      expect(res.body.warning).toBeNull();
+      expect(res.body.warning).toBeUndefined();
     });
 
     test('deve criar evento com horarioTermino válido', async () => {
@@ -168,10 +168,10 @@ describe('EventoController — verificação de capacidade', () => {
 
       const res = await request(app)
         .put('/api/eventos/' + EVT_ID)
-        .send({ localId: LOC_1, qtdPessoas: 0 });
+        .send({ localId: LOC_1, qtdPessoas: 0, qtdAdultos: 0, qtdCriancas: 0, qtdBebes: 0 });
 
       expect(res.status).toBe(200);
-      expect(res.body.warning).toBeNull();
+      expect(res.body.warning).toBeUndefined();
     });
 
     test('deve atualizar evento sem localId (sem warning)', async () => {

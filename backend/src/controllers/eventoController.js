@@ -17,7 +17,7 @@ const {
 } = require("../models");
 const { gerarLinkWhatsApp } = require('../utils/whatsapp');
 const { fail, warning } = require('../utils/response');
-const { isValidUUID } = require('../utils/validators');
+const { isValidUUID, gerarWarningPessoas } = require('../utils/validators');
 
 // ─── Funções auxiliares (DRY) ──────────────────────────────────
 
@@ -29,6 +29,7 @@ function gerarWarningCapacidade(local, qtdPessoas) {
   }
   return null;
 }
+
 
 function validarHorarioTermino(horarioTermino, dataEvento) {
   const horario = new Date(horarioTermino);
@@ -72,7 +73,8 @@ async function listar(req, res, next) {
       }
     );
 
-    const { page = 1, limit = 20, status, localId, incluirConcluidos } = req.query;
+    const { page = 1, limit = 20, status, localId, incluirConcluidos, incluirCancelados } = req.query;
+
     const pageNum = Math.max(1, parseInt(page, 10) || 1);
     const limitNum = Math.min(100, Math.max(1, parseInt(limit, 10) || 20));
 
@@ -86,8 +88,14 @@ async function listar(req, res, next) {
     const where = { deletadoEm: null };
     if (status) {
       where.status = status;
-    } else if (incluirConcluidos !== 'true') {
-      where.status = { [Op.ne]: 'concluido' };
+    } else {
+      const excluded = [];
+      if (incluirConcluidos !== 'true') excluded.push('concluido');
+      if (incluirCancelados !== 'true') excluded.push('cancelado');
+      
+      if (excluded.length > 0) {
+        where.status = { [Op.notIn]: excluded };
+      }
     }
     if (localId) {
       where.localId = localId;
@@ -234,15 +242,21 @@ async function criar(req, res, next) {
       });
     }
 
-    let warning;
+    let warnings = [];
 
     if (localId) {
       const localExiste = await Local.findByPk(localId);
       if (!localExiste) {
         return res.status(404).json({ success: false, message: "Local não encontrado." });
       }
-      warning = gerarWarningCapacidade(localExiste, qtdPessoas);
+      const warnCapacidade = gerarWarningCapacidade(localExiste, qtdPessoas);
+      if (warnCapacidade) warnings.push(warnCapacidade);
     }
+    
+    const warnPessoas = gerarWarningPessoas(qtdPessoas, qtdAdultos, qtdCriancas, qtdBebes);
+    if (warnPessoas) warnings.push(warnPessoas);
+    
+    let warning = warnings.length > 0 ? warnings.join(' ') : undefined;
 
     if (orcamentoId) {
       const valorDb = await buscarValorOrcamento(orcamentoId);
@@ -323,7 +337,7 @@ async function atualizar(req, res, next) {
 
     let { orcamento: orcamentoValor } = req.body;
 
-    let warning;
+    let warnings = [];
 
     if (horarioTermino !== undefined) {
       if (typeof horarioTermino !== 'string' && typeof horarioTermino !== 'number' && !(horarioTermino instanceof Date)) {
@@ -336,14 +350,32 @@ async function atualizar(req, res, next) {
       }
     }
 
+    const novaQtdPessoas = qtdPessoas !== undefined ? qtdPessoas : evento.qtdPessoas;
+
     if (localId !== undefined && localId !== null) {
       const localExiste = await Local.findByPk(localId);
       if (!localExiste) {
         return res.status(404).json({ success: false, message: "Local não encontrado." });
       }
-      const novaQtd = qtdPessoas !== undefined ? qtdPessoas : evento.qtdPessoas;
-      warning = gerarWarningCapacidade(localExiste, novaQtd);
+      const warnCapacidade = gerarWarningCapacidade(localExiste, novaQtdPessoas);
+      if (warnCapacidade) warnings.push(warnCapacidade);
+    } else if (evento.localId) {
+      // Se não mudou o local mas mudou a quantidade de pessoas, precisamos checar a capacidade do local atual
+      const localAtual = await Local.findByPk(evento.localId);
+      if (localAtual) {
+        const warnCapacidade = gerarWarningCapacidade(localAtual, novaQtdPessoas);
+        if (warnCapacidade) warnings.push(warnCapacidade);
+      }
     }
+
+    const novaQtdAdultos = qtdAdultos !== undefined ? qtdAdultos : evento.qtdAdultos;
+    const novaQtdCriancas = qtdCriancas !== undefined ? qtdCriancas : evento.qtdCriancas;
+    const novaQtdBebes = qtdBebes !== undefined ? qtdBebes : evento.qtdBebes;
+
+    const warnPessoas = gerarWarningPessoas(novaQtdPessoas, novaQtdAdultos, novaQtdCriancas, novaQtdBebes);
+    if (warnPessoas) warnings.push(warnPessoas);
+
+    let warning = warnings.length > 0 ? warnings.join(' ') : undefined;
 
     const novoOrcamentoId = orcamentoId ? orcamentoId : orcamentoId === "" ? null : evento.orcamentoId;
     if (orcamentoId && orcamentoId !== evento.orcamentoId) {

@@ -22,6 +22,7 @@ export default function EventosPage() {
   // Filtros
   const [filtroLocal, setFiltroLocal] = useState("");
   const [mostrarConcluidos, setMostrarConcluidos] = useState(false);
+  const [mostrarCancelados, setMostrarCancelados] = useState(false);
   const [form, setForm] = useState({
     nome: "",
     dataEvento: "",
@@ -55,7 +56,12 @@ export default function EventosPage() {
     try {
       const params = { page, limit: 10 };
       if (filtroLocal) params.localId = filtroLocal;
-      if (mostrarConcluidos) params.incluirConcluidos = "true";
+      
+      if (mostrarCancelados) {
+        params.status = 'cancelado';
+      } else if (mostrarConcluidos) {
+        params.status = 'concluido';
+      }
 
       const { data: res } = await api.get("/eventos", { params });
       const items = Array.isArray(res.data) ? res.data : [];
@@ -66,7 +72,7 @@ export default function EventosPage() {
 
   useEffect(() => {
     fetchData();
-  }, [page, filtroLocal, mostrarConcluidos]);
+  }, [page, filtroLocal, mostrarConcluidos, mostrarCancelados]);
 
   useEffect(() => {
     api
@@ -122,7 +128,7 @@ export default function EventosPage() {
         : await api.post("/eventos", payload);
       if (res.warning) {
         setToast({
-          message: `Evento ${editing ? "atualizado" : "criado"} com sucesso! Porém, a quantidade de convidados excede a capacidade máxima do local selecionado.`,
+          message: `Evento ${editing ? "atualizado" : "criado"} com sucesso! Aviso: ${res.warning}`,
           type: "warning",
         });
       } else {
@@ -362,10 +368,27 @@ export default function EventosPage() {
                 <input
                   type="checkbox"
                   checked={mostrarConcluidos}
-                  onChange={(e) => setMostrarConcluidos(e.target.checked)}
+                  onChange={(e) => {
+                    setMostrarConcluidos(e.target.checked);
+                    if (e.target.checked) setMostrarCancelados(false);
+                  }}
                   className="w-4 h-4 rounded accent-primary"
                 />
                 <span className="text-sm font-medium text-on-surface-variant">Concluídos</span>
+              </label>
+
+              {/* Filtro de cancelados */}
+              <label className="flex items-center gap-2 cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  checked={mostrarCancelados}
+                  onChange={(e) => {
+                    setMostrarCancelados(e.target.checked);
+                    if (e.target.checked) setMostrarConcluidos(false);
+                  }}
+                  className="w-4 h-4 rounded accent-error"
+                />
+                <span className="text-sm font-medium text-on-surface-variant">Cancelados</span>
               </label>
               <select
                 className="bg-surface-container-low border-none rounded-full py-2 px-4 focus:ring-2 focus:ring-primary text-sm font-medium outline-none"
@@ -408,7 +431,7 @@ export default function EventosPage() {
                     <td className="py-4 px-4 text-sm hidden sm:table-cell">
                       {formatDate(evt.dataEvento)}{" "}
                       <span className="text-outline block text-[11px]">
-                        {formatTime(evt.dataEvento)}
+                        {formatTime(evt.dataEvento)} — {formatTime(evt.horarioTermino)}
                       </span>
                     </td>
                     <td className="py-4 px-4 text-sm capitalize hidden md:table-cell">{evt.local?.nome || evt.local || "—"}</td>

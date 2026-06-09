@@ -61,6 +61,13 @@ function formatDateTime(d) {
   return date.toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo" });
 }
 
+function formatTime(d) {
+  const date = parseDate(d);
+  return date
+    ? date.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit", timeZone: "America/Sao_Paulo" })
+    : "";
+}
+
 export default function OrcamentosPage() {
   const { user } = useAuth();
   const isOperador = user?.role === 'operador';
@@ -124,8 +131,21 @@ export default function OrcamentosPage() {
         dataEvento: dataEventoUTC,
         horarioTermino: horarioTerminoUTC,
       };
-      if (editing) await api.put(`/orcamentos/${editing}`, payload);
-      else await api.post('/orcamentos', payload);
+      let res;
+      if (editing) {
+        const response = await api.put(`/orcamentos/${editing}`, payload);
+        res = response.data;
+      } else {
+        const response = await api.post('/orcamentos', payload);
+        res = response.data;
+      }
+      
+      if (res.warning) {
+        setToast({ message: `Orçamento salvo com sucesso! Aviso: ${res.warning}`, type: 'warning' });
+      } else {
+        setToast({ message: `Orçamento salvo com sucesso!`, type: 'success' });
+      }
+      
       setShowPanel(false); setEditing(null); fetchData();
     } catch (err) { await confirm(err.response?.data?.message || err.response?.data?.error || 'Erro', { title: 'Erro', showCancel: false }); }
   };
@@ -213,21 +233,28 @@ export default function OrcamentosPage() {
             <table className="w-full text-left min-w-[600px]">
               <thead>
                 <tr className="text-on-surface-variant text-xs uppercase tracking-widest font-bold">
-                  <th className="pb-4 px-4">Cliente</th>
-                  <th className="pb-4 px-4 hidden sm:table-cell">Local</th>
-                  <th className="pb-4 px-4 hidden md:table-cell">Validade</th>
+                  <th className="pb-4 px-4">Orçamento (Evento)</th>
+                  <th className="pb-4 px-4 hidden sm:table-cell">Data & Hora</th>
+                  <th className="pb-4 px-4 hidden sm:table-cell">Cliente</th>
+                  <th className="pb-4 px-4 hidden md:table-cell">Local</th>
                   <th className="pb-4 px-4">Valor Total</th>
                   <th className="pb-4 px-4">Status</th>
                   <th className="pb-4 px-4 text-right">Ações</th>
                 </tr>
               </thead>
               <tbody>
-                {orcamentos.length === 0 && <tr><td colSpan={6} className="py-12 text-center text-on-surface-variant">Nenhum orçamento.</td></tr>}
+                {orcamentos.length === 0 && <tr><td colSpan={7} className="py-12 text-center text-on-surface-variant">Nenhum orçamento.</td></tr>}
                 {orcamentos.map((o) => (
                   <tr key={o.id} className="group hover:bg-surface-container-low transition-colors cursor-pointer" onClick={() => setSelected(o)}>
-                    <td className="py-4 px-4 font-semibold text-sm">{o.cliente?.nome || o.Cliente?.nome || '—'}</td>
-                    <td className="py-4 px-4 text-sm capitalize hidden sm:table-cell">{o.local?.nome || o.local || '—'}</td>
-                    <td className="py-4 px-4 text-sm opacity-80 hidden md:table-cell">{formatDate(o.dataValidade)}</td>
+                    <td className="py-4 px-4 font-semibold text-sm">{o.nome || '—'}</td>
+                    <td className="py-4 px-4 text-sm hidden sm:table-cell">
+                      {formatDate(o.dataEvento)}{" "}
+                      <span className="text-outline block text-[11px]">
+                        {formatTime(o.dataEvento)} — {formatTime(o.horarioTermino)}
+                      </span>
+                    </td>
+                    <td className="py-4 px-4 text-sm hidden sm:table-cell">{o.cliente?.nome || o.Cliente?.nome || '—'}</td>
+                    <td className="py-4 px-4 text-sm capitalize hidden md:table-cell">{o.local?.nome || o.local || '—'}</td>
                     <td className="py-4 px-4 font-bold text-sm">{formatCurrency(o.valorTotal)}</td>
                     <td className="py-4 px-4"><span className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium ${statusBadge(o.status)}`}>{o.status}</span></td>
                     <td className="py-4 px-4 text-right">

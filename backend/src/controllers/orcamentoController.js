@@ -11,7 +11,7 @@ const {
   CategoriaProduto,
   Evento,
 } = require("../models");
-const { isValidUUID } = require('../utils/validators');
+const { isValidUUID, gerarWarningPessoas } = require('../utils/validators');
 const { gerarLinkWhatsApp } = require('../utils/whatsapp');
 
 function respostaNaoEncontrado(res, mensagem = "Orçamento não encontrado.") {
@@ -21,6 +21,7 @@ function respostaNaoEncontrado(res, mensagem = "Orçamento não encontrado.") {
 function respostaErro(res, statusCode, mensagem) {
   return res.status(statusCode).json({ success: false, message: mensagem });
 }
+
 
 const includesLista = [
   { model: Cliente, as: "cliente", attributes: ["id", "nome", "email", "telefone"] },
@@ -171,11 +172,14 @@ async function criar(req, res, next) {
     }
 
     await orcamento.reload({ include: includesOrcamentoDetalhado });
+    
+    let warning = gerarWarningPessoas(qtdPessoas, qtdAdultos, qtdCriancas, qtdBebes, "no orçamento") || undefined;
 
     return res.status(201).json({
       success: true,
       message: "Orçamento criado com sucesso!",
       data: orcamento,
+      warning,
     });
   } catch (error) {
     return next(error);
@@ -234,10 +238,18 @@ async function atualizar(req, res, next) {
 
     await orcamento.update(updates);
 
+    const novaQtdPessoas = qtdPessoas !== undefined ? qtdPessoas : orcamento.qtdPessoas;
+    const novaQtdAdultos = qtdAdultos !== undefined ? qtdAdultos : orcamento.qtdAdultos;
+    const novaQtdCriancas = qtdCriancas !== undefined ? qtdCriancas : orcamento.qtdCriancas;
+    const novaQtdBebes = qtdBebes !== undefined ? qtdBebes : orcamento.qtdBebes;
+    
+    let warning = gerarWarningPessoas(novaQtdPessoas, novaQtdAdultos, novaQtdCriancas, novaQtdBebes, "no orçamento") || undefined;
+
     return res.json({
       success: true,
       message: "Orçamento atualizado com sucesso!",
       data: orcamento,
+      warning,
     });
   } catch (error) {
     return next(error);
