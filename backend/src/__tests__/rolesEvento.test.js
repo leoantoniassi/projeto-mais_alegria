@@ -120,15 +120,6 @@ describe('Roles — Eventos (operador)', () => {
 
       expect(res.status).toBe(201);
     });
-
-    
-
-      const res = await request(app)
-        .post('/api/eventos')
-        .send({ ...eventoPayload, status: 'confirmado', orcamentoId: 'orc-1' });
-
-      expect(res.status).toBe(201);
-    });
   });
 
   // ==========================================================

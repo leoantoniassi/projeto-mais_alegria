@@ -15,7 +15,6 @@ async function stats(req, res, next) {
       totalEventos,
       orcamentosPendentes,
       orcamentosAprovados,
-      
       eventosPendentes,
       eventosProximos30Dias,
     ] = await Promise.all([
@@ -25,8 +24,7 @@ async function stats(req, res, next) {
       Orcamento.count(),
       Evento.count(),
       Orcamento.count({ where: { status: 'pendente' } }),
-      Orcamento.count({ where: { status: 'aprovado' } }),
-      Evento.count({ where: { status: 'confirmado' } }),
+      Orcamento.scope('comDeletados').count({ where: { status: 'aprovado' } }),
       Evento.count({ where: { status: 'pendente' } }),
       Evento.count({
         where: {
@@ -87,19 +85,18 @@ async function charts(req, res, next) {
       where: {
         status: { [Op.ne]: 'cancelado' },
       },
-      attributes: ['id', 'nome', 'dataEvento', 'qtdPessoas'],
+      attributes: ['id', 'nome', 'dataEvento', 'qtdPessoas', 'valorOrcamento'],
       include: [
-        { model: Orcamento, as: 'orcamento', attributes: ['valorTotal'] },
         { model: Local,     as: 'local',     attributes: ['nome'] },
       ]
     });
 
     // 1. Scatter (Convidados vs Custo)
     const scatter = eventos
-      .filter(e => e.qtdPessoas > 0 && e.orcamento && e.orcamento.valorTotal > 0)
+      .filter(e => e.qtdPessoas > 0 && e.valorOrcamento > 0)
       .map(e => ({
         convidados: e.qtdPessoas,
-        custo: Number(e.orcamento.valorTotal),
+        custo: Number(e.valorOrcamento),
         nome: e.nome
       }));
 
