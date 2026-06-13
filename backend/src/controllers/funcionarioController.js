@@ -229,4 +229,58 @@ async function whatsapp(req, res, next) {
   }
 }
 
-module.exports = { listar, buscarPorId, criar, atualizar, remover, whatsapp };
+// GET /api/funcionarios/:id/detalhes
+async function buscarDetalhes(req, res, next) {
+  try {
+    if (!isValidUUID(req.params.id)) {
+      return res.status(400).json({ success: false, message: 'ID do funcionário inválido.' });
+    }
+    const funcionario = await Funcionario.findByPk(req.params.id, {
+      include: [{ model: Funcao, as: 'funcao', attributes: ['id', 'nome'] }],
+    });
+    if (!funcionario) {
+      return res.status(404).json({
+        success: false,
+        message: 'Funcionário não encontrado.',
+      });
+    }
+
+    const escalas = await Escala.findAll({
+      where: { funcionarioId: req.params.id },
+      include: [{
+        model: Evento,
+        as: 'evento',
+        where: { deletadoEm: null },
+        attributes: ['id', 'nome', 'dataEvento', 'horarioTermino', 'status'],
+        required: true,
+      }],
+      order: [[{ model: Evento, as: 'evento' }, 'dataEvento', 'DESC']],
+    });
+
+    const agora = new Date();
+    const eventosFuturos = [];
+    const eventosPassados = [];
+
+    for (const esc of escalas) {
+      if (new Date(esc.evento.dataEvento) > agora) {
+        eventosFuturos.push(esc.evento);
+      } else {
+        eventosPassados.push(esc.evento);
+      }
+    }
+
+    return res.json({
+      success: true,
+      data: {
+        ...funcionario.toJSON(),
+        totalEventos: escalas.length,
+        eventosFuturos,
+        eventosPassados,
+      },
+    });
+  } catch (error) {
+    return next(error);
+  }
+}
+
+module.exports = { listar, buscarPorId, criar, atualizar, remover, whatsapp, buscarDetalhes };

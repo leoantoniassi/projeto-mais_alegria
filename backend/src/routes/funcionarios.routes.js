@@ -10,6 +10,7 @@ router.use(auth);
 
 router.get('/', controller.listar);
 router.get('/:id', controller.buscarPorId);
+router.get('/:id/detalhes', controller.buscarDetalhes);
 router.post('/', authorize('gerente'), controller.criar);
 router.put('/:id', authorize('gerente'), controller.atualizar);
 router.delete('/:id', authorize('gerente'), controller.remover);

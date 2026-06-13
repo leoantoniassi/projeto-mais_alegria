@@ -14,18 +14,6 @@ function garantirNumeroValido(valor, nome) {
   return valor;
 }
 
-function calcularLimitesDia(data) {
-  const dataEvento = new Date(data);
-  if (Number.isNaN(dataEvento.getTime())) {
-    throw new Error('Data do evento inválida.');
-  }
-  const inicioDia = new Date(dataEvento);
-  inicioDia.setHours(0, 0, 0, 0);
-  const fimDia = new Date(dataEvento);
-  fimDia.setHours(23, 59, 59, 999);
-  return { inicioDia, fimDia };
-}
-
 function temConflito(inicioA, fimA, inicioB, fimB) {
   return fimB + CONFLITO_GAP_MS > inicioA && fimA + CONFLITO_GAP_MS > inicioB;
 }
@@ -34,7 +22,7 @@ function mensagemConflito(funcionarioNome, eventoNome) {
   return `"${funcionarioNome}" já está alocado no evento "${eventoNome}" neste horário (gap mínimo de 2h não respeitado).`;
 }
 
-function buscarEscalasMesmoDia(funcionarioId, eventoId, inicioDia, fimDia) {
+function buscarEscalasNoPeriodo(funcionarioId, eventoId, inicioA, fimA) {
   return Escala.findAll({
     where: {
       funcionarioId,
@@ -44,7 +32,8 @@ function buscarEscalasMesmoDia(funcionarioId, eventoId, inicioDia, fimDia) {
       model: Evento,
       as: 'evento',
       where: {
-        dataEvento: { [Op.between]: [inicioDia, fimDia] },
+        horarioTermino: { [Op.gt]: new Date(inicioA - CONFLITO_GAP_MS) },
+        dataEvento: { [Op.lt]: new Date(fimA + CONFLITO_GAP_MS) },
         deletadoEm: null,
       },
       required: true,
@@ -83,13 +72,12 @@ async function alocar(req, res, next) {
     }
 
     // Verifica conflito de horário com gap mínimo de 2h
-    const { inicioDia, fimDia } = calcularLimitesDia(evento.dataEvento);
     const inicioA = garantirNumeroValido(new Date(evento.dataEvento).getTime(), 'Data de início do evento');
     const fimA = garantirNumeroValido(new Date(evento.horarioTermino).getTime(), 'Horário de término do evento');
 
-    const escalasMesmoDia = await buscarEscalasMesmoDia(funcionarioId, eventoId, inicioDia, fimDia);
+    const escalasPeriodo = await buscarEscalasNoPeriodo(funcionarioId, eventoId, inicioA, fimA);
 
-    for (const escala of escalasMesmoDia) {
+    for (const escala of escalasPeriodo) {
       const inicioB = garantirNumeroValido(new Date(escala.evento.dataEvento).getTime(), 'Data de início do evento conflitante');
       const fimB = garantirNumeroValido(new Date(escala.evento.horarioTermino).getTime(), 'Horário de término do evento conflitante');
       if (temConflito(inicioA, fimA, inicioB, fimB)) {
@@ -184,7 +172,6 @@ async function listarDisponiveis(req, res, next) {
       return res.status(404).json({ success: false, message: 'Evento não encontrado.' });
     }
 
-    const { inicioDia, fimDia } = calcularLimitesDia(evento.dataEvento);
     const inicioA = garantirNumeroValido(new Date(evento.dataEvento).getTime(), 'Data de início do evento');
     const fimA = garantirNumeroValido(new Date(evento.horarioTermino).getTime(), 'Horário de término do evento');
 
@@ -195,7 +182,7 @@ async function listarDisponiveis(req, res, next) {
     });
     const idsJaEscalados = jaEscalados.map(e => e.funcionarioId);
 
-    // Todas as escalas de outros eventos no mesmo dia
+    // Todas as escalas de outros eventos no período de conflito
     const escalasOutrosEventos = await Escala.findAll({
       where: {
         eventoId: { [Op.ne]: req.params.eventoId },
@@ -204,7 +191,8 @@ async function listarDisponiveis(req, res, next) {
         model: Evento,
         as: 'evento',
         where: {
-          dataEvento: { [Op.between]: [inicioDia, fimDia] },
+          horarioTermino: { [Op.gt]: new Date(inicioA - CONFLITO_GAP_MS) },
+          dataEvento: { [Op.lt]: new Date(fimA + CONFLITO_GAP_MS) },
           deletadoEm: null,
         },
         required: true,
@@ -262,7 +250,6 @@ async function alocarLote(req, res, next) {
       return res.status(404).json({ success: false, message: 'Evento não encontrado.' });
     }
 
-    const { inicioDia, fimDia } = calcularLimitesDia(evento.dataEvento);
     const inicioA = garantirNumeroValido(new Date(evento.dataEvento).getTime(), 'Data de início do evento');
     const fimA = garantirNumeroValido(new Date(evento.horarioTermino).getTime(), 'Horário de término do evento');
 
@@ -273,10 +260,10 @@ async function alocarLote(req, res, next) {
       const funcionario = await Funcionario.findByPk(funcionarioId);
       if (!funcionario) { erros.push(`Funcionário ${funcionarioId} não encontrado.`); continue; }
 
-      const escalasMesmoDia = await buscarEscalasMesmoDia(funcionarioId, eventoId, inicioDia, fimDia);
+      const escalasPeriodo = await buscarEscalasNoPeriodo(funcionarioId, eventoId, inicioA, fimA);
 
       let conflito = false;
-      for (const escala of escalasMesmoDia) {
+      for (const escala of escalasPeriodo) {
         const inicioB = garantirNumeroValido(new Date(escala.evento.dataEvento).getTime(), 'Data de início do evento conflitante');
         const fimB = garantirNumeroValido(new Date(escala.evento.horarioTermino).getTime(), 'Horário de término do evento conflitante');
         if (temConflito(inicioA, fimA, inicioB, fimB)) {

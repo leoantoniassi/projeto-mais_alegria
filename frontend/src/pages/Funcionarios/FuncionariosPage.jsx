@@ -19,6 +19,10 @@ export default function FuncionariosPage() {
   const [toast, setToast] = useState(null);
   const { executeDelete } = useDeleteWithConfirm();
 
+  const [selectedFuncionario, setSelectedFuncionario] = useState(null);
+  const [detalhes, setDetalhes] = useState(null);
+  const [loadingDetalhes, setLoadingDetalhes] = useState(false);
+
   useEffect(() => {
     api.get('/lookup/funcoes')
       .then(r => {
@@ -39,6 +43,18 @@ export default function FuncionariosPage() {
 
   useEffect(() => { fetchData(); }, [page, search]);
 
+  useEffect(() => {
+    if (selectedFuncionario) {
+      setLoadingDetalhes(true);
+      api.get(`/funcionarios/${selectedFuncionario.id}/detalhes`)
+        .then(r => setDetalhes(r.data.data))
+        .catch(() => setDetalhes(null))
+        .finally(() => setLoadingDetalhes(false));
+    } else {
+      setDetalhes(null);
+    }
+  }, [selectedFuncionario]);
+
   const handleSave = async (e) => {
     e.preventDefault();
     try {
@@ -51,7 +67,10 @@ export default function FuncionariosPage() {
   const handleEdit = (f) => { setForm({ nome: f.nome, email: f.email, telefone: f.telefone, funcaoId: f.funcaoId || f.funcao?.id || '' }); setEditing(f.id); setShowPanel(true); };
   const handleDelete = async (id) => {
     const toast = await executeDelete(id, '/funcionarios', 'Funcionário', fetchData);
-    if (toast) setToast(toast);
+    if (toast) {
+      setToast(toast);
+      if (selectedFuncionario?.id === id) setSelectedFuncionario(null);
+    }
   };
   
   const handleWhatsApp = async (id) => {
@@ -70,6 +89,12 @@ export default function FuncionariosPage() {
     return m[f] || 'bg-surface-container text-on-surface-variant';
   };
 
+  const formatDate = (d) => {
+    if (!d) return "";
+    const date = new Date(d);
+    return isNaN(date.getTime()) ? "" : date.toLocaleDateString("pt-BR", { day: "2-digit", month: "short", year: "numeric", timeZone: "America/Sao_Paulo" });
+  };
+
   return (
     <div>
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
@@ -82,70 +107,132 @@ export default function FuncionariosPage() {
         </button>
       </div>
 
-      <div className="grid grid-cols-12 gap-8">
-        <div className="col-span-12 lg:col-span-3 space-y-6">
-          <div className="bg-surface-container-low p-6 rounded-xl space-y-4">
-            <p className="text-xs font-bold uppercase tracking-widest text-on-surface-variant">Pesquisar</p>
-            <input className="w-full bg-white border-none rounded-full py-3 px-5 focus:ring-2 focus:ring-primary text-sm" placeholder="Buscar..." value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }} />
-          </div>
-          <div className="bg-tertiary p-6 rounded-xl text-on-tertiary relative overflow-hidden shadow-lg shadow-tertiary/20">
-            <div className="relative z-10">
-              <p className="text-xs font-bold uppercase tracking-widest opacity-70">Status do Time</p>
-              <h3 className="text-4xl font-black mt-2">{total}</h3>
-              <p className="text-sm font-medium mt-1">Colaboradores Ativos</p>
+      <div className="grid grid-cols-12 gap-6 mb-8">
+        <div className="col-span-12 lg:col-span-8 bg-white p-6 rounded-2xl shadow-sm border border-outline-variant/30">
+          <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-6">
+            <div className="flex items-center gap-3">
+              <h3 className="text-xl font-bold font-headline">Equipe Ativa</h3>
+              <span className="bg-primary/10 text-primary font-bold px-3 py-1 rounded-full text-sm">{total}</span>
             </div>
-            <span className="material-symbols-outlined absolute -bottom-4 -right-4 text-8xl opacity-10">celebration</span>
+            <input className="w-full sm:w-64 bg-surface-container-low border-none rounded-full py-2.5 px-5 focus:ring-2 focus:ring-primary text-sm outline-none" placeholder="Buscar colaborador..." value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }} />
+          </div>
+
+          <div className="overflow-x-auto">
+            <table className="w-full text-left min-w-[600px] border-collapse">
+              <thead>
+                <tr className="text-on-surface-variant text-xs uppercase tracking-widest font-bold border-b border-surface-container-high">
+                  <th className="pb-4 px-4">Nome & Perfil</th>
+                  <th className="pb-4 px-4">Contato</th>
+                  <th className="pb-4 px-4">Função</th>
+                  <th className="pb-4 px-4 text-right">Ações</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-surface-container-high">
+                {funcionarios.length === 0 && <tr><td colSpan={4} className="px-6 py-12 text-center text-on-surface-variant">Nenhum colaborador encontrado.</td></tr>}
+                {funcionarios.map((f) => (
+                  <tr key={f.id} className={`group hover:bg-surface-container-low transition-colors cursor-pointer ${selectedFuncionario?.id === f.id ? 'bg-primary/5 border-l-2 border-primary' : ''}`} onClick={() => setSelectedFuncionario(f)}>
+                    <td className="px-4 py-4">
+                      <div className="flex items-center gap-4">
+                        <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center font-bold text-on-primary-container text-sm">{initials(f.nome)}</div>
+                        <div><p className="font-bold text-sm text-on-surface">{f.nome}</p><p className="text-[11px] text-on-surface-variant">ID: #{String(f.id).slice(0, 8)}</p></div>
+                      </div>
+                    </td>
+                    <td className="px-4 py-4"><p className="text-sm font-medium text-on-surface">{f.email}</p><p className="text-xs text-on-surface-variant">{f.telefone}</p></td>
+                    <td className="px-4 py-4"><span className={`px-2.5 py-0.5 ${funcaoColor(f.funcao?.nome)} text-[11px] font-bold rounded-full uppercase tracking-tight`}>{f.funcao?.nome || '—'}</span></td>
+                    <td className="px-4 py-4 text-right">
+                      <div className="flex justify-end gap-1">
+                        <button onClick={(e) => { e.stopPropagation(); handleWhatsApp(f.id); }} className="w-8 h-8 rounded-full bg-secondary text-on-secondary flex items-center justify-center hover:scale-110 transition-all shadow-md shadow-secondary/20 mr-1" title="WhatsApp">
+                          <span className="material-symbols-outlined text-sm filled">chat</span>
+                        </button>
+                        <button onClick={(e) => { e.stopPropagation(); handleEdit(f); }} className="p-1.5 text-on-surface-variant hover:text-primary rounded-full transition-colors"><span className="material-symbols-outlined text-lg">edit</span></button>
+                        {user?.role !== 'operador' && (
+                          <button onClick={(e) => { e.stopPropagation(); handleDelete(f.id); }} className="p-1.5 text-on-surface-variant hover:text-error transition-colors rounded-full"><span className="material-symbols-outlined text-lg">delete</span></button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <div className="pt-4 mt-4 flex items-center justify-between border-t border-surface-container-high">
+            <p className="text-xs text-on-surface-variant font-medium">Mostrando {funcionarios.length} de {total}</p>
+            <div className="flex gap-2">
+              <button onClick={() => setPage(Math.max(1, page - 1))} disabled={page === 1} className="p-2 rounded-full bg-white border border-surface-container-high hover:bg-primary/10 transition-colors disabled:opacity-30 flex items-center justify-center"><span className="material-symbols-outlined text-sm">chevron_left</span></button>
+              <button onClick={() => setPage(page + 1)} disabled={funcionarios.length < 10} className="p-2 rounded-full bg-white border border-surface-container-high hover:bg-primary/10 transition-colors disabled:opacity-30 flex items-center justify-center"><span className="material-symbols-outlined text-sm">chevron_right</span></button>
+            </div>
           </div>
         </div>
 
-        <div className="col-span-12 lg:col-span-9">
-          <div className="bg-white border border-surface-container-high rounded-xl shadow-sm overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse">
-                <thead>
-                  <tr className="bg-surface-container-low/50">
-                    <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-on-surface-variant">Nome & Perfil</th>
-                    <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-on-surface-variant">Contato</th>
-                    <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-on-surface-variant">Função</th>
-                    <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-on-surface-variant text-right">Ações</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-surface-container-high">
-                  {funcionarios.length === 0 && <tr><td colSpan={4} className="px-6 py-12 text-center text-on-surface-variant">Nenhum colaborador encontrado.</td></tr>}
-                  {funcionarios.map((f) => (
-                    <tr key={f.id} className="group hover:bg-primary/5 transition-colors">
-                      <td className="px-6 py-5">
-                        <div className="flex items-center gap-4">
-                          <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center font-bold text-on-primary-container ring-2 ring-primary/20">{initials(f.nome)}</div>
-                          <div><p className="font-bold text-on-surface">{f.nome}</p><p className="text-xs text-on-surface-variant">ID: #{String(f.id).slice(0, 8)}</p></div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-5"><p className="text-sm font-medium text-on-surface">{f.email}</p><p className="text-xs text-on-surface-variant">{f.telefone}</p></td>
-                      <td className="px-6 py-5"><span className={`px-3 py-1 ${funcaoColor(f.funcao?.nome)} text-xs font-bold rounded-full uppercase tracking-tight`}>{f.funcao?.nome || '—'}</span></td>
-                      <td className="px-6 py-5 text-right">
-                        <div className="flex justify-end gap-1">
-                          <button onClick={() => handleWhatsApp(f.id)} className="p-2 text-secondary hover:bg-secondary/10 rounded-full transition-colors" title="WhatsApp">
-                            <span className="material-symbols-outlined text-sm filled">chat</span>
-                          </button>
-                          <button onClick={() => handleEdit(f)} className="p-2 text-on-surface-variant hover:text-tertiary transition-colors"><span className="material-symbols-outlined">edit</span></button>
-                          {user?.role !== 'operador' && (
-                            <button onClick={() => handleDelete(f.id)} className="p-2 text-on-surface-variant hover:text-error transition-colors"><span className="material-symbols-outlined">delete</span></button>
+        {/* Sidebar de Detalhes */}
+        <div className="col-span-12 lg:col-span-4 space-y-4">
+          {selectedFuncionario ? (
+            <div className="bg-tertiary text-on-tertiary p-6 rounded-2xl relative overflow-hidden shadow-xl">
+              <div className="relative z-10">
+                <h3 className="text-xl font-bold mb-1">Detalhes</h3>
+                <p className="text-sm opacity-80 mb-6">{selectedFuncionario.nome}</p>
+                
+                {loadingDetalhes ? (
+                  <div className="flex items-center justify-center py-8">
+                    <span className="material-symbols-outlined animate-spin text-3xl">progress_activity</span>
+                  </div>
+                ) : detalhes ? (
+                  <div className="space-y-6">
+                    <div className="flex items-center justify-between border-b border-white/20 pb-4">
+                      <div>
+                        <p className="text-xs uppercase tracking-widest opacity-80">Total de Eventos</p>
+                        <p className="text-3xl font-black">{detalhes.totalEventos || 0}</p>
+                      </div>
+                      <span className="material-symbols-outlined text-5xl opacity-20">celebration</span>
+                    </div>
+
+                    <div>
+                      <h4 className="text-sm font-bold uppercase tracking-widest opacity-80 mb-3 border-b border-white/20 pb-1">Próximos Eventos</h4>
+                      {detalhes.eventosFuturos?.length === 0 ? (
+                        <p className="text-xs opacity-70">Nenhum evento agendado.</p>
+                      ) : (
+                        <div className="space-y-2">
+                          {detalhes.eventosFuturos?.slice(0, 5).map(evt => (
+                            <div key={evt.id} className="flex justify-between items-center text-sm border-b border-white/10 pb-2">
+                              <span className="font-bold truncate">{evt.nome}</span>
+                              <span className="opacity-80">{formatDate(evt.dataEvento)}</span>
+                            </div>
+                          ))}
+                          {detalhes.eventosFuturos?.length > 5 && (
+                            <p className="text-xs text-center opacity-70 mt-2 pt-2">+ {detalhes.eventosFuturos.length - 5} eventos</p>
                           )}
                         </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            <div className="px-6 py-4 bg-surface-container-low/30 flex items-center justify-between border-t border-surface-container-high">
-              <p className="text-xs text-on-surface-variant font-medium">Mostrando {funcionarios.length} de {total}</p>
-              <div className="flex gap-2">
-                <button onClick={() => setPage(Math.max(1, page - 1))} disabled={page === 1} className="p-2 rounded-full bg-white border border-surface-container-high hover:bg-primary/10 transition-colors disabled:opacity-30"><span className="material-symbols-outlined text-sm">chevron_left</span></button>
-                <button onClick={() => setPage(page + 1)} disabled={funcionarios.length < 10} className="p-2 rounded-full bg-white border border-surface-container-high hover:bg-primary/10 transition-colors disabled:opacity-30"><span className="material-symbols-outlined text-sm">chevron_right</span></button>
+                      )}
+                    </div>
+
+                    <div>
+                      <h4 className="text-sm font-bold uppercase tracking-widest opacity-80 mb-3 border-b border-white/20 pb-1">Últimos Eventos</h4>
+                      {detalhes.eventosPassados?.length === 0 ? (
+                        <p className="text-xs opacity-70">Nenhum evento passado.</p>
+                      ) : (
+                        <div className="space-y-2">
+                          {detalhes.eventosPassados?.slice(0, 3).map(evt => (
+                            <div key={evt.id} className="flex justify-between items-center text-sm border-b border-white/10 pb-2">
+                              <span className="font-bold truncate">{evt.nome}</span>
+                              <span className="opacity-80">{formatDate(evt.dataEvento)}</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ) : (
+                  <p className="text-sm opacity-80">Erro ao carregar os detalhes.</p>
+                )}
               </div>
+              <div className="absolute -right-10 -bottom-10 w-40 h-40 bg-white/5 rounded-full blur-3xl" />
             </div>
-          </div>
+          ) : (
+            <div className="bg-surface-container-high rounded-2xl p-8 text-center border border-outline-variant/30">
+              <span className="material-symbols-outlined text-5xl text-outline/30 mb-4">badge</span>
+              <p className="text-sm text-on-surface-variant font-medium">Selecione um colaborador para ver o resumo de escalas e contadores</p>
+            </div>
+          )}
         </div>
       </div>
 
