@@ -14,11 +14,18 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// Interceptor: trata erros de resposta (sem hard redirect)
+// Interceptor: trata erros de resposta (como expiração do token)
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    // Não faz redirect automático — deixa o AuthContext cuidar disso
+    if (error.response && (error.response.status === 401 || error.response.status === 403)) {
+      const isLoginRequest = error.config && error.config.url && error.config.url.includes('/auth/login');
+      if (!isLoginRequest) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        window.location.href = '/login';
+      }
+    }
     return Promise.reject(error);
   }
 );
