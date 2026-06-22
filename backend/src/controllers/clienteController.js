@@ -88,6 +88,29 @@ async function criar(req, res, next) {
       });
     }
 
+    const clienteExistente = await Cliente.scope('comDeletados').findOne({
+      where: {
+        [Op.or]: [{ email }, { rgCpf }]
+      }
+    });
+
+    if (clienteExistente) {
+      if (clienteExistente.deletadoEm && clienteExistente.rgCpf === rgCpf) {
+        return res.status(409).json({
+          success: false,
+          message: 'Já existe um cliente desativado com este documento.',
+          action: 'reactivate',
+          clienteId: clienteExistente.id,
+        });
+      }
+      
+      const campo = clienteExistente.email === email ? 'email' : 'documento';
+      return res.status(400).json({
+        success: false,
+        message: `Já existe um cliente ativo com este ${campo}.`,
+      });
+    }
+
     const cliente = await Cliente.create({ nome, email, rgCpf, telefone });
 
     return res.status(201).json({
@@ -200,4 +223,25 @@ async function whatsapp(req, res, next) {
   }
 }
 
-module.exports = { listar, buscarPorId, criar, atualizar, remover, whatsapp };
+// POST /api/clientes/:id/reativar
+async function reativar(req, res, next) {
+  try {
+    if (!isValidUUID(req.params.id)) {
+      return res.status(400).json({ success: false, message: 'ID do cliente inválido.' });
+    }
+    const cliente = await Cliente.scope('comDeletados').findByPk(req.params.id);
+    if (!cliente) {
+      return res.status(404).json({ success: false, message: 'Cliente não encontrado.' });
+    }
+    if (!cliente.deletadoEm) {
+      return res.status(400).json({ success: false, message: 'Este cliente já está ativo.' });
+    }
+
+    await cliente.update({ deletadoEm: null, atualizadoEm: new Date() });
+    return res.json({ success: true, message: 'Cliente reativado com sucesso!', data: cliente });
+  } catch (error) {
+    return next(error);
+  }
+}
+
+module.exports = { listar, buscarPorId, criar, atualizar, remover, whatsapp, reativar };

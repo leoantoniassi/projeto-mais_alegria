@@ -4,6 +4,7 @@
 const router = require('express').Router();
 
 router.use('/auth',         require('./auth.routes'));
+router.use('/busca',        require('./busca.routes'));
 router.use('/clientes',     require('./clientes.routes'));
 router.use('/locais',       require('./locais.routes'));
 router.use('/lookup',       require('./lookup.routes'));

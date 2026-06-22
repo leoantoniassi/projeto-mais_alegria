@@ -56,7 +56,23 @@ export default function ClientesPage() {
       setForm({ nome: '', email: '', telefone: '', rgCpf: '' });
       fetchClientes();
     } catch (err) {
-      await confirm(err.response?.data?.message || 'Erro ao salvar', { title: 'Erro', showCancel: false });
+      if (err.response?.data?.action === 'reactivate') {
+        const wantsReactivate = await confirm(err.response.data.message + ' Deseja reativá-lo?', { title: 'Cliente Desativado', showCancel: true, confirmText: 'Reativar' });
+        if (wantsReactivate) {
+          try {
+            await api.post(`/clientes/${err.response.data.clienteId}/reativar`);
+            setToast({ type: 'success', message: 'Cliente reativado com sucesso!' });
+            setShowPanel(false);
+            setEditing(null);
+            setForm({ nome: '', email: '', telefone: '', rgCpf: '' });
+            fetchClientes();
+          } catch (reactivateErr) {
+            await confirm(reactivateErr.response?.data?.message || 'Erro ao reativar cliente', { title: 'Erro', showCancel: false });
+          }
+        }
+      } else {
+        await confirm(err.response?.data?.message || 'Erro ao salvar', { title: 'Erro', showCancel: false });
+      }
     }
   };
 

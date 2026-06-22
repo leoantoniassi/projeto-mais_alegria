@@ -1,5 +1,6 @@
 import { useAuth } from "../../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
+import GlobalSearch from "./GlobalSearch";
 
 export default function TopNav({ onMenuClick }) {
   const { user, logout } = useAuth();
@@ -24,16 +25,7 @@ export default function TopNav({ onMenuClick }) {
         </button>
 
         {/* Search (Oculto no mobile, visível do md para cima) */}
-        <div className="hidden md:flex items-center bg-surface-container-low px-4 py-2 rounded-full w-64 lg:w-96 group focus-within:ring-2 focus-within:ring-primary transition-all">
-          <span className="material-symbols-outlined text-on-surface-variant mr-2">
-            search
-          </span>
-          <input
-            className="bg-transparent border-none focus:ring-0 focus:outline-none text-sm w-full placeholder:text-on-surface-variant/60"
-            placeholder="Pesquisar eventos, clientes..."
-            type="text"
-          />
-        </div>
+        <GlobalSearch />
       </div>
 
       {/* Right Actions */}
