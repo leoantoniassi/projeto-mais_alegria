@@ -31,10 +31,6 @@ export default function TopNav({ onMenuClick }) {
       {/* Right Actions */}
       <div className="flex items-center gap-3 md:gap-6">
         <div className="flex items-center gap-2 md:gap-4 text-on-surface-variant">
-          <button className="hover:text-tertiary transition-all relative">
-            <span className="material-symbols-outlined">notifications</span>
-            <span className="absolute top-0 right-0 w-2 h-2 bg-error rounded-full border-2 border-white" />
-          </button>
           <button className="hidden sm:block hover:text-tertiary transition-all">
             <span className="material-symbols-outlined">settings</span>
           </button>
