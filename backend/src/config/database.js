@@ -20,6 +20,12 @@ const sequelize = new Sequelize(
     },
     dialectOptions: {
       useUTC: false,
+      ...(process.env.NODE_ENV === 'production' && {
+        ssl: {
+          require: true,
+          rejectUnauthorized: false
+        }
+      })
     },
     pool: {
       max: 10,
