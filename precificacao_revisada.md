@@ -1,3 +1,14 @@
+Tarefa: analisar precificacao.docx (proposta de preço do sistema Projeto Mais Alegria) e sugerir melhorias.
+
+O que foi feito:
+1. Extraí o texto do .docx original (via PowerShell, já que não havia Python/pandoc disponíveis) e identifiquei o conteúdo: custos de infraestrutura, Opção 1 (SaaS, R$800/mês) e Opção 2 (compra definitiva, R$10.000 + infra própria).
+2. Analisei o documento e apontei problemas: contradição no custo-base de manutenção (R$75 vs R$175, dependendo do plano Vercel Free/Pro sem isso ficar explícito), inconsistência "Opção 2" vs "Opção B", erros de acentuação, ausência de tabela comparativa, ausência de ponto de equilíbrio (break-even), e várias lacunas contratuais (propriedade do código, forma de pagamento, cancelamento, nota fiscal, SLA, validade da proposta).
+3. Tentei gerar a versão revisada em .docx via automação COM do Word, mas os nomes de estilo em inglês ("Title", "Heading 1") falharam por causa da localização em português do Word instalado.
+4. A pedido do usuário, mudei para gerar em Markdown: criei precificacao_revisada.md na raiz do projeto, com tabela comparativa das opções, análise de break-even (14–16 meses), os dois cenários de infraestrutura (econômico ~R$75/mês vs recomendado ~R$175/mês), política de suporte, condições comerciais, observação sobre câmbio/IOF e seção de contato.
+
+Pendências: o arquivo precificacao_revisada.md tem placeholders entre [COLCHETES] que precisam ser preenchidos pelo usuário — data de emissão, SLA de suporte, valor de hora técnica, forma de pagamento da Opção 2, regime tributário e dados de contato.
+
+
 # Proposta de Precificação - Projeto Mais Alegria
 
 *Proposta válida por 15 dias a partir de [DATA DE EMISSÃO]. Valores sujeitos a variação cambial (ver seção 5).*
